@@ -1,0 +1,374 @@
+Macro tests for expandfile and htmxlib.htmi %[timestamp]%
+2017-03-03 THVV initial
+2017-05-06 THVV added more tests and test machinery, corrected some bugs
+2017-06-04 THVV improved tests, added test macros
+================================================================
+Including htmxlib.htmi
+%[*shell,&_t,=ls -l htmxlib.htmi]%
+%[_t]%
+%[*include,=htmxlib.htmi]%
+================================================================
+small test of *format
+%[*set,&_fmt,="('$2','$1')"]%
+%[*format,&x,_fmt,="a",="b",="c"]%
+result is %[x]%
+should be ('b','a')
+================================================================
+setup vars
+%[** 1x files are files that have no -2x **]%
+%[*set,&bigpath,="dmj-rar-6180-big.jpg"]%
+%[*set,&bigpath1x,="6180-lights1x.jpg"]%
+%[*set,&bigpath2x,="dmj-rar-6180-big-2x.jpg"]%
+%[*set,&nonxpath,="nonexist.jpg"]%
+%[*set,&thupath,="thumb-dmj-rar-6180-big.jpg"]%
+%[*set,&thupath2x,="thumb-6180-lights-2x.jpg"]%
+%[*set,&thupath3x,="thumb-6180-lights3x-2x.jpg"]%
+%[*set,&alttag,="Alt"]%
+%[*set,&titletag,="Title"]%
+%[*set,&targeth,="http://multicians.org/"]%
+%[*set,&caption,="Hiya Froggy"]%
+%[*set,&popupcaption,="this is the MIT 6180"]%
+
+%[*callv,testsetup]%
+%[** ----------------------------------------------------------------  **]%
+%[*block,&testsetup,^END]%
+%[*set,&ntests,=0]%
+%[*set,&nerrs,=0]%
+END
+%[** ----------------------------------------------------------------  **]%
+%[*block,&teststart,^END]%
+%[*increment,&ntests,=1]%
+Test %[param1]%, %[param2]%
+END
+%[** ----------------------------------------------------------------  **]%
+%[*block,&testfail,^END]%
+%[*increment,&nerrs,=1]%
+!%[*expand,=ERROR]%!
+END
+%[** ----------------------------------------------------------------  **]%
+%[*block,&testpass,^END]%
+!%[*expand,=OK]%!
+END
+
+================================================================
+================================================================
+testing getimgtag
+-- 4 cases: 1x+2x, only 1x, only 2x, none
+================================================================
+%[*callv,teststart,="1",="*callv,getimgtag,bigpath1x,alttag,titletag -- 1x, no 2x, returns IMG tag, fills in width and height"]%
+%[*set,&x,=%[*callv,getimgtag,bigpath1x,alttag,titletag]%]%
+%[*set,&y,="<img src=\"6180-lights1x.jpg\" width=\"164\" height=\"300\" border=\"0\" alt=\"Alt\" title=\"Title\">"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="1a",="*callv,getimgtag,nonxpath,alttag,titletag -- file does not exist, returns IMG tag without width and height"]%
+%[*set,&x,=%[*callv,getimgtag,nonxpath,alttag,titletag]%]%
+%[*set,&y,="<img src=\"nonexist.jpg\" border=\"0\" alt=\"Alt\" title=\"Title\">"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="1b",="*callv,getimgtag,thupath3x,alttag,titletag -- no 1x, -2x exists, use 2x path and half the size"]%
+%[*set,&x,=%[*callv,getimgtag,thupath3x,alttag,titletag]%]%
+%[*set,&y,="<img src=\"thumb-6180-lights3x-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\">"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="1c",="*callv,getimgtag,thupath,alttag,titletag -- both 1x and 2x exist"]%
+%[*set,&x,=%[*callv,getimgtag,thupath,alttag,titletag]%]%
+%[*set,&y,="<img src=\"thumb-dmj-rar-6180-big.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"thumb-dmj-rar-6180-big.jpg 1x, thumb-dmj-rar-6180-big-2x.jpg 2x\">"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+
+================================================================
+================================================================
+testing getimgdiv
+-- 16 cases. 4 thumb x target/not.  does not use a -2x target if one exists; target may be html
+================================================================
+%[*callv,teststart,="2",="*callv,getimgdiv,thupath,bigpath,alttag,titletag,="rtpic",caption -- target, 1x and 2x exist"]%
+%[*set,&x,=%[*callv,getimgdiv,thupath,bigpath,alttag,titletag,="rtpic",caption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><a href=\"dmj-rar-6180-big.jpg\"><img src=\"thumb-dmj-rar-6180-big.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"thumb-dmj-rar-6180-big.jpg 1x, thumb-dmj-rar-6180-big-2x.jpg 2x\"></a><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="2a",="*callv,getimgdiv,bigpath,="",alttag,titletag,="rtpic",caption -- no target specified, 1x and 2x exist"]%
+%[*set,&x,=%[*callv,getimgdiv,bigpath,="",alttag,titletag,="rtpic",caption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 976px;\"><img src=\"dmj-rar-6180-big.jpg\" width=\"976\" height=\"619\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"dmj-rar-6180-big.jpg 1x, dmj-rar-6180-big-2x.jpg 2x\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="2b",="*callv,getimgdiv,nonxpath,="fred.html",alttag,titletag,="rtpic",caption -- target specified, no 1x or 2x .. shd have A tab surrounding IMG with no width or height"]%
+%[*set,&x,=%[*callv,getimgdiv,nonxpath,="fred.html",alttag,titletag,="rtpic",caption]%]%
+%[*set,&y,="<div class=\"rtpic\"><a href=\"fred.html\"><img src=\"nonexist.jpg\" border=\"0\" alt=\"Alt\" title=\"Title\"></a><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="2c",="*callv,getimgdiv,nonxpath,="x.html",alttag,titletag,="rtpic",caption -- no target specified, no 1x or 2x file .. shd have no width or heigh"]%
+%[*set,&x,=%[*callv,getimgdiv,nonxpath,="x.html",alttag,titletag,="rtpic",caption]%]%
+%[*set,&y,="<div class=\"rtpic\"><a href=\"x.html\"><img src=\"nonexist.jpg\" border=\"0\" alt=\"Alt\" title=\"Title\"></a><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="2d",="*callv,getimgdiv,thupath3x,="x.html",alttag,titletag,="rtpic",caption -- target specified, existing 2x file, no 1x"]%
+%[*set,&x,=%[*callv,getimgdiv,thupath3x,="x.html",alttag,titletag,="rtpic",caption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><a href=\"x.html\"><img src=\"thumb-6180-lights3x-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\"></a><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="2e",="*callv,getimgdiv,thupath3x,="x.html",alttag,titletag,="rtpic",caption -- no target specified, existing 2x file, no 1x"]%
+%[*set,&x,=%[*callv,getimgdiv,thupath3x,="",alttag,titletag,="rtpic",caption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-6180-lights3x-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="2f",="*callv,getimgdiv,thupath,="x.html",alttag,titletag,="rtpic",caption -- target specified, existing 1x and 2x file"]%
+%[*set,&x,=%[*callv,getimgdiv,thupath,="x.html",alttag,titletag,="rtpic",caption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><a href=\"x.html\"><img src=\"thumb-dmj-rar-6180-big.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"thumb-dmj-rar-6180-big.jpg 1x, thumb-dmj-rar-6180-big-2x.jpg 2x\"></a><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="2g",="*callv,getimgdiv,thupath,="x.html",alttag,titletag,="rtpic",caption -- no target specified, existing 1x and 2x file"]%
+%[*set,&x,=%[*callv,getimgdiv,thupath,="",alttag,titletag,="rtpic",caption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-dmj-rar-6180-big.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"thumb-dmj-rar-6180-big.jpg 1x, thumb-dmj-rar-6180-big-2x.jpg 2x\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+
+================================================================
+================================================================
+testing getimgpopdiv
+-- total 20 cases: 4 cases with no target, 4 with nonext target, 4 with 1x target only, 4 with 2x target only, 4 with both targets
+================================================================
+%[*callv,teststart,="3",="*callv,getimgpopdiv,thupath,bigpath1x,alttag,titletag,="rtpic",caption,popupcaption -- 1x and 2x thumb, 1x target only"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath,bigpath1x,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-dmj-rar-6180-big.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"thumb-dmj-rar-6180-big.jpg 1x, thumb-dmj-rar-6180-big-2x.jpg 2x\" onClick=\"showLightBox('6180-lights1x.jpg','164','300','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3a",="*callv,getimgpopdiv,thupath2x,="",alttag,titletag,="rtpic",caption,popupcaption -- 1x thumb only, no target specified"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath2x,="",alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 150px;\"><img src=\"thumb-6180-lights-2x.jpg\" width=\"150\" height=\"150\" border=\"0\" alt=\"Alt\" title=\"Title\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3b",="*callv,getimgpopdiv,thupath3x,="",alttag,titletag,="rtpic",caption,popupcaption -- 2x only, no target specified"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath3x,="",alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-6180-lights3x-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3c",="*callv,getimgpopdiv,nonxpath,="",alttag,titletag,="rtpic",caption,popupcaption -- nonext thumb, no target specified"]%
+%[*set,&x,=%[*callv,getimgpopdiv,nonxpath,="",alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\"><img src=\"nonexist.jpg\" border=\"0\" alt=\"Alt\" title=\"Title\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3d",="*callv,getimgpopdiv,thupath,="",alttag,titletag,="rtpic",caption,popupcaption -- 1x and 2x thumb, no target specified"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath,="",alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-dmj-rar-6180-big.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"thumb-dmj-rar-6180-big.jpg 1x, thumb-dmj-rar-6180-big-2x.jpg 2x\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3e",="*callv,getimgpopdiv,thupath,thupath,alttag,titletag,="rtpic",caption,popupcaption -- 1x and 2x thumb, 1x and 2x target"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath,thupath,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-dmj-rar-6180-big.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"thumb-dmj-rar-6180-big.jpg 1x, thumb-dmj-rar-6180-big-2x.jpg 2x\" onClick=\"showLightBox2('thumb-dmj-rar-6180-big.jpg','75','75','Alt','Title','this is the MIT 6180','thumb-dmj-rar-6180-big-2x.jpg')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3f",="*callv,getimgpopdiv,bigpath1x,thupath,alttag,titletag,="rtpic",caption,popupcaption -- 1x thumb only, 1x and 2x target"]%
+%[*set,&x,=%[*callv,getimgpopdiv,bigpath1x,thupath,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 164px;\"><img src=\"6180-lights1x.jpg\" width=\"164\" height=\"300\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox2('thumb-dmj-rar-6180-big.jpg','75','75','Alt','Title','this is the MIT 6180','thumb-dmj-rar-6180-big-2x.jpg')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3g",="*callv,getimgpopdiv,thupath3x,thupath,alttag,titletag,="rtpic",caption,popupcaption -- 2x thumb only, 1x and 2x target"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath3x,thupath,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-6180-lights3x-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox2('thumb-dmj-rar-6180-big.jpg','75','75','Alt','Title','this is the MIT 6180','thumb-dmj-rar-6180-big-2x.jpg')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3h",="*callv,getimgpopdiv,nonxpath,thupath,alttag,titletag,="rtpic",caption,popupcaption -- nonext thumb, 1x and 2x target  ***** check"]%
+%[*set,&x,=%[*callv,getimgpopdiv,nonxpath,thupath,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\"><img src=\"nonexist.jpg\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox('thumb-dmj-rar-6180-big-2x.jpg','75','75','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3i",="*callv,getimgpopdiv,thupath,thupath3x,alttag,titletag,="rtpic",caption,popupcaption -- 1x and 2x thumb, 2x target only"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath,thupath3x,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-dmj-rar-6180-big.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"thumb-dmj-rar-6180-big.jpg 1x, thumb-dmj-rar-6180-big-2x.jpg 2x\" onClick=\"showLightBox('thumb-6180-lights3x-2x.jpg','75','75','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3j",="*callv,getimgpopdiv,bigpath1x,thupath3x,alttag,titletag,="rtpic",caption,popupcaption -- 1x thumb, 2x target only"]%
+%[*set,&x,=%[*callv,getimgpopdiv,bigpath1x,thupath3x,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 164px;\"><img src=\"6180-lights1x.jpg\" width=\"164\" height=\"300\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox('thumb-6180-lights3x-2x.jpg','75','75','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3k",="*callv,getimgpopdiv,thupath3x,thupath3x,alttag,titletag,="rtpic",caption,popupcaption -- 2x thumb, 2x target only"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath3x,thupath3x,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-6180-lights3x-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox('thumb-6180-lights3x-2x.jpg','75','75','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3l",="*callv,getimgpopdiv,nonxpath,thupath3x,alttag,titletag,="rtpic",caption,popupcaption -- nonext thumb, 2x target only"]%
+%[*set,&x,=%[*callv,getimgpopdiv,nonxpath,thupath3x,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\"><img src=\"nonexist.jpg\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox('thumb-6180-lights3x-2x.jpg','75','75','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3m",="*callv,getimgpopdiv,thupath,nonxpath,alttag,titletag,="rtpic",caption,popupcaption -- 1x and 2x thumb, nonext target"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath,nonxpath,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-dmj-rar-6180-big.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" srcset=\"thumb-dmj-rar-6180-big.jpg 1x, thumb-dmj-rar-6180-big-2x.jpg 2x\" onClick=\"showLightBox('nonexist.jpg','','','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3n",="*callv,getimgpopdiv,bigpath1x,nonxpath,alttag,titletag,="rtpic",caption,popupcaption -- 1x thumb, nonext target"]%
+%[*set,&x,=%[*callv,getimgpopdiv,bigpath1x,nonxpath,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 164px;\"><img src=\"6180-lights1x.jpg\" width=\"164\" height=\"300\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox('nonexist.jpg','','','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3o",="*callv,getimgpopdiv,thupath3x,nonxpath,alttag,titletag,="rtpic",caption,popupcaption -- 2x thumb, nonext target"]%
+%[*set,&x,=%[*callv,getimgpopdiv,thupath3x,nonxpath,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-6180-lights3x-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox('nonexist.jpg','','','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3p",="*callv,getimgpopdiv,nonxpath,nonxpath,alttag,titletag,="rtpic",caption,popupcaption -- nonext thumb, nonext target"]%
+%[*set,&x,=%[*callv,getimgpopdiv,nonxpath,nonxpath,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\"><img src=\"nonexist.jpg\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox('nonexist.jpg','','','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+
+================================================================
+================================================================
+testing getimgtag75, getimgdiv75, getimgpopdiv75
+================================================================
+%[*callv,teststart,="4",="*callv,getimgtag75,thupath2x,alttag,titletag -- 1x, no 2x, returns IMG tag, fills in width and height"]%
+%[*set,&x,=%[*callv,getimgtag75,thupath2x,alttag,titletag]%]%
+%[*set,&y,="<img src=\"thumb-6180-lights-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\">"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+
+%[*callv,teststart,="4a",="*callv,getimgdiv75,thupath2x,bigpath,alttag,titletag,csstag,caption -- target, 1x and 2x exist"]%
+%[*set,&x,=%[*callv,getimgdiv75,thupath2x,bigpath,alttag,titletag,="rtpic",caption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><a href=\"dmj-rar-6180-big.jpg\"><img src=\"thumb-6180-lights-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\"></a><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+
+%[*callv,teststart,="4b",="*callv,getimgpopdiv75,thupath2x,alttag,titletag -- 1x, no 2x, returns IMG tag, fills in width and height"]%
+%[*set,&x,=%[*callv,getimgpopdiv75,thupath2x,bigpath1x,alttag,titletag,="rtpic",caption,popupcaption]%]%
+%[*set,&y,="<div class=\"rtpic\" style=\"width: 75px;\"><img src=\"thumb-6180-lights-2x.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"Alt\" title=\"Title\" onClick=\"showLightBox('6180-lights1x.jpg','164','300','Alt','Title','this is the MIT 6180')\"><p class=\"caption\">Hiya Froggy</p></div>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+
+================================================================
+================================================================
+testing gettwodigit, getcomma3, getformattedsecs
+================================================================
+%[*callv,teststart,="5",="*callv,gettwodigit,number"]%
+
+%[*set,&x,=%[*callv,gettwodigit,=4]%]%
+%[*set,&y,="04"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+
+%[*set,&x,=%[*callv,gettwodigit,=14]%]%
+%[*set,&y,="14"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+
+%[*set,&x,=%[*callv,gettwodigit,=114]%]%
+%[*set,&y,="14"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="6",="*callv,getcomma3,=1234567"]%
+%[*set,&x,=%[*callv,getcomma3,=1234567]%]%
+%[*set,&y,="1,234,567"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="7",="*callv,getformattedsecs,=1234567"]%
+%[*set,&x,=%[*callv,getformattedsecs,=1234567]%]%
+%[*set,&y,="342:56:07"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+================================================================
+no tests for setscale, dumpsql, javatag, headinginit, heading2, heading3, heading4
+================================================================
+%[ntests]% tests, %[nerrs]% errors

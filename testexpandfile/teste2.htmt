@@ -1,0 +1,5 @@
+%[** Test e2, missing end indicator for *block **]%
+%[*block,foo,^END]%
+wibby wabby
+tibby tabby
+%[** end of test **]%

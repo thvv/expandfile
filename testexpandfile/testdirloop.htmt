@@ -1,0 +1,74 @@
+%[*block,iter,^END]%
+<tr>
+<td>%[file_name]%</td>
+<td>%[file_type]%</td>
+<td>%[file_dev]%</td>
+<td>%[file_ino]%</td>
+<td>%[file_mode]%</td>
+<td>%[file_nlink]%</td>
+<td>%[file_uid]%</td>
+<td>%[file_gid]%</td>
+<td>%[file_rdev]%</td>
+<td>%[file_size]%</td>
+<td>%[file_atime]%</td>
+<td>%[file_mtime]%</td>
+<td>%[file_ctime]%</td>
+<td>%[file_blksize]%</td>
+<td>%[file_blocks]%</td>
+<td>%[file_sec]%</td>
+<td>%[file_min]%</td>
+<td>%[file_hour]%</td>
+<td>%[file_mday]%</td>
+<td>%[file_mon]%</td>
+<td>%[file_year]%</td>
+<td>%[file_wday]%</td>
+<td>%[file_yday]%</td>
+<td>%[file_isdst]%</td>
+<td>%[file_datemod]%</td>
+<td>%[file_modshort]%</td>
+<td>%[file_sizek]%</td>
+<td>%[file_age]%</td>
+</tr>
+END
+%[*dirloop,&content,iter,=".",="."]%
+<html>
+  <head>
+    <title>test of dirloop</title>
+  </head>
+  <body>
+    <table border=1>
+      <tr>
+	<th>name</th>
+	<th>type</th>
+	<th>dev</th>
+	<th>ino</th>
+	<th>mode</th>
+	<th>nlink</th>
+	<th>uid</th>
+	<th>gid</th>
+	<th>rdev</th>
+	<th>size</th>
+	<th>atime</th>
+	<th>mtime</th>
+	<th>ctime</th>
+	<th>blksize</th>
+	<th>blocks</th>
+	<th>sec</th>
+	<th>min</th>
+	<th>hour</th>
+	<th>mday</th>
+	<th>mon</th>
+	<th>year</th>
+	<th>wday</th>
+	<th>yday</th>
+	<th>isDST</th>
+	<th>datemod</th>
+	<th>modshort</th>
+	<th>sizeK</th>
+	<th>age</th>
+      </tr>
+      %[content]%
+    </table>
+    %[_nrows]%
+  </body>
+</html>

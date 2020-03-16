@@ -1,0 +1,3 @@
+%[** Test e6, unknown function **]%
+%[*set,&foo,="string"]%
+%[*gork,foo,="string"]%

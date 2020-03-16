@@ -1,0 +1,9 @@
+%[** Test e4, attempts to set illegal varname **]%
+%[*set,&*,=punch]%
+%[*set,&,=panch]%
+%[*set,&7,="x"]%
+%[*set,&h,="a,b"]%
+%[*set,&%[h]%,=pinch]%
+%[*set,&h,="a|b"]%
+%[*set,&%[h]%,=ponch]%
+%[** end of test **]%

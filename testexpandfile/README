@@ -1,0 +1,26 @@
+## Tests for expandfile and macros
+THVV
+
+setup:
+-- install expandfile and expandfile.pm in ~/bin and set your PATH
+-- install required helper programs into ~/bin
+-- install mysql
+-- set up .my.cnf with mysql password
+-- install required CPAN modules
+-- unpack testexpadfile.tar into ~/bin/testexpandfile
+
+cd testecpandfile
+sh setup-config.sh
+
+-- now start testing
+sh test.sh
+expandfile macrotest.tpt
+sh testerr.sh
+
+---------- results -----------
+- test.sh should has many small tests. all should pass.
+- a few functions are not tested with test.sh
+- macrotest.tpt tests the macro library and helper functions.  all should pass.
+- testerr.sh tests error messages.
+--- flawed because 'diff' cannot be told to ignore color shifts
+--- funny error message and abort on *dirloop error

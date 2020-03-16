@@ -1,0 +1,17 @@
+%[** test CSV for expandfile **]%
+%[** Copyright (c) 2007, Tom Van Vleck **]%
+%[** 03/03/15 THVV add test for quoted quote **]%
+%[** ================================================================ **]%
+%[*block,iterator,^END]%
+|%[col1]%|%[col2]%|%[col3]%
+END
+==== Testing csvloop ====
+%[*csvloop,&result,iterator,=test.csv]%
+column names are %[_colnames]%
+nrows is %[_nrows]%
+result is %[result]%
+-------- should be
+|1|2|3
+|aaa|bbb|ccc
+|d"d|"abc"|3
+==== end csvloop test ====

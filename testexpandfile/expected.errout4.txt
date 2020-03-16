@@ -1,0 +1,4 @@
+expandfile: teste4.htmt warning: invalid chars in varname '*' in *set
+expandfile: teste4.htmt warning: blank varname in *set
+expandfile: teste4.htmt warning: invalid chars in varname '' in *set
+expandfile: teste4.htmt warning: all numeric varname '7' in *set

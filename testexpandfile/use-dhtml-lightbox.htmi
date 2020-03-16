@@ -1,0 +1,22 @@
+%[** Script for using DHTML lightbox popup in multicians.org **]%
+%[** .. include this in the "extrastyle" block **]%
+%[** In the body, include dhtml-lightbox.htmi **]%
+%[** then use the imgpopdiv from mxlib.htmi to specify small and large images **]%
+%[** Copyright (c) 2013, Tom Van Vleck **]%
+%[** ================================================================ **]%
+<script type="text/javascript" src="js/dhtml-lightbox.js"></script>
+<style type="text/css">
+ #slide {
+  position: absolute; z-index: 1020; display: none; 
+  top: 0px; padding: 0px 8px 8px 8px; 
+  background-color: #222222; cursor: pointer; text-align: right; font: bold 12px "helvetica neue",Arial, Helvetica, sans-serif;
+ }
+ #cover {
+  position: fixed; width: 100%; height: 100%; z-index: 1010; display: none; 
+  background-color: #000000; opacity: .75; 
+  filter:progid:DXImageTransform.Microsoft.BasicImage(opacity=.75); 
+  top: 0px; left: 0px;
+ }
+ .slideControl { color: red; }
+ .capt { color: white; }
+</style>

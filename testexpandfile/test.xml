@@ -1,0 +1,19 @@
+<?xml version='1.0'?>
+<!--test file for XML -->
+<list>
+  
+  <item type="booknews" sequence="69">
+    <title>!!cite!!Open Standards and the Digital Age: History, Ideology, and Networks!!/cite!!</title>
+    <authors>By committee member Andrew Russell</authors>
+    <pubdate>2014</pubdate>
+    <link>http://www.cambridge.org/us/academic/subjects/history/twentieth-century-american-history/open-standards-and-digital-age-history-ideology-and-networks</link>
+  </item>
+  
+  <item type="booknews" sequence="54">
+    <title>!!cite!!Computer: A History of the Information Machine!!/cite!!</title>
+    <authors>co-authored by committee chair Jeffrey Yost</authors>
+    <pubdate>July 2013</pubdate>
+    <refinfo>new edition of Martin Campbell-Kelly's classic</refinfo>
+    <link>http://www.amazon.com/Computer-A-History-Information-Machine/dp/0813345901/ref=sr_1_1?ie=UTF8&amp;qid=1376949238&amp;sr=8-1&amp;keywords=yost+campbell-kelly</link>
+  </item>
+</list>

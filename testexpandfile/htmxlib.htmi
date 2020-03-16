@@ -1,0 +1,800 @@
+%[** Common HTMX macros **]%
+%[** Copyright (c) 2005-2017 by Tom Van Vleck **]%
+%[*block,&doc,^ENDDOC]%
+ .. 2017-03-31 THVV use "format" operator in imgtag
+ .. 2017-04-02 THVV add get--- macros and responsive 2x image handling
+ .. 2017-05-06 THVV bug fixes in the 2x-only case for getimgxxx
+ .. 2017-05-10 THVV bug fixes to getimgpopdiv
+ .. 2017-05-30 THVV add getimgpopdiv75, getimgdiv75, and getimgtag75
+ .. 2017-06-05 THVV use showLightBox2, fix bug in getimbpopdiv75, warning on file not found
+ .. 2017-06-15 THVV clean args to avoid errors
+ ================================================================
+ Contents
+   getimgtag
+   getimgdiv
+   getimgpopdiv
+   gettwodigit
+   getformattedsecs
+   getimgtag75
+   getimgtdiv75
+   getimgpopdiv75
+   setscale
+   formatsecs
+   getcomma3
+   (comma3) old name
+
+   imgdiv
+   imgpopdiv
+   twodigit
+   dumpsql
+   javatag
+   headinginit
+   heading2
+   heading3
+   heading4
+ naming convention: macros "get..." return a value               
+ see bin/textexpandfile/marcrotest.tpt for tests                 
+ ================================================================
+ other macro files
+  thvvs/thvvlib.htmi -- fileinfov fileinfom fileinfod applemenu (also used by macs)
+  thvvs/wtlib.htmi -- optref docopt
+  mxs/mxlib.htmi -- fileinfo mitsourcearc mitsourcefile mitinfoseg bitsaversmultics
+  wtx/wtxmacros.htmi -- getquery savehist fetchhist deltacomment deltandays trace trimdomain
+================================================================
+
+ Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
+ENDDOC
+%[** ================================================================ **]%
+%[** ================================================================ **]%
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ macro for generating a RESPONSIVE image tag and returning the value
+   *callv,getimgtag,path,alttag,titletag
+ parameters:
+   param1 - file path, same rel path must work in source and object dir
+   param2 - alt tag
+   param3 - title tag
+ output: (resulting IMG tag)
+ gets width and height from inside the graphic. if file not found, leave dimensions out.
+ uses 'gifsize2' perl program, which prints '' if file is not found, else 'w h filename'
+ also looks for file-2x.jpg, and makes use of it if it exists 
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ .. case 0 = no files found -- do not specify width and height
+ .. case 1 = only 1x found -- get width and height from image
+ .. case 2 = only 2x found, cut width and height in half
+ .. case 3 = both found -- space is size of 1x, SRCSET selects
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getimgtag,^END]%
+%[*set,&_fmtstring0,="<img src=\"$1\" border=\"0\" alt=\"$2\" title=\"$3\">"]%
+%[*set,&_fmtstring1,="<img src=\"$1\" width=\"$4\" height=\"$5\" border=\"0\" alt=\"$2\" title=\"$3\">"]%
+%[*set,&_fmtstring2,="<img src=\"$6\" width=\"$4\" height=\"$5\" border=\"0\" alt=\"$2\" title=\"$3\">"]%
+%[*set,&_fmtstring3,="<img src=\"$1\" width=\"$4\" height=\"$5\" border=\"0\" alt=\"$2\" title=\"$3\" srcset=\"$1 1x, $6 2x\">"]%
+%[*set,&_fmtstring,fmtstring1]%
+%[*set,&_width,=""]%
+%[*set,&_height,=""]%
+%[*shell,&_gifsizer,=gifsize2 \"%[param1]%\"]%
+%[*if,eq,_gifsizer,="",*warn,missing: %[param1]%]%
+%[*if,ne,_gifsizer,="",*set,&_fmtstring,_fmtstring1]%
+%[*if,ne,_gifsizer,="",*popssv,&_width,&_gifsizer]%
+%[*if,ne,_gifsizer,="",*popssv,&_height,&_gifsizer]%
+%[** .. look for 2x version **]%
+%[*shell,&_gifsizer2x,=gifsize2 \"%[param1]%\" 2x]%
+%[*if,eq,_gifsizer,="",*if,eq,_gifsizer2x,="",*set,&_fmtstring,_fmtstring0]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*set,&_fmtstring,_fmtstring2]%
+%[*if,ne,_gifsizer,="",*if,ne,_gifsizer2x,="",*set,&_fmtstring,_fmtstring3]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_width2x,&_gifsizer2x]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_height2x,&_gifsizer2x]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*quotient,&_width,_width2x,=2]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*quotient,&_height,_height2x,=2]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_filename2x,&_gifsizer2x]%
+%[** .. generate the img tag **]%
+%[*format,&_getimgtag_result,_fmtstring,param1,param2,param3,_width,_height,_filename2x]%
+%[_getimgtag_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ macro for generating a RESPONSIVE image DIV with optional caption
+   *callv,getimgdiv,path,target,alttag,titletag,class,caption
+ parameters:
+   param1 - file path, same rel path must work in source and object dir
+   param2 - link target or "" .. if link target is specified, put in a link.  since no size is specified, no possibility of 2x
+   param3 - alt tag
+   param4 - title tag
+   param5 - DIV class
+   param6 - caption, may not contain refs like {[ ... ]} directly because they would be expanded to things with commas and generate extra params
+            .. instead of ="{[ ... ]}" use ="%[lbrace]%[ ... ]%[rbrace]%"
+ gets width and height from inside the graphic. if not found, leaves dimensions out.
+ also looks for file-2x.jpg, and if it is found, uses that file, with the size of the base file 
+ output: (resulting DIV) 
+ (8 cases: 4 cases with no target, 4 cases with target) 
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getimgdiv,^END]%
+%[*set,&_fmtstring0,="<div class=\"$5\">$10<img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\">$11<p class=\"caption\">$6</p></div>\\n"]%
+%[*set,&_fmtstring1,="<div class=\"$5\" style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
+%[*set,&_fmtstring2,="<div class=\"$5\" style=\"width: $7px;\">$10<img src=\"$9\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
+%[*set,&_fmtstring3,="<div class=\"$5\" style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\">$11$12</div>\\n"]%
+%[*set,&_beglink,=""]%
+%[*set,&_endlink,=""]%
+%[*set,&_fmtstring,=""]%
+%[*set,&_width,=""]%
+%[*set,&_height,=""]%
+%[*set,&_cap,=""]%
+%[** .. look for 1x version **]%
+%[*shell,&_gifsizer,=gifsize2 \"%[param1]%\"]%
+%[*if,eq,_gifsizer,="",*warn,missing: %[param1]%]%
+%[*if,ne,_gifsizer,="",*set,&_fmtstring,_fmtstring1]%
+%[*if,ne,_gifsizer,="",*popssv,&_width,&_gifsizer]%
+%[*if,ne,_gifsizer,="",*popssv,&_height,&_gifsizer]%
+%[** .. look for 2x version **]%
+%[*shell,&_gifsizer2x,=gifsize2 \"%[param1]%\" 2x]%
+%[*if,eq,_gifsizer,="",*if,eq,_gifsizer2x,="",*set,&_fmtstring,_fmtstring0]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*set,&_fmtstring,_fmtstring2]%
+%[*if,ne,_gifsizer,="",*if,ne,_gifsizer2x,="",*set,&_fmtstring,_fmtstring3]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_width2x,&_gifsizer2x]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_height2x,&_gifsizer2x]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*quotient,&_width,_width2x,=2]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*quotient,&_height,_height2x,=2]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_filename2x,&_gifsizer2x]%
+%[** .. if param2 is given, set the link **]%
+%[*if,ne,param2,="",*format,&_beglink,="<a href=\"$1\">",param2]%
+%[*if,ne,param2,="",*set,&_endlink,="</a>"]%
+%[** .. if param6 is given, set the caption **]%
+%[*if,ne,param6,="",*format,&_cap,="<p class=\"caption\">$1</p>",param6]%
+%[** .. generate the div tag **]%
+%[*format,&_getimgdiv_result,_fmtstring,param1,param2,param3,param4,param5,param6,_width,_height,_filename2x,_beglink,_endlink,_cap]%
+%[** .. expand twice, once to get the braces, again to do the Multics lookup **]%
+%[*expandv,&_getimgdiv_result,_getimgdiv_result]%
+%[*expandv,&_getimgdiv_result,_getimgdiv_result]%
+%[_getimgdiv_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ macro for generating a RESPONSIVE image DIV with a popup
+   *callv,getimgpopdiv,path,target,alttag,titletag,class,thumbcaption,popupcaption
+ parameters:
+   param1 - visible file path, same rel path must work in source and object dir
+   param2 - target popup image or ""
+   param3 - alt tag
+   param4 - title tag
+   param5 - DIV class
+   param6 - thumb caption or ""
+   param7 - popup caption, may not contain refs like {[ ... ]} directly because they would be expanded to things with commas and generate extra params
+            .. instead of ="{[ ... ]}" use ="%[lbrace]%[ ... ]%[rbrace]%"
+            .. may not contain single quote (because is an arg to ShowLightBox2), use &#39 instead
+ gets width and height from inside the graphic. if file is not found, leave dimensions out.
+ also looks for file-2x.jpg, and if it is found, uses that file, with the size of the base file 
+ output: (resulting DIV)
+ .. requires use-dhtml-lightbox.htmi to be included in the HEAD
+ .. requires dhtml-lightbox.htmi to be included in the BODY
+ .. dhtml-lightbox.js must be in the "js" dir relative to the output file
+ .. dhtml-lightbox.js defines function showLightBox(bvfilename, bvwidth, bvheight, bvalt, bvtitle, bvcaption)
+ (20 cases: 4 cases with no target, 4 with nonext target, 4 with 1x target only, 4 with 2x target only, 4 with both targets)
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getimgpopdiv,^END]%
+%[*subst,&param7,="'",="&#39;"]%
+%[*set,&_fmtstring0,="<div class=\"$5\"><img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\"$10><p class=\"caption\">$6</p></div>\\n"]%
+%[*set,&_fmtstring1,="<div class=\"$5\" style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
+%[*set,&_fmtstring2,="<div class=\"$5\" style=\"width: $7px;\"><img src=\"$9\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
+%[*set,&_fmtstring3,="<div class=\"$5\" style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\"$10>$12</div>\\n"]%
+%[*set,&_ocl,=""]%
+%[*set,&_cap,=""]%
+%[*set,&_fmtstring,=""]%
+%[*set,&_width,=""]%
+%[*set,&_height,=""]%
+%[** .. look for 1x version of path **]%
+%[*shell,&_gifsizer,=gifsize2 \"%[param1]%\"]%
+%[*if,eq,_gifsizer,="",*warn,missing: %[param1]%]%
+%[*if,ne,_gifsizer,="",*set,&_fmtstring,_fmtstring1]%
+%[*if,ne,_gifsizer,="",*popssv,&_width,&_gifsizer]%
+%[*if,ne,_gifsizer,="",*popssv,&_height,&_gifsizer]%
+%[** .. look for 2x version of path **]%
+%[*shell,&_gifsizer2x,=gifsize2 \"%[param1]%\" 2x]%
+%[*if,eq,_gifsizer,="",*if,eq,_gifsizer2x,="",*set,&_fmtstring,_fmtstring0]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*set,&_fmtstring,_fmtstring2]%
+%[*if,ne,_gifsizer,="",*if,ne,_gifsizer2x,="",*set,&_fmtstring,_fmtstring3]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_width2x,&_gifsizer2x]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_height2x,&_gifsizer2x]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*quotient,&_width,_width2x,=2]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*quotient,&_height,_height2x,=2]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_filename2x,&_gifsizer2x]%
+%[** .. if param6 is given, set the caption **]%
+%[*if,ne,param6,="",*format,&_cap,="<p class=\"caption\">$1</p>",param6]%
+%[** .. if param2 is given, generate the onclick **]%
+%[*set,&_oclfmt,=" onClick=\"showLightBox('$1','$2','$3','$4','$5','$6')\""]%
+%[*set,&_oclfmt1,=" onClick=\"showLightBox('$7','$2','$3','$4','$5','$6')\""]%
+%[*set,&_oclfmt2,=" onClick=\"showLightBox2('$1','$2','$3','$4','$5','$6','$7')\""]%
+%[*set,&_tfilename2x,=""]%
+%[*if,ne,param2,="",*shell,&_tgifsizer,=gifsize2 \"%[param2]%\"]%
+%[*if,ne,param2,="",*if,eq,_tgifsizer,="",*warn,missing: %[param2]%]%
+%[*if,ne,param2,="",*popssv,&_twidth,&_tgifsizer]%
+%[*if,ne,param2,="",*popssv,&_theight,&_tgifsizer]%
+%[** .... look for a 2x version of the target **]%
+%[*if,ne,param2,="",*shell,&_tgifsizer2x,=gifsize2 \"%[param2]%\" 2x]%
+%[*if,ne,param2,="",*if,ne,_tgifsizer2x,="",*popssv,&_twidth2x,&_tgifsizer2x]%
+%[*if,ne,param2,="",*if,ne,_tgifsizer2x,="",*popssv,&_theight2x,&_tgifsizer2x]%
+%[** .... if we have a 2x target but no 1x, set the length and width as half the size of the 2x **]%
+%[*if,ne,param2,="",*if,eq,_tgifsizer,="",*if,ne,_tgifsizer2x,="",*quotient,&_twidth,_twidth2x,=2]%
+%[*if,ne,param2,="",*if,eq,_tgifsizer,="",*if,ne,_tgifsizer2x,="",*quotient,&_theight,_theight2x,=2]%
+%[** .... if we have a 2x target, use its filename **]%
+%[*if,ne,param2,="",*if,ne,_tgifsizer2x,="",*popssv,&_tfilename2x,&_tgifsizer2x]%
+%[*if,ne,param2,="",*if,ne,_tfilename2x,="",*set,&_oclfmt,_oclfmt1]%
+%[** .... if we have both 1x and 2x targets, send both filenames to showLightBox2.. it will show the 2x in the space sized by the 1x **]%
+%[*if,ne,param2,="",*if,ne,_tfilename2x,="",*if,ne,_gifsizer,="",*set,&_oclfmt,_oclfmt2]%
+%[*if,ne,param2,="",*format,&_ocl,_oclfmt,param2,_twidth,_theight,param3,param4,param7,_tfilename2x]%
+%[** .. generate the div tag **]%
+%[*format,&_getimgpopdiv_result,_fmtstring,param1,param2,param3,param4,param5,param6,_width,_height,_filename2x,_ocl,junk,_cap]%
+%[** .. expand twice, once to get the braces, again to do the Multics lookup **]%
+%[*expandv,&_getimgpopdiv_result,_getimgpopdiv_result]%
+%[*expandv,&_getimgpopdiv_result,_getimgpopdiv_result]%
+%[_getimgpopdiv_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ macro for generating an IMG tag of CSS size 75x75 with a caption .. used to crunch 150x150 thumbnails to 75x75
+   *callv,getimgtag75,path,alttag,titletag
+ parameters:
+   param1 - file path, same rel path must work in source and object dir
+   param2 - alt tag
+   param3 - title tag
+ output: (resulting IMG)
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getimgtag75,^END]%
+%[*set,&_fmtstring1,="<img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$2\" title=\"$3\">"]%
+%[*shell,&_gifsizer,=gifsize2 \"%[param1]%\"]%
+%[*if,eq,_gifsizer,="",*warn,missing: %[param1]%]%
+%[*format,&_getimgtag_result,_fmtstring1,param1,param2,param3]%
+%[_getimgtag_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ macro for generating an image DIV of CSS size 75x75 with a caption .. used to crunch 150x150 thumbnails to 75x75
+   *callv,getimgdiv75,path,target,alttag,titletag,class,caption
+ parameters:
+   param1 - file path, same rel path must work in source and object dir
+   param2 - link target or ""
+   param3 - alt tag
+   param4 - title tag
+   param5 - DIV class
+   param6 - caption, may not contain refs like {[ ... ]} directly because they would be expanded to things with commas and generate extra params
+            .. instead of ="{[ ... ]}" use ="%[lbrace]%[ ... ]%[rbrace]%"
+ output: (resulting DIV)
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getimgdiv75,^END]%
+%[*set,&_fmtstring1,="<div class=\"$5\" style=\"width: 75px;\">$7<img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\">$8$9</div>\\n"]%
+%[*set,&_beglink,=""]%
+%[*set,&_endlink,=""]%
+%[*set,&_cap,=""]%
+%[*shell,&_gifsizer,=gifsize2 \"%[param1]%\"]%
+%[*if,eq,_gifsizer,="",*warn,missing: %[param1]%]%
+%[** .. if param2 is given, set the link **]%
+%[*if,ne,param2,="",*format,&_beglink,="<a href=\"$1\">",param2]%
+%[*if,ne,param2,="",*set,&_endlink,="</a>"]%
+%[** .. if param6 is given, set the caption **]%
+%[*if,ne,param6,="",*format,&_cap,="<p class=\"caption\">$1</p>",param6]%
+%[** .. generate the div tag **]%
+%[*format,&_getimgdiv_result,_fmtstring1,param1,param2,param3,param4,param5,param6,_beglink,_endlink,_cap]%
+%[** .. expand twice, once to get the braces, again to do the Multics lookup **]%
+%[*expandv,&_getimgdiv_result,_getimgdiv_result]%
+%[*expandv,&_getimgdiv_result,_getimgdiv_result]%
+%[_getimgdiv_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ macro for generating an image DIV of size 75x75 with a popup
+   *callv,getimgpopdiv75,path,target,alttag,titletag,class,thumbcaption,popupcaption
+ parameters:
+   param1 - visible file path, same rel path must work in source and object dir
+   param2 - path of file shown in popup or ""
+   param3 - alt tag
+   param4 - title tag
+   param5 - DIV class
+   param6 - thumb caption or ""
+   param7 - popup caption, may not contain refs like {[ ... ]} directly because they would be expanded to things with commas and generate extra params
+            .. instead of ="{[ ... ]}" use ="%[lbrace]%[ ... ]%[rbrace]%"
+ also looks for file-2x.jpg, and if it is found, uses that file, with the size of the base file 
+ output: (resulting DIV)
+ .. requires use-dhtml-lightbox.htmi to be included in the HEAD
+ .. requires dhtml-lightbox.htmi to be included in the BODY
+ .. dhtml-loghtbox.js must be in the "js" dir relative to the output file
+ .. dhtml-lightbox.js defines function showLightBox(bvfilename, bvwidth, bvheight, bvalt, bvtitle, bvcaption)
+ (10 cases: (with/without caption) x (no target given/none found/1x/2x/both))
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getimgpopdiv75,^END]%
+%[*subst,&param7,="'",="&#39;"]%
+%[*set,&_fmtstring1,="<div class=\"$5\" style=\"width: 75px;\"><img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\"$7>$8</div>\\n"]%
+%[*set,&_ocl,=""]%
+%[*set,&_cap,=""]%
+%[*set,&_tfilename2x,=""]%
+%[*shell,&_gifsizer,=gifsize2 \"%[param1]%\"]%
+%[*if,eq,_gifsizer,="",*warn,missing: %[param1]%]%
+%[** .. if param6 is given, set the caption **]%
+%[*if,ne,param6,="",*format,&_cap,="<p class=\"caption\">$1</p>",param6]%
+%[** .. if param2 is given, generate the onclick **]%
+%[*set,&_oclfmt,=" onClick=\"showLightBox('$1','$2','$3','$4','$5','$6')\""]%
+%[*set,&_oclfmt1,=" onClick=\"showLightBox('$7','$2','$3','$4','$5','$6')\""]%
+%[*set,&_oclfmt2,=" onClick=\"showLightBox2('$7','$2','$3','$4','$5','$6','$7')\""]%
+%[*if,ne,param2,="",*shell,&_tgifsizer,=gifsize2 \"%[param2]%\"]%
+%[*if,ne,param2,="",*if,eq,_tgifsizer,="",*warn,missing: %[param2]%]%
+%[*if,ne,param2,="",*popssv,&_twidth,&_tgifsizer]%
+%[*if,ne,param2,="",*popssv,&_theight,&_tgifsizer]%
+%[** .... look for a 2x version of the target **]%
+%[*if,ne,param2,="",*shell,&_tgifsizer2x,=gifsize2 \"%[param2]%\" 2x]%
+%[*if,ne,param2,="",*if,ne,_tgifsizer2x,="",*popssv,&_twidth2x,&_tgifsizer2x]%
+%[*if,ne,param2,="",*if,ne,_tgifsizer2x,="",*popssv,&_theight2x,&_tgifsizer2x]%
+%[** .... if we have a 2x target but no 1x, set the length and width as half the size of the 2x **]%
+%[*if,ne,param2,="",*if,eq,_tgifsizer,="",*if,ne,_tgifsizer2x,="",*quotient,&_twidth,_twidth2x,=2]%
+%[*if,ne,param2,="",*if,eq,_tgifsizer,="",*if,ne,_tgifsizer2x,="",*quotient,&_theight,_theight2x,=2]%
+%[** .... if we have a 2x target, use its filename **]%
+%[*if,ne,param2,="",*if,ne,_tgifsizer2x,="",*popssv,&_tfilename2x,&_tgifsizer2x]%
+%[*if,ne,param2,="",*if,ne,_tfilename2x,="",*set,&_oclfmt,_oclfmt2]%
+%[*if,ne,param2,="",*format,&_ocl,_oclfmt,param2,_twidth,_theight,param3,param4,param7,_tfilename2x]%
+%[** .. generate the div tag **]%
+%[*format,&_getimgpopdiv_result,_fmtstring1,param1,param2,param3,param4,param5,param6,_ocl,_cap]%
+%[** .. expand twice, once to get the braces, again to do the Multics lookup **]%
+%[*expandv,&_getimgpopdiv_result,_getimgpopdiv_result]%
+%[*expandv,&_getimgpopdiv_result,_getimgpopdiv_result]%
+%[_getimgpopdiv_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ convert integer to two digits
+   *callv,gettwodigit,x
+ Parameters:
+ - param1 = an integer le 99
+ Return:
+ - _x0 = 00 if input was null or 0
+ - _x0 = 0x if input was x le 9
+ - _x0 = input otherwise
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&gettwodigit,^END$]%
+%[*set,&_x0,="00"]%
+%[*concat,&_x0,param1]%
+%[*subst,&_x0,="^.*(..)$",="$1"]%
+%[_x0]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ convert systime to h:mm:ss, m:ss, or 0:ss
+   *callv,getformattedsecs,numsecs
+ Parameters:
+ - param1 = a duration in seconds
+ Return: "hh:mm:ss"
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getformattedsecs,^END$]%
+%[*quotient,&_h1,param1,=3600]%
+%[*product,&_m2,_h1,=60]%
+%[** _h1 contains hours, _m2 contains hours conv to minutes]%
+%[*quotient,&_m1,param1,=60]%
+%[*decrement,&_m1,_m2]%
+%[** _m1 contains leftover minutes]%
+%[*product,&_s2,_m1,=60]%
+%[** _s2 contains minutes conv to seconds]%
+%[*set,&_s1,param1]%
+%[*decrement,&_s1,_s2]%
+%[*product,&_s2,_h1,=3600]%
+%[*decrement,&_s1,_s2]%
+%[** _s1 contains leftover seconds]%
+%[** build answer in _h1]%
+%[*concat,&_h1,=":"]%
+%[*if,eq,_h1,="0:",*set,&_h1,=""]%
+%[*if,ne,_h1,="",*set,&_m1,=%[*callv,gettwodigit,_m1]%]%
+%[*concat,&_h1,_m1]%
+%[*concat,&_h1,=":"]%
+%[*concat,&_h1,=%[*callv,gettwodigit,_s1]%]%
+%[_h1]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ insert commas every three digits
+   *callv,getcomma3,x
+ Parameters:
+ - param1 = an integer
+ Return: string with commas every 3
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getcomma3,^END$]%
+%[*set,&_x0,param1]%
+%[*set,&_y0,param1]%
+%[*set,&_z0,=""]%
+%[*callv,comma3step]%
+%[_y0]%%[_z0]%
+END
+%[** ---- old name ---- **]%
+%[*block,&comma3,^END$]%
+%[*set,&_x0,param1]%
+%[*set,&_y0,param1]%
+%[*set,&_z0,=""]%
+%[*callv,comma3step]%
+%[_y0]%%[_z0]%
+END
+%[** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - **]%
+%[** recursive: _x0 is the number to be reduced, _z0 is the tail-so-far, _y0 is the head-so-far **]%
+%[*block,&comma3step,^END]%
+%[*if,gt,_x0,=999,*set,&_w0,_y0]%
+%[*if,gt,_x0,=999,*subst,&_w0,="^.*(...)$",=",$1"]%
+%[*if,gt,_x0,=999,*concat,&_w0,_z0]%
+%[*if,gt,_x0,=999,*set,&_z0,_w0]%
+%[*if,gt,_x0,=999,*quotient,&_w0,_x0,=1000]%
+%[*if,gt,_x0,=999,*set,&_y0,_w0]%
+%[*if,gt,_x0,=999,*set,&_x0,_w0]%
+%[*if,gt,_x0,=999,*callv,comma3step]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ macro for generating apple menu reference for macs
+   usage: *callv,getapplemenu,=''System Preferences...=>Security=>General''
+   returns <span class="macmenu nb">%[mapple]%%[marrow]%System Preferences...%[marrow]%Security%[marrow]%General</span>
+ parameters:
+   param1 - text]%
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getapplemenu,^END]%
+%[*set,&_temp1,param1]%
+%[*subst,&_temp1,="=>",marrow]%
+%[*format,&_result,="<span class=\"macmenu nb\">$1$2$3</span>",mapple,marrow,_temp1]%
+%[_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ Older HTMX macros
+ ================================================================
+ old macro for generating an image tag
+   *callv,imgtag,path,alttag,titletag
+ parameters:
+   param1 - file path, same rel path must work in source and object dir
+   param2 - alt tag
+   param3 - title tag
+ output: none
+ sets: imgtag_result (resulting IMG tag)
+ uses: helper Perl program 'gifsize' which returns '"filename" width="xx" height="xx"' 
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&imgtag,^END]%
+%[*shell,&_gifsizer,=gifsize \"%[param1]%\"]%
+%[*if,eq,_gifsizer,="",*set,&_gifsizer,="\"\""]%
+%[*set,&imgtag_result,="<img src="]%
+%[*concat,&imgtag_result,_gifsizer]%
+%[*concat,&imgtag_result,=" border=\"0\" alt=\""]%
+%[*concat,&imgtag_result,param2]%
+%[*concat,&imgtag_result,="\" title=\""]%
+%[*concat,&imgtag_result,param3]%
+%[*concat,&imgtag_result,="\">"]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ old macro for generating an image DIV with a caption
+   *callv,imgdiv,path,target,alttag,titletag,class,caption
+ parameters:
+   param1 - file path, same rel path must work in source and object dir
+   param2 - link target or ""
+   param3 - alt tag
+   param4 - title tag
+   param5 - DIV class
+   param6 - caption, may not contain refs like {[ ... ]} directly because they would be expanded to things with commas and generate extra params
+            .. instead of ="{[ ... ]}" use ="%[lbrace]%[ ... ]%[rbrace]%"
+ output: (resulting DIV)
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&imgdiv,^END]%
+%[*shell,&_gifsizer,=gifsize \"%[param1]%\"]%
+%[*if,eq,_gifsizer,="",*set,&_gifsizer,="\"\""]%
+%[*set,&_width,_gifsizer]%
+%[*subst,&_width,="^.*width=\"",=""]%
+%[*subst,&_width,="\".*$",=""]%
+%[*set,&_imgdiv_result,="<div class=\""]%
+%[*concat,&_imgdiv_result,param5]%
+%[*concat,&_imgdiv_result,="\" style=\"width: "]%
+%[*concat,&_imgdiv_result,_width]%
+%[*concat,&_imgdiv_result,="px;\">"]%
+%[*if,ne,param2,="",*concat,&_imgdiv_result,="<a href=\""]%
+%[*if,ne,param2,="",*concat,&_imgdiv_result,param2]%
+%[*if,ne,param2,="",*concat,&_imgdiv_result,="\">"]%
+%[*concat,&_imgdiv_result,="<img src="]%
+%[*concat,&_imgdiv_result,_gifsizer]%
+%[*concat,&_imgdiv_result,=" border=\"0\" alt=\""]%
+%[*concat,&_imgdiv_result,param3]%
+%[*concat,&_imgdiv_result,="\" title=\""]%
+%[*concat,&_imgdiv_result,param4]%
+%[*concat,&_imgdiv_result,="\" />"]%
+%[*if,ne,param2,="",*concat,&_imgdiv_result,="</a>"]%
+%[*concat,&_imgdiv_result,="<p class=\"caption\">"]%
+%[*concat,&_imgdiv_result,param6]%
+%[*concat,&_imgdiv_result,="</p></div>\\n"]%
+%[*expandv,&_imgdiv_result,_imgdiv_result]%
+%[*expandv,&_imgdiv_result,_imgdiv_result]%
+%[_imgdiv_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ old macro for generating an image DIV with a popup
+ .. requires use-dhtml-lightbox.htmi to be included in the HEAD
+ .. requires dhtml-lightbox.htmi to be included in the BODY
+ .. dhtml-loghtbox.js must be in the "js" dir relative to the output file
+   *callv,imgpopdiv,path,target,alttag,titletag,class,thumbcaption,popupcaption
+ parameters:
+   param1 - visible file path, same rel path must work in source and object dir
+   param2 - path of file shown in popup or ""
+   param3 - alt tag
+   param4 - title tag
+   param5 - DIV class
+   param6 - thumb caption or ""
+   param7 - popup caption, may not contain refs like {[ ... ]} directly because they would be expanded to things with commas and generate extra params
+            .. instead of ="{[ ... ]}" use ="%[lbrace]%[ ... ]%[rbrace]%"
+ output: (resulting DIV)
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&imgpopdiv,^END]%
+%[*subst,&param7,="'",="&#39;"]%
+%[*shell,&_gifsizer,=gifsize \"%[param1]%\"]%
+%[*if,eq,_gifsizer,="",*set,&_gifsizer,="\"\""]%
+%[*set,&_width,_gifsizer]%
+%[*set,&_height,_gifsizer]%
+%[*subst,&_width,="^.*width=\"",=""]%
+%[*subst,&_width,="\".*$",=""]%
+%[*subst,&_height,="^.*height=\"",=""]%
+%[*subst,&_height,="\".*$",=""]%
+%[** generate the div tag **]%
+%[*set,&_imgpopdiv_result,="<div class=\""]%
+%[*concat,&_imgpopdiv_result,param5]%
+%[*concat,&_imgpopdiv_result,="\" style=\"width: "]%
+%[*concat,&_imgpopdiv_result,_width]%
+%[*concat,&_imgpopdiv_result,="px;\">"]%
+%[** generate the onclick **]%
+%[*set,&_imgpopdiv_ocl,=""]%
+%[*if,ne,param2,="",*shell,&_tgifsizer,=gifsize \"%[param2]%\"]%
+%[*if,ne,param2,="",*if,eq,_tgifsizer,="",*set,&_tgifsizer,="\"\""]%
+%[*if,ne,param2,="",*set,&_twidth,_tgifsizer]%
+%[*if,ne,param2,="",*set,&_theight,_tgifsizer]%
+%[*if,ne,param2,="",*subst,&_twidth,="^.*width=\"",=""]%
+%[*if,ne,param2,="",*subst,&_twidth,="\".*$",=""]%
+%[*if,ne,param2,="",*subst,&_theight,="^.*height=\"",=""]%
+%[*if,ne,param2,="",*subst,&_theight,="\".*$",=""]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,=" onClick=\"showLightBox('"]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,param2]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,_twidth]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,_theight]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,param3]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,=""]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,param7]%
+%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="')\""]%
+%[** generate the img tag **]%
+%[*concat,&_imgpopdiv_result,="<img src="]%
+%[*concat,&_imgpopdiv_result,_gifsizer]%
+%[*concat,&_imgpopdiv_result,=" border=\"0\" alt=\""]%
+%[*concat,&_imgpopdiv_result,param3]%
+%[*concat,&_imgpopdiv_result,="\" title=\""]%
+%[*concat,&_imgpopdiv_result,param4]%
+%[*concat,&_imgpopdiv_result,="\""]%
+%[*concat,&_imgpopdiv_result,_imgpopdiv_ocl]%
+%[*concat,&_imgpopdiv_result,=" />"]%
+%[*concat,&_imgpopdiv_result,="<p class=\"caption\">"]%
+%[*concat,&_imgpopdiv_result,param6]%
+%[*concat,&_imgpopdiv_result,="</p></div>\\n"]%
+%[*expandv,&_imgpopdiv_result,_imgpopdiv_result]%
+%[*expandv,&_imgpopdiv_result,_imgpopdiv_result]%
+%[_imgpopdiv_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ convert integer to two digits
+   *callv,twodigit,x
+ Parameters:
+ - param1 = an integer <= 99
+ Return:
+ - x0 = 00 if input was null or 0
+ - x0 = 0x if input was x <= 9
+ - x0 = input otherwise
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&twodigit,^END$]%
+%[*set,&x0,="00"]%
+%[*concat,&x0,param1]%
+%[*subst,&x0,="^.*(..)$",="$1"]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ convert bytes to appropriate scale
+   *callv,setscale,number
+ Parameters:
+ - param1 = count of bytes
+ Return:
+ - x0 = int(param1/1024); y0 = "KB"; z0 = 1024 etc
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&setscale,^END$]%
+%[*set,&x0,param1]%
+%[*set,&y0,=""]%
+%[*set,&z0,=1]%
+%[*if,eq,x0,="",*set,&x0,=0]%
+%[*if,ge,x0,=512,*set,&y0,="KB"]%
+%[*if,ge,x0,=512,*product,&z0,z0,=1024]%
+%[*if,ge,x0,=512,*quotientrounded,&x0,x0,=1024]%
+%[*if,ge,x0,=512,*set,&y0,="MB"]%
+%[*if,ge,x0,=512,*product,&z0,z0,=1024]%
+%[*if,ge,x0,=512,*quotientrounded,&x0,x0,=1024]%
+%[*if,ge,x0,=512,*set,&y0,="GB"]%
+%[*if,ge,x0,=512,*product,&z0,z0,=1024]%
+%[*if,ge,x0,=512,*quotientrounded,&x0,x0,=1024]%
+%[*if,ge,x0,=512,*set,&y0,="TB"]%
+%[*if,ge,x0,=512,*product,&z0,z0,=1024]%
+%[*if,ge,x0,=512,*quotientrounded,&x0,x0,=1024]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ dump the values bound by *sqlloop statement to an html formatted dump
+   callv,dumpsql,query
+ Parameters:
+ - param1 = the SQL query
+ Return:
+ - x0 = formatted dump
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&dumpsql,^END$]%
+%[*set,&x0,="<p>"]%
+%[*concat,&x0,param1]%
+%[*concat,&x0,="</p><dl>"]%
+%[*set,&x1,_colnames]%
+%[*ssvloop,&x0,dumpsqliter,x1]%
+%[*concat,&x0,="</dl>"]%
+END
+%[** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - **]%
+%[*block,&dumpsqliter,^END$]%
+<dt>%[_ssvitem]%</dt><dd>%[%[_ssvitem]%]%</dd>
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ ================================================================
+ macro for generating a java applet reference
+   *callv,javatag,classfile,name,width,height,title,sorrymsg,standbymsg,paramblockname
+ parameters:
+   param1 - Java class file
+   param2 - name attribute
+   param3 - width
+   param4 - height
+   param5 - title
+   param6 - sorry message
+   param7 - standby message
+   param8 - name of block containing params
+ output: OBJECT and APPLET tag nested .. removed OBJECT tag 20120822 because it did not work in FF 14.0.1
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&javatag,^END]%
+<applet code="%[param1]%" name="%[param2]%" width="%[param3]%" height="%[param4]%" title="%[param5]%">
+%[%[param8]%]%
+  %[param6]%
+</applet>
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ ================================================================
+ heading macro setup
+   *callv,headinginit
+ Parameters: none
+ Output: none
+ Sets: level2, level3, level4=0 toc=""
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&headinginit,^END$]%
+%[*set,&level2,=0]%%[*set,&level3,=0]%%[*set,&level4,=0]%%[*set,&toc,=""]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ heading macro for H2
+   *callv,heading2,title
+ Parameters:
+ - param1 = title
+ Output: H2 tag
+ Sets: level2++, level3=0 and concats a <li>...</li> onto "toc"
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&heading2,^END$]%
+%[*increment,&level2,=1]%%[*set,&level3,=0]%
+%[*set,&x0,=section%[level2]%]%
+    <h2 id="%[x0]%">%[level2]%. %[param1]%</h2>
+%[*concat,&toc,="<li class=\"tocitem2\"><a href=\"#"]%
+%[*concat,&toc,x0]%
+%[*concat,&toc,="\">"]%
+%[*concat,&toc,level2]%
+%[*concat,&toc,=". "]%
+%[*concat,&toc,param1]%
+%[*concat,&toc,="</a></li>"]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ heading macro for H3
+   *callv,heading3,title
+ Parameters:
+ - param1 = title
+ Output: H3 tag
+ Sets: level3++, level4=0 and concats a <li>...</li> onto "toc"
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&heading3,^END$]%
+%[*increment,&level3,=1]%%[*set,&level4,=0]%
+%[*set,&x0,=section%[level2]%x%[level3]%]%
+    <h3 id="%[x0]%">%[level2]%.%[level3]%. %[param1]%</h3>
+%[*concat,&toc,="<li class=\"tocitem3\"><a href=\"#"]%
+%[*concat,&toc,x0]%
+%[*concat,&toc,="\">"]%
+%[*concat,&toc,level2]%
+%[*concat,&toc,="."]%
+%[*concat,&toc,level3]%
+%[*concat,&toc,=". "]%
+%[*concat,&toc,param1]%
+%[*concat,&toc,="</a></li>"]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ heading macro for H4
+   *callv,heading4,title
+ Parameters:
+ - param1 = title
+ Output: H4 tag
+ Sets: level4++, level5=0 and concats a <li>...</li> onto "toc"
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&heading4,^END$]%
+%[*increment,&level4,=1]%%[*set,&level5,=0]%
+%[*set,&x0,=section%[level2]%x%[level3]%x%[level4]%]%
+    <h4 id="%[x0]%">%[level2]%.%[level3]%.%[level4]%. %[param1]%</h4>
+%[*concat,&toc,="<li class=\"tocitem4\"><a href=\"#"]%
+%[*concat,&toc,x0]%
+%[*concat,&toc,="\">"]%
+%[*concat,&toc,level2]%
+%[*concat,&toc,="."]%
+%[*concat,&toc,level3]%
+%[*concat,&toc,="."]%
+%[*concat,&toc,level4]%
+%[*concat,&toc,=". "]%
+%[*concat,&toc,param1]%
+%[*concat,&toc,="</a></li>"]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ macro to generate an <LI> block for use with fancybox jquery plugin -- see http://fancyapps.com/fancybox/3/
+   usage:  *callv,lightbox_li,="gal1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"
+ parameters:
+   param1 - gallery ID
+   param2 - thumbnails dirname
+   param3 - image file name
+   param4 - caption
+ output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" border="0" alt=""></a></li>
+ THVV 05/05/19 1.0
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&lightbox_li,^END]%
+%[*set,&_fmt,="<li><a href=\"mulimg/$3\" data-fancybox=\"$1\" data-caption=\"$4\" title=\"$4\"><img src=\"$2/$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\"></a></li>\\n"]%
+%[*format,&_result,_fmt,param1,param2,param3,param4]%
+%[_result]%
+END

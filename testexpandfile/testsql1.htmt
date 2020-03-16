@@ -1,0 +1,26 @@
+%[** test SQL file for expandfile **]%
+%[** Copyright (c) 2007, Tom Van Vleck **]%
+%[** 02/21/07 THVV add test for columnames **]%
+%[** ================================================================ **]%
+%[** iterator invoked by sqlloop for each row in testexpandfile table **]%
+%[*block,iterator,^END]%
+%[*set,&proto,="|"]%
+%[*ssvloop,&junk,iterator2,_colnames]%
+%[*expand,proto]%
+
+END
+%[** ================================================================ **]%
+%[** iterator invoked by ssvloop to generate a template accessing each column **]%
+%[*block,iterator2,^END]%
+%[*concat,&proto,pct]%
+%[*concat,&proto,lbkt]%
+%[*concat,&proto,_ssvitem]%
+%[*concat,&proto,rbkt]%
+%[*concat,&proto,pct]%
+%[*concat,&proto,="|"]%
+END
+%[** ================================================================ **]%
+Testing sqlloop
+%[*sqlloop,&result,iterator,="SELECT * FROM testexpandfile"]%
+nrows is %[_nrows]%
+result is %[result]%

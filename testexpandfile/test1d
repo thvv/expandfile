@@ -1,0 +1,439 @@
+Basic tests for expandfile
+    THVV 02/22/05
+    THVV 05/18/15 revised
+
+================================================================
+Test 1, should see these words.
+%[*warn,** %[timestamp]% This is what a warning looks like. It will come out before any of the output. **]%
+================================================================
+Test 2, the "set" should not generate a line.
+================================================================
+Test 3, y should be set to 33 and then expanded.
+%[*set,&y,=33]%
+result is %[y]% shd be 33, and no blank line above
+%[** **]%
+%[*if,ne,y,=33,=ERROR3]%
+================================================================
+Test 4, increment
+%[*set,&x,=33]%
+%[*increment,&x,=1]%
+result is %[x]% shd be 34
+%[*set,&testno,=4]%
+%[** **]%
+%[*if,ne,x,=34,=ERROR4]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, concat
+%[*set,&y,=12345]%
+%[*concat,&y,=hello]%
+result is %[y]% shd be 12345hello
+%[** **]%
+%[*if,ne,y,=12345hello,=ERROR5]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, multiple values
+%[*set,&y,=33]%
+%[*set,&z,=%[queep,quap,y,quop]%]%
+result is %[z]% shd be 33
+%[** **]%
+%[*if,ne,z,=33,=ERROR6]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, prefix and suffix
+%[*set,&y,=33]%
+%[*set,&z,=%[y|aaa|bbb]%]%
+result is %[z]% shd be aaa33bbb
+%[** **]%
+%[*if,ne,z,=aaa33bbb,=ERROR7]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, prefix and suffix with multiple values
+%[*set,&y,=33]%
+%[*set,&z,=%[queep,quap,y,quop|aaa|bbb]%]%
+result is %[z]% shd be aaa33bbb
+%[** **]%
+%[*if,ne,z,=aaa33bbb,=ERROR8]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, comment
+%[** comment should do nothing]%
+shd be nothing above
+%[** **]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *include
+%[*include,=test1d1]%
+Above line should be hello world
+%[** **]%
+================================================================
+Indirect get and set features removed.
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, backslashes at level 0
+%[*set,&y,=33]%
+\%[*set,&y,=44]%
+set should print out, not execute
+result is %[y]% shd be 33
+%[** **]%
+%[*if,ne,y,=33,=ERROR12]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, recursion
+%[** recursion **]%
+%[*set,&y,=33]%
+%[*set,&x,=ab%[y]%cd]%
+result is %[x]% shd be ab33cd
+%[** **]%
+%[*if,ne,x,=ab33cd,=ERROR13]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, recursion/indirection
+%[*set,&y,=33]%
+%[*set,&x,=ab%[y]%cd]%
+%[*set,&z,=x]%
+shd be ab33cd: %[%[z]%]%
+%[** **]%
+%[*if,ne,%[z]%,=ab33cd,=ERROR14]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, backslashes
+%[*set,&y,=33]%
+%[*set,&x,=ab\%[y]\%cd]%
+result is %[x]% shd be ab-pct-bkt-y-bkt-pct
+%[** **]%
+%[*if,ne,x,="ab%[y]%cd",=ERROR15]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, quoting
+%[*set,&y,=33]%
+%[*set,&x,=ab"%[y]%"cd]%
+result is %[x]% shd be ab-pct-lbkt-y-rbkt-pct
+%[** **]%
+%[*if,ne,x,="ab%[y]%cd",=ERROR16]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, quoting
+%[*set,&x,="]%"]%
+result is %[x]% shd be rbkt-pct
+%[** **]%
+%[*if,ne,x,="]%",=ERROR17]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, quoting and backslashes
+%[*set,&x,="\""]%
+result is %[x]% shd be quote
+%[** **]%
+%[*if,ne,x,="\"",=ERROR18]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, subst
+%[*set,&x,=12345]%
+%[*subst,&x,=34,=aa]%
+result is %[x]% shd be 12aa5
+%[** **]%
+%[*if,ne,x,=12aa5,=ERROR19]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, subst with $1
+%[*set,&v,="Van Vleck, Thomas H."]%
+%[*subst,&v,="^([^,]*), (.*)$",="$2 $1"]%
+result is '%[v]%' shd be 'Thomas H. Van Vleck'
+%[** **]%
+%[*if,ne,v,="Thomas H. Van Vleck",=ERROR20]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, if =
+%[*set,&x,=33]%
+%[*if,=,x,=33,*set,&x,=43]%
+result is %[x]% shd be 43
+%[** **]%
+%[*if,ne,x,=43,=ERROR21]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, if !=
+%[*set,&x,=33]%
+%[*if,!=,x,=37,*set,&x,=44]%
+result is %[x]% shd be 44
+%[** **]%
+%[*if,ne,x,=44,=ERROR22]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, if <
+%[*set,&x,=33]%
+%[*if,<,x,=34,*set,&x,=45]%
+result is %[x]% shd be 45
+%[** **]%
+%[*if,ne,x,=45,=ERROR23]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, if >
+%[*set,&x,=33]%
+%[*if,>,x,=32,*set,&x,=46]%
+result is %[x]% shd be 46
+%[** **]%
+%[*if,ne,x,=46,=ERROR24]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, if =~
+%[*set,&x,=abcde]%
+%[*if,=~,x,=cde,*set,&x,=47]%
+result is %[x]% shd be 47
+%[** **]%
+%[*if,ne,x,=47,=ERROR25]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, negative if =
+%[*set,&x,=33]%
+%[*if,=,x,=34,*set,&x,=43]%
+result is %[x]% shd be 33
+%[** **]%
+%[*if,ne,x,=33,=ERROR26]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, negative if !=
+%[*set,&x,=33]%
+%[*if,!=,x,=33,*set,&x,=44]%
+result is %[x]% shd be 33
+%[** **]%
+%[*if,ne,x,=33,=ERROR]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, negative if <
+%[*set,&x,=33]%
+%[*if,<,x,=33,*set,&x,=45]%
+result is %[x]% shd be 33
+%[** **]%
+%[*if,ne,x,=33,=ERROR27]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, negative if >
+%[*set,&x,=33]%
+%[*if,>,x,=33,*set,&x,=46]%
+result is %[x]% shd be 33
+%[** **]%
+%[*if,ne,x,=33,=ERROR28]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, negative if =~
+%[*set,&x,=abcde]%
+%[*if,=~,x,=cxy,*set,&x,=47]%
+result is %[x]% shd be abcde
+%[** **]%
+%[*if,ne,x,=abcde,=ERROR29]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, if = direct eval
+%[*set,&x,=33]%
+%[*set,&y,=hello]%
+This should say hello: %[*if,=,x,=33,y]%
+%[** **]%
+%[*if,ne,y,=hello,=ERROR30]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, ssv and _ssvsep
+%[*set,&x,=a;b;c;d;e]%
+%[*set,&_ssvsep,=;]%
+%[*popssv,&y,&x]%
+This should say b;c;d;e: %[x]%
+This should say a: %[y]%
+%[** **]%
+%[*if,ne,x,="b;c;d;e",=ERROR31]%
+%[*if,ne,y,=a,=ERROR32]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *shell external command
+%[*shell,&result,=filemodshort test1d]%
+This test file was modified %[result]%
+%[** **]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *block
+%[*block,&woffle,^END]%
+--block content--
+END
+This should say --block content--
+%[woffle]%
+%[** **]%
+================================================================
+Arithmetic
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *decrement
+%[*set,&x,=33]%
+%[*decrement,&x,=1]%
+result is %[x]% shd be 32
+%[** **]%
+%[*if,ne,x,=32,=ERROR35]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *product
+%[*set,&x,=7]%
+%[*set,&y,=33]%
+%[*product,&x,y,=2]%
+result is %[x]% shd be 66
+%[** **]%
+%[*if,ne,x,=66,=ERROR36]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *quotient
+%[*set,&x,=7]%
+%[*set,&y,=33]%
+%[*quotient,&x,y,=3]%
+result is %[x]% shd be 11
+%[** **]%
+%[*if,ne,x,=11,=ERROR37]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *quotient with remainder truncated
+%[*set,&x,=7]%
+%[*set,&y,=33]%
+%[*quotient,&x,y,=2]%
+result is %[x]% shd be 16
+%[** **]%
+%[*if,ne,x,=16,=ERROR38]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *quotientrounded -- store int((val1/val2)+0.5) into varname
+%[*set,&y,=33]%
+%[*set,&x,=7]%
+%[*quotientrounded,&x,y,=2]%
+result is %[x]% shd be 17
+%[** **]%
+%[*if,ne,x,=17,=ERROR38]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *scale -- store int((top*range)/base) into varname
+%[*set,&x,=7]%
+%[*set,&y,=33]%
+%[*scale,&x,y,=2,=10]%
+result is %[x]% shd be 165
+%[** **]%
+%[*if,ne,x,=165,=ERROR39]%
+================================================================
+other strings
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *ncopies
+%[*set,&x,=woo]%
+%[*set,&y,=ding]%
+%[*ncopies,&x,y,=3]%
+result is %[x]% shd be dingdingding
+%[** **]%
+%[*if,ne,x,=dingdingding,=ERROR40]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *htmlescape
+%[*set,&s,="Heckler & Koch is > O'Reilly"]%
+%[*set,&x,=%[*htmlescape,s]%]%
+result is "%[x]%"
+...shd be "Heckler &amp; Koch is &gt; O&#39;Reilly"
+%[** **]%
+%[*if,ne,x,="Heckler &amp; Koch is &gt; O&#39;Reilly",=ERROR41]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *urlfetch
+# ugh: cannot use a varible name here, has to have an = sign
+%[*urlfetch,&x,="http://www.multicians.org/thvv/readme_tvv.txt"]%
+result is %[x]%
+# ugh: this value ends in a newline.. maybe i should chomp it.
+%[** **]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *dump
+%[*dump]%
+%[** **]%
+================================================================
+%[*increment,&testno,=1]%
+Test %[testno]%, *format
+%[*format,&x,="<a href=\"$1\">$2</a>",="fred",="jack"]%
+result is %[x]% shd be <a href="fred">jack</a>
+# second test
+%[*format,&x,="--$10-- --$11-- --$12--",=1,=2,=3,=4,=5,=6,=7,=8,=9,=10,=11]%
+result is %[x]%  shd be --10-- --11-- ----.
+# multicians.org uses the getimgdiv (etc) macros which do a lot of *format calls
+%[** **]%
+================================================================
+
+
+# Untested features.. multics-stories does a good job on the first four
+#  \%[*callv,var,v1,v2,...]%    binds v1 to param1, etc, then expands var
+#     check   *callv shd return null if it was returning just a NL
+#     check   *callv should nest, pushing and popping args correctly
+#  \%[*expand,val]%              expands val (including mult), outputs expanded value
+#  \%[*expandv,&var,val]%        expands val (including mult), assigns to var, returns nothing
+#  \%[*fread,&var,=filename]%   reads contents of filename into var, returns nothing
+#  \%[*fwrite,=filename,val]%    writes val to filename, returns nothing
+#  \%[*fappend,=filename,val]%   appends val to filename, returns nothing
+
+# Value of a variable that was never set.
+# Single quote is not a special character.
+# warning if a variable name is all numeric.
+# each run of expandfile has its own list of variable values
+# setting variables from the command arguments to expandfile
+# getting variable values from the shell
+# setting variables in one file and using them in another file
+# prefix and suffix .. e.g
+#   %[*set,&fred,=999]%
+#     The value of "fred" is %[fred|(|)]%.
+#     The value of "mike" is %[mike|(|)]%.
+# selecting the first nonempty value .. The value of "fred,mike" is %[fred,mike|(|)]%.
+# quote marks
+# quote marks inside expansions
+# backslashes inside expansions
+# *bindcsv
+
+# biblio tests onchange heavily
+#  \%[*onchange,var,cmd]% evaluate cmd when var changes
+#  \%[*onnochange,var,cmd]% evaluate cmd if var does not change (put before onchange if using both)
+#
+# titles in {{ }} and {[ ]} {! !} and {@ @} links .. would need database
+
+# \%[*includeraw,=filename]%  outputs non-expanded contents of filename
+
+# relational operators not tested
+# \%[*if,!~,x,y,cmd]%
+# \%[*if,<=,x,y,cmd]%
+# \%[*if,>=,x,y,cmd]%
+# \%[*if,eqlc,x,y,cmd]%
+# \%[*if,nelc,x,y,cmd]%
+# also test the error message for unknown relational, continues and treats as false
+
+# alphabetical list of 37 builtins
+# ** comment
+# *bindcsv,=csvfile_or_url
+# *block,&result,regex
+# *callv,function_block,v1,v2,...
+# *concat,&result,val
+# *csvloop,&outvar,iterator,=csvfile
+# *decrement,&result,val
+# *dirloop,&outvar,iterator,=dirname,starrex
+# *dump
+# *exit,anything
+# *expand,val
+# *expandv,&result,val
+# *fappend,=filename,val
+# *format,&result,formatstring,v1,v2,...
+# *fread,&result,=filename
+# *fwrite,=filename,val
+# *htmlescape,s
+# *if,op,v1,v2,rest
+# *include,=filename
+# *includeraw,=filename
+# *increment,&result,val
+# *ncopies,&result,val,n
+# *onchange,var,command
+# *onnochange,var,command
+# *popssv,&result,&ssv
+# *product,&result,val1,val2
+# *quotient,&result,val1,val2
+# *quotientrounded,&result,val1,val2
+# *scale,&result,val1,val2,val3
+# *set,&result,val
+# *shell,&result,varnameorliteral
+# *sqlloop,&outvar,iterator,query
+# *ssvloop,&outvar,iterator,sslist
+# *subst,&result,left,right
+# *urlfetch,&result,url
+# *warn,anything
+# *xmlloop,&outvar,iterator,=xmlfile
+# 

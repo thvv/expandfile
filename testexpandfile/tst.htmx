@@ -1,0 +1,5 @@
+%[** test if a table is defined in a particular database **]%
+%[** .. usage: expandfile swtconfig.htmi tst.htmx **]%
+%[** **]%
+%[*sqlloop,&out,iter,="SELECT COUNT(*) AS x FROM information_schema.tables  WHERE table_schema = 'thvv_userlist'  AND table_name = 'wtdayhist'"]%
+total is %[.x]%

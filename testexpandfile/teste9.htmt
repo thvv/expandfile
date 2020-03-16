@@ -1,0 +1,4 @@
+%[** test e9, cammand that fails to execute **]%
+%[*shell,&&x,=gorkle teste9.htmt]%
+echo result=%[x]%
+%[** end of test **]%

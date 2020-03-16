@@ -1,0 +1,6 @@
+%[** Test e5, complain if setting a varname that does not exist **]%
+%[** only fires if _HTMXDEBUG2 = yes **]%
+grooble=%[grooble]%
+3=%[3]%
+%[*if,=,a,3,*warn,gribble]%
+%[** end of test **]%

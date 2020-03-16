@@ -1,0 +1,17 @@
+%[** test XML for expandfile **]%
+%[** Copyright (c) 2015, Tom Van Vleck **]%
+%[** 03/30/15 THVV new **]%
+%[** ================================================================ **]%
+%[*block,iterator,^END]%
+|%[item.title]%|%[item.authors]%|%[item.sequence]%
+END
+==== Testing xmlloop ====
+%[*xmlloop,&result,iterator,=test.xml]%
+_nxml is %[_nxml]%
+_xmlfields is %[_xmlfields]%
+result is
+%[result]%
+-------- should be
+|<cite>Open Standards and the Digital Age: History, Ideology, and Networks</cite>|By committee member Andrew Russell|69
+|<cite>Computer: A History of the Information Machine</cite>|co-authored by committee chair Jeffrey Yost|54
+==== end xmlloop test ====

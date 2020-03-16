@@ -1,0 +1,6 @@
+expandfile: teste5.htmt trace: no value for expansion 'grooble'
+expandfile: teste5.htmt trace: no value for expansion '3'
+expandfile: teste5.htmt warning: no value for argument 'a'
+expandfile: teste5.htmt warning: missing = before numeric argument '3'
+expandfile: teste5.htmt warning: no value for argument '3'
+gribble

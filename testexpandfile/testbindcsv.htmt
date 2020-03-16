@@ -1,0 +1,29 @@
+%[** test bindCSV for expandfile **]%
+%[** Copyright (c) 2020, Tom Van Vleck **]%
+%[** ================================================================ **]%
+%[*block,iterator,^END]%
+%[_ssvitem]% = %[%[_ssvitem]%]%
+END
+==== Testing bindcsv local file ====
+%[*bindcsv,=testbind.csv]%
+column names are %[_colnames]%
+%[*ssvloop,&result,iterator,_colnames]%
+-------- result is
+%[result]%
+-------- should be
+x = hello
+t =
+z = Boston, MA
+w = gotta quote "
+==== Testing bindcsv with URL ====
+%[*bindcsv,="https://multicians.org/thvv/htmx/testbind.csv"]%
+column names are %[_colnames]%
+%[*ssvloop,&result,iterator,_colnames]%
+-------- result is
+%[result]%
+-------- should be
+x = hello
+t =
+z = Boston, MA
+w = gotta quote "
+==== end csvloop test ====

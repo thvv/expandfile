@@ -1,0 +1,16 @@
+%[** Script for using DHTML lightbox popup in multicians.org **]%
+%[** Include this file in the body. **]%
+%[** In the "extrastyle" block, include use-dhtml-lightbox.htmi **]%
+%[** then use the imgpopdiv from mxlib.htmi to specify small and large images **]%
+%[** THVV 06/06/17 2.0 use 50x50 logo in 25x25 hole **]%
+%[** Copyright (c) 2013-2017, Tom Van Vleck **]%
+%[** ================================================================ **]%
+<div id="cover" onClick="hideLightBox()">&nbsp;</div>
+<div id="slide" class="headbar">
+  <div class="headbar2">
+  <span class="headinglogo"><a href="%[HOMEREL]%multics.html"><img src="%[HOMEREL]%mulimg/multics-redblack50x50.gif" alt="" height="25" width="25" border="0"></a></span>
+  <span class="headingmult"><a href="%[HOMEREL]%multics.html">Multics</a></span>
+  <span class="slideControl" onclick="hideLightBox()">Close &otimes;</span>
+  </div>
+  <div id="photoSlide" class="clr">Loading</div>
+</div>

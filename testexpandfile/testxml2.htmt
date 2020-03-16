@@ -1,0 +1,19 @@
+%[** test 2 of XML for expandfile **]%
+%[** Copyright (c) 2018, Tom Van Vleck **]%
+%[** 10/15/18 THVV new **]%
+%[** ================================================================ **]%
+%[*block,iterator,^END]%
+|%[results.name]%|%[results.sensorStates]%|%[results.avStatus]%|%[results.avStatus_attr]%
+END
+==== Testing xmlloop 2 ==== (should be a warning above)
+%[*xmlloop,&result,iterator,=xmltest2.xml]%
+_nxml is %[_nxml]%
+_xmlfields is %[_xmlfields]%
+result is
+%[result]%
+-------- should be
+|Paul-Koenig|ACTIVE,LIVE_RESPONSE_NOT_RUNNING,LIVE_RESPONSE_NOT_KILLED,LIVE_RESPONSE_ENABLED||
+|Cheryl-Glinka|ACTIVE,SENSOR_SHUTDOWN,LIVE_RESPONSE_NOT_RUNNING,LIVE_RESPONSE_NOT_KILLED,LIVE_RESPONSE_ENABLED||
+|DESKTOP-0ER376K|ACTIVE,LIVE_RESPONSE_NOT_RUNNING,LIVE_RESPONSE_NOT_KILLED,LIVE_RESPONSE_ENABLED|AV_ACTIVE,ONDEMAND_SCAN_DISABLED|
+==== end xmlloop test 2 ====
+

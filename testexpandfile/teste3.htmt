@@ -1,0 +1,6 @@
+%[** Test e3, missing percent-bracket **]%
+ring ding
+%[*set,&munch,=punch]
+wibby wabby
+tibby tabby
+%[** end of test **]%

@@ -1,0 +1,66 @@
+External function tests for expandfile %[timestamp]%
+    THVV 03/31/17
+
+================================================================
+%[*set,&bigpath,="6180-lights.jpg"]%
+%[*set,&thupath,="thumb-6180-lights.jpg"]%
+%[*set,&alttag,="Alt"]%
+%[*set,&titletag,="Title"]%
+%[*set,&targeth,="http://multicians.org/"]%
+%[*set,&caption,="Hiya Froggy"]%
+%[*set,&popupcaption,="this is the MIT 6180"]%
+================================================================
+Test 1, gifsize
+%[*shell,&x,=gifsize 6180-lights.jpg]%
+result is %[x]%
+should be "6180-lights.jpg" width="164" height="300"
+================================================================
+Test 2, gifsize2
+%[*shell,&x,=gifsize2 6180-lights.jpg]%
+result is %[x]%
+should be 164 300 6180-lights.jpg
+================================================================
+Test 2a, gifsize2
+%[*shell,&x,=gifsize2 6180-lights.jpg -2x]%
+result is %[x]%
+should be 328 600 6180-lights-2x.jpg
+================================================================
+Test 3, filemodshort
+%[*shell,&x,=filemodshort test1d]%
+result is %[x]%
+should be 03/31/17
+================================================================
+Test 4, filemodiso
+%[*shell,&x,=filemodiso test1d]%
+result is %[x]%
+should be 2017-03-31
+================================================================
+Test 5, filedaysold
+%[*shell,&x,=filedaysold test1d]%
+result is %[x]%
+should be 1
+================================================================
+Test 6, filesizek
+%[*shell,&x,=filesizek test1d]%
+result is %[x]%
+should be 13
+================================================================
+Test 7, firstletter
+%[*shell,&x,=firstletter abcde]%
+result is %[x]%
+should be a
+================================================================
+Test 8, nargs
+%[*shell,&x,=nargs a b c d e]%
+result is %[x]%
+should be 5
+================================================================
+Test 9, lowercase
+%[*shell,&x,=lowercase HELLO]%
+result is %[x]%
+should be hello
+================================================================
+Test 10, dbcounts
+%[*shell,&x,=dbcounts mtb]%
+result is %[x]%
+should be 719

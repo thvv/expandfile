@@ -1,0 +1,5 @@
+%[*include,=wtxmacros.htmi]%
+%[*set,&x,=61000000000]%
+%[*callv,setscale,x]%
+======= %[x]% => %[x0]% %[y0]%
+

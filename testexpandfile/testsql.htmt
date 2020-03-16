@@ -1,0 +1,29 @@
+%[** test SQL file for expandfile **]%
+%[** Copyright (c) 2007, Tom Van Vleck **]%
+%[** 02/21/07 THVV add test for columnames **]%
+%[** ================================================================ **]%
+%[*block,iterator,^END]%
+%[*set,&proto,="|"]%
+%[*ssvloop,&junk,iterator2,_colnames]%
+%[*expand,proto]%
+
+END
+%[*block,iterator2,^END]%
+%[*concat,&proto,pct]%
+%[*concat,&proto,lbkt]%
+%[*concat,&proto,_ssvitem]%
+%[*concat,&proto,rbkt]%
+%[*concat,&proto,pct]%
+%[*concat,&proto,="|"]%
+END
+==== Testing sqlloop ====
+%[*sqlloop,&result,iterator,="SELECT * FROM testexpandfile"]%
+nrows is %[_nrows]%
+colnames are "%[_colnames]%"
+.. iterated over colnames to get values
+result is
+%[result]%
+--------- should be 
+|1|2|3|
+|aaa1|bbb2|ccc3|
+==== end sqlloop ====

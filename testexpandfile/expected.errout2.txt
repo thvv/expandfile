@@ -1,0 +1,1 @@
+expandfile: teste2.htmt error: missing end of *block foo -- ^END

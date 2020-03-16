@@ -1,0 +1,8 @@
+%[** Test e1, missing close quote **]%
+%[*set,&foo,="string]%
+wups
+what is going on here
+vups
+tups
+mups
+%[** end of test **]%

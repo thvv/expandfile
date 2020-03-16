@@ -1,0 +1,31 @@
+%[*include,=wtxmacros.htmi]%
+%[*set,&x,=1]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)
+%[*set,&x,=10]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)
+%[*set,&x,=100]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)
+%[*set,&x,=1000]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)
+%[*set,&x,=10000]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)
+%[*set,&x,=100000]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)
+%[*set,&x,=1000000]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)
+%[*set,&x,=10000000]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)
+%[*set,&x,=100000000]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)
+%[*set,&x,=1000000000]%
+%[*callv,setscale,x]%
+x = %[x]%, %[x0]%%[y0]% (%[z0]%)

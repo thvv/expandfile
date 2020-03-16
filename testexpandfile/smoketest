@@ -1,0 +1,16 @@
+Simple smoke test of expandfile -- %[timestamp]%
+
+Here is some plain text.
+
+Test variable setting, increment, conditionals, and blocks.
+%[*set,&x,=35]%
+%[*increment,&x,=1]%
+%[*if,eq,x,=36,*expand,itworked]%
+%[*if,ne,x,=36,*expand,itfailed]%
+%[*block,&itworked,^END]%
+x is %[x]% as it should be.
+END
+%[*block,&itfailed,^END]%
+x is %[x]% but it should be 36.
+END
+%[*warn,end smoke test %[timestamp]% %[EDITOR]%]%

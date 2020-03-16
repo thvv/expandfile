@@ -1,0 +1,13 @@
+%[** test ssvloop **]%
+%[** Copyright (c) 2007, Tom Van Vleck **]%
+%[** ================================================================ **]%
+%[*block,iterator,^END]%
+ item: %[_ssvitem]%
+END
+%[*set,&myssv,=a b c d e]%
+==== Testing ssvloop, shd be a thru e ====
+%[*ssvloop,&result,iterator,myssv]%
+nssv is %[_nssv]%
+result is
+%[result]%
+==== end ssvloop test ====

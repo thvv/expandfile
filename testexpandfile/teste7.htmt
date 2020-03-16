@@ -1,0 +1,23 @@
+%[** Test e7, extra args to builtin **]%
+only the first error is checked because then it exits.
+%[*include,==foo,="extra",args,here]%
+%[*includeraw,=foo,="extra"]%
+%[*expand,foo,="extra"]%
+%[*expandv,&&foo,bar,="extra"]%
+%[*ncopies,&&foo,bar,=4,="extra"]%
+%[*increment,&&foo,=4,="extra"]%
+%[*decrement,&&foo,=4,="extra"]%
+%[*product,&&foo,=5,=4,="extra"]%
+%[*quotient,&&foo,=5,=4,="extra"]%
+%[*quotientrounded,&&foo,=5,=4,="extra"]%
+%[*scale,&&foo,=5,=4,=10,="extra"]%
+%[*popssv,&&oldtop,&ssv,="extra"]%
+%[*fread2,&varname,=filename,="extra"]%
+%[*fwrite,==nowrite,varname,="extra"]%
+%[*fappend,==nowrite,varname,="extra"]%
+%[*csvloop,&&outvar,iter,csvfile,="extra"]%
+%[*ssvloop,&&outvar,iter,ssv,="extra"]%
+%[*dirloop,&&outvar,iter,dirpath,nameregex,="extra"]%
+%[*htmlescape,foo,="extra"]%
+
+%[** end of test **]%
