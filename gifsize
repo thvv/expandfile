@@ -1,0 +1,134 @@
+#!/usr/local/bin/perl 
+# for Duncan
+# THVV 1997
+# THVV 07/14/13 fix %20 in pathname
+
+#  Permission is hereby granted, free of charge, to any person obtaining
+#  a copy of this software and associated documentation files (the
+#  "Software"), to deal in the Software without restriction, including
+#  without limitation the rights to use, copy, modify, merge, publish,
+#  distribute, sublicense, and/or sell copies of the Software, and to
+#  permit persons to whom the Software is furnished to do so, subject to
+#  the following conditions:
+
+#  The above copyright notice and this permission notice shall be included
+#  in all copies or substantial portions of the Software.
+
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+#  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+#  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+#  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
+if ($#ARGV < 0) {
+    die "Usage: gifsize x.gif .... ";
+} # if $#ARGV
+
+while ($#ARGV >= 0) {
+    $mfile = shift;
+    print &process_one_file ($mfile);
+    print "\n";
+} # while
+
+sub process_one_file {
+    my $file = shift;
+    $file =~ s/%20/ /g; # encoded spaces in pathname
+    my $tags;
+    open(GRAPHIC, "$file") || die "Can't open graphic $file $!";
+    binmode(GRAPHIC);		# necessary for non UNIX perl. just leave it.
+
+    if ($file =~ /\.gif$/i) {
+	$tags = &gifSize(GRAPHIC);
+    } elsif ($file =~ /\.jpg$|.jpeg$/i) {
+	$tags =  &jpegSize(GRAPHIC);
+    } elsif ($file =~ /\.png$/i) {
+	$tags =  &pngSize(GRAPHIC);
+    } else {
+	$tags = "";
+    }
+
+    close (GRAPHIC);
+    return "\"$file\" $tags";
+} # process_one_file
+
+sub gifSize {
+    # return a string of height and width tags for a gif.
+    # this code "adapted" from:
+    # http://rajiv.org/programming/gifsize.txt
+
+    my $GIF = shift;
+    my ($w, $w2, $h, $h2, $width, $height, $type) = () ;
+
+    read ($GIF, $type, 3);
+    seek ($GIF, 6, 0); 
+    read ($GIF, $w, 1);
+    read ($GIF, $w2, 1);
+    read ($GIF, $h,  1); 
+    read ($GIF, $h2, 1);
+
+    $width  = ord ($w) + ord ($w2) * 256;
+    $height = ord ($h) + ord ($h2) * 256;
+    return ("width=\"$width\" height=\"$height\"");
+} # gifSize
+
+# jpegsize : gets the width and height (in pixels) of a jpeg file
+# Andrew Tong, werdna@ugcs.caltech.edu           February 14, 1995
+# modified slightly by alex@ed.ac.uk
+sub jpegSize {
+    my $JPEG = shift;
+    my ($done) = 0;
+    my ($size) = "";
+
+    read($JPEG, $c1, 1); read($JPEG, $c2, 1);
+    if( !((ord($c1) == 0xFF) && (ord($c2) == 0xD8))){
+	print "This is not a JPEG!";
+	$done = 1;
+    }
+    while (ord($ch) != 0xDA && !$done) {
+	# Find next marker (JPEG markers begin with 0xFF)
+	# This can hang the program!!
+	while (ord($ch) != 0xFF) {  read($JPEG, $ch, 1); }
+	# JPEG markers can be padded with unlimited 0xFF's
+	while (ord($ch) == 0xFF) { read($JPEG, $ch, 1); }
+	# Now, $ch contains the value of the marker.
+	if ((ord($ch) >= 0xC0) && (ord($ch) <= 0xC3)) {
+	    read ($JPEG, $junk, 3); read($JPEG, $s, 4);
+	    ($a,$b,$c,$d) = unpack("C"x4,$s);
+	    $size = join("",'width="',$c<<8|$d, '" height="',$a<<8|$b, '"' );
+	    $done = 1;
+	} else { # skip
+	    # We **MUST** skip variables, since FF's within variable names are
+	    # NOT valid JPEG markers
+	    read ($JPEG, $s, 2); 
+	    ($c1, $c2) = unpack("C"x2,$s); 
+	    $length = $c1<<8|$c2;
+	    if( ($length < 2) ){
+		print "Erroneous JPEG marker length";
+		$done = 1;
+	    } else {
+		read($JPEG, $junk, $length-2);
+	    }
+	} # skip
+    } # while
+    return $size;
+} # jpegSize
+
+sub pngSize {
+# pngsize : gets the width & height (in pixels) of a png file
+# Re-written and tested by tmetro@vl.com
+    my $PNG = shift;
+    my $buffer;
+    my ($size, $x, $y);
+    read($PNG, $buffer, 30);
+    # Offset to first Chunk Type code = 8-byte ident + 4-byte chunk length + 1
+    if (substr($buffer,12,4) eq 'IHDR') {
+        # IHDR = Image Header
+        ($x, $y) = unpack("NN",substr($buffer,16,8));
+	$size = join("",'width="',$x, '" height="',$y, '"' );
+    } else {
+	print "This is not a PNG!";
+    }
+    return $size;
+} # pngSize

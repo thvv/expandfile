@@ -1,0 +1,47 @@
+#!/usr/local/bin/perl
+
+# fmtsql - format a string so that it can be input safely to mysql - used by expandfile
+#  %[*shell,&x,=fmtsql %[x]%]%
+
+# 04/14/18 THVV
+
+#  Permission is hereby granted, free of charge, to any person obtaining
+#  a copy of this software and associated documentation files (the
+#  "Software"), to deal in the Software without restriction, including
+#  without limitation the rights to use, copy, modify, merge, publish,
+#  distribute, sublicense, and/or sell copies of the Software, and to
+#  permit persons to whom the Software is furnished to do so, subject to
+#  the following conditions:
+
+#  The above copyright notice and this permission notice shall be included
+#  in all copies or substantial portions of the Software.
+
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+#  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+#  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+#  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
+# ================================================================
+my $arg = shift;
+
+$arg =~ s/\u2018/'/g; # LEFT SINGLE QUOTATION MARK               U+2018        0xE2 0x80 0x98
+$arg =~ s/\u2019/'/g; # RIGHT SINGLE QUOTATION MARK              U+2019        0xE2 0x80 0x99
+$arg =~ s/\u201A/'/g; # SINGLE LOW-9 QUOTATION MARK              U+201A        0xE2 0x80 0x9A
+$arg =~ s/\u201B/'/g; # SINGLE HIGH-REVERSED-9 QUOTATION MARK    U+201B        0xE2 0x80 0x9B 
+$arg =~ s/\u201C/'/g; # LEFT DOUBLE QUOTATION MARK               U+201C        0xE2 0x80 0x9C
+$arg =~ s/\u201D/'/g; # RIGHT DOUBLE QUOTATION MARK              U+201D        0xE2 0x80 0x9D
+$arg =~ s/\u201E/'/g; # DOUBLE LOW-9 QUOTATION MARK              U+201E        0xE2 0x80 0x9E
+$arg =~ s/\u201F/'/g; # DOUBLE HIGH-REVERSED-9 QUOTATION MARK    U+201F        0xE2 0x80 0x9F
+$arg =~ s/\u2013/--/g; # en dash
+$arg =~ s/\u2014/--/g; # em dash
+$arg =~ s/\u2022/*/g; # Bullet
+$arg =~ s/\u2026/.../g; # ellipsis
+$arg =~ s/\u2032/'/g; # prime
+$arg =~ s/\u2033/"/g; # double prime
+$arg =~ s/\u00ac/!/g; # not sign, angled dash
+$arg =~ s/'/''/g;
+$arg =~ tr[\000-\177]//c;
+print "$arg\n";

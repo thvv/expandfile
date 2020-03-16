@@ -1,0 +1,99 @@
+%[** convert CSV file to SQL input **]%
+%[** ..  **]%
+%[** USAGE: expandfile in=csvfile.csv table=csvfile prefix=csv csv2sql.htmt  **]%
+%[** . input: specified in the in= arg, default csvfile.csv  **]%
+%[** . output: MySQL table definition and initialization on stdout  **]%
+%[** ..  **]%
+%[** THVV 03/27/18 v1 **]%
+%[** ================================================================ **]%
+%[*block,&doc,^ENDDOC]%
+ Permission is hereby granted, free of charge, to any person obtaining
+ a copy of this software and associated documentation files (the
+ "Software"), to deal in the Software without restriction, including
+ without limitation the rights to use, copy, modify, merge, publish,
+ distribute, sublicense, and/or sell copies of the Software, and to
+ permit persons to whom the Software is furnished to do so, subject to
+ the following conditions:
+
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
+ENDDOC
+%[** ================================================================ **]%
+%[** ================================================================ **]%
+%[** .. setup, parse args **]%
+%[*set,&_ssvsep,="~"]%
+%[*set,&_inputfile,="csvfile.csv"]%
+%[*if,ne,in,="",*set,&_inputfile,in]%
+%[*set,&_tablename,_inputfile]%
+%[*subst,&_tablename,=".csv$",=""]%
+%[*if,ne,table,="",*set,&_tablename,table]%
+%[*set,&_pfx,="csv"]%
+%[*if,ne,prefix,="",*set,&_pfx,prefix]%
+%[** ---------------------------------------------------------------- **]%
+%[** .. read the csv file once to find out the column names **]%
+%[**set,&_tracebind,=yes]%
+%[*csvloop,&junk,="",=%[_inputfile]%]%
+%[*if,eq,_nrows,=0,*warn,zero rows]%
+%[*if,eq,_nrows,=0,*exit]%
+%[*set,&nitems,_nrows]%
+%[** .. loop over the column names to write out the table defs **]%
+%[*ssvloop,&tabledefs,defiter,_colnames]%
+%[*subst,&tabledefs,=",$",=""]%
+%[** .. read the csv file again and generate a VALUES initializer for each row **]%
+%[*set,&inits,=""]%
+%[*csvloop,&junk,inititer,=%[_inputfile]%]%
+%[*subst,&inits,=",\\n$",=";\\n"]%
+%[** .. all content generated **]%
+%[** ================================================================ **]%
+%[** .. iterator over column names to generate table defs **]%
+%[*block,&defiter,^END]%
+%[*set,&v,_ssvitem]%
+%[*subst,&v,=" ",="_"]%
+  %[_pfx]%%[v]%  VARCHAR(255),
+END
+%[** ---------------------------------------------------------------- **]%
+%[** .. iterator over CSV rows to generate initializers **]%
+%[*block,&inititer,^END]%
+%[*concat,&inits,="("]%
+%[*set,&vals,=""]%
+%[*ssvloop,&junk,valiter,_colnames]%
+%[*subst,&vals,=",$",=""]%
+%[*concat,&inits,vals]%
+%[*concat,&inits,="),\\n"]%
+END
+%[** ---------------------------------------------------------------- **]%
+%[** .. iterator over column names in each row to fetch column values **]%
+%[*block,&valiter,^END]%
+%[*set,&v1,=%[%[_ssvitem]%]%]%
+%[*subst,&v1,="'",="''"]%
+%[*concat,&vals,="'"]%
+%[*concat,&vals,v1]%
+%[*concat,&vals,="',"]%
+END
+%[** ================================================================ **]%
+%[** ================================================================ **]%
+%[*block,&example,^ENDEXAMPLE]%
+%[** .. actual output template **]%
+-- generated %[timestamp]%
+-- data definitions for Jira report
+-- thvv 03/27/18
+--
+-- Data converted from a CSV file extracted from NetSuite
+
+DROP TABLE IF EXISTS %[_tablename]%;
+CREATE TABLE %[_tablename]%(
+%[tabledefs]%
+);
+INSERT INTO %[_tablename]% VALUES
+-- %[nitems]% items
+%[inits]%
+ENDEXAMPLE

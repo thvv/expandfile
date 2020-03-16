@@ -1,0 +1,125 @@
+#!/usr/local/bin/perl
+
+# fmtnum - format numbers - used by expandfile
+#  %[*shell,&x,=fmtnum %[x]% disk]%  --  format a file size as KB/MB/GB/TB
+#  %[*shell,&x,=fmtnum %[x]% num]%   --  format a number with commas every 3 digits
+
+# 10/26/10 THVV
+# 09/08/18 THVV add "-"
+# 01/28/19 THVV add "unixsec" and "unixms" and "daystill" and "daystillms"
+
+#  Permission is hereby granted, free of charge, to any person obtaining
+#  a copy of this software and associated documentation files (the
+#  "Software"), to deal in the Software without restriction, including
+#  without limitation the rights to use, copy, modify, merge, publish,
+#  distribute, sublicense, and/or sell copies of the Software, and to
+#  permit persons to whom the Software is furnished to do so, subject to
+#  the following conditions:
+
+#  The above copyright notice and this permission notice shall be included
+#  in all copies or substantial portions of the Software.
+
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+#  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+#  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+#  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
+# ================================================================
+use Time::Local;
+use Time::Zone;
+
+my $arg = shift;
+my $fmt = shift;
+if ($arg eq "-") {
+    $arg = <STDIN>;		# allow "cat fred | fmtnum - disk"
+}
+my $x0 = $arg;
+if ($arg =~ /^-?[0-9,]+$/) {
+    if ($fmt eq 'disk') {	# human readable disk size
+	# disk, KB/MB/GB/TB
+	my $y0 = "";
+	if ($x0 > 512) {
+	    $y0 = "KB";
+	    $x0 = int(($x0 / 1024) + 0.5);
+	}
+	if ($x0 > 512) {
+	    $y0 = "MB";
+	    $x0 = int(($x0 / 1024) + 0.5);
+	}
+	if ($x0 > 512) {
+	    $y0 = "GB";
+	    $x0 = int(($x0 / 1024) + 0.5);
+	}
+	if ($x0 > 512) {
+	    $y0 = "TB";
+	    $x0 = int(($x0 / 1024) + 0.5);
+	}
+	$arg = "$x0$y0";
+    } elsif ($fmt eq 'unixsec') {    # needed this func because 'date' works differently between Linux and macOS (BSD)
+	$arg = &tostring($x0);
+    } elsif ($fmt eq 'unixms') {     # same function but in milliseconds, cert expiration dates are in this form
+	$arg = &tostring($x0/1000);
+    } elsif ($fmt eq 'daystill') {   # compute days till a given date in sec
+	$arg = &deltatime($x0);
+    } elsif ($fmt eq 'daystillms') { # compute days till a given date in ms
+	$arg = &deltatime($x0/1000);
+    } else {			     # number, commas every 3 digits
+	my $neg = "";
+	if (($x0+0) < 0) {
+	    $neg = "-";
+	    $x0 = -$x0;
+	}
+	my $y0 = "$x0";
+	my $z0 = "";
+	while ($x0 > 999) {
+	    $z0 = ',' . substr($y0, -3, 3) . $z0;
+	    $x0 = int($x0 / 1000);
+	    $y0 = "$x0";
+	}
+	$arg = $neg . $x0 . $z0;
+    }
+} else {
+    # not all digits, repeat the first arg
+}
+print "$arg\n";
+
+# ================================================================
+# convert unix time to string
+# $printable = &tosring($epochtime)
+sub tostring {
+    my $xx0 = shift;
+    my $off = tz_local_offset();
+    my $gmt = $xx0 + $off;  # i guess??
+    #print "arg $xx0 offset $off gmt $gmt\n";
+    my ($sec, $min, $hrs, $day, $mon, $yyy) = (localtime($gmt))[0,1,2,3,4,5];
+    my $s = ($yyy+1900) . "-" . &twodigit($mon+1) . "-" . &twodigit($day) . "-" . &twodigit($hrs) . ":" . &twodigit($min) . ":" . &twodigit($sec) . "+0000";
+} # tostring
+
+# ================================================================
+# how many days to a given unix time
+# $days = &deltatime($epochtime)
+sub deltatime {
+    my $xx0 = shift;
+    my $minus = "";
+    my $off = tz_local_offset();
+    my $gmt = $xx0 + $off;
+    my $now = time();
+    if ($gmt < $now) {
+	$minus = "-";
+    }
+    my $diff = ($gmt - $now) / (60 * 60 * 24);
+    #print "now $now gmt $gmt diff $diff offset $off\n";
+    return $minus . int($diff);
+} # deltatime
+
+# ================================================================
+# prettifier for dates
+# $val = &twodigit ($field)
+sub twodigit {			# returns field with leading zero if necessary
+    my $x = shift;
+    return "$x" if ($x > 9);
+    return "0$x";
+} # twodigit

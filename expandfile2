@@ -1,0 +1,20 @@
+ #!/bin/sh
+ # run expandfile on an input file, using config.htmi and an optional extra config
+ # USAGE: expandfile2 sourcefile [optional extra config]
+ # THVV 09/10/18
+ if [ "$1" = "" ] ; then
+     echo >&2 "USAGE: $0 xxx.htmx"
+     exit 1
+ fi
+ xx=`which expandfile`
+ if [ "$xx" = "" ] ; then
+     echo >&2 "error: expandfile is not installed"
+     exit 1
+ fi
+ if [ ! -f "config.htmi" ] ; then
+     echo >&2 "error: config.htmi not found"
+     exit 1
+ fi
+ echo >&2 "expandfile config.htmi $2 $1"
+ expandfile config.htmi $2 $1
+ #end

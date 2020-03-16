@@ -1,0 +1,483 @@
+.\" Manpage for expandfile.
+.\" see https://wpollock.com/AUnix2/manpages.pdf
+.\" Contact thvv@multicians.org to correct errors or typos.
+.\" ================================================================
+.TH man 8 "01 Jan 2020" "1.1" "expandfile man page"
+.\" ================================================================
+.SH NAME
+expandfile \- expand template files
+.\" ================================================================
+.SH SYNOPSIS
+expandfile [var=value] ... [template.htmx] ...
+.\" ================================================================
+.SH DESCRIPTION
+.B expandfile
+is a command line program that reads template files and writes output.
+Characters in the input are copied to the output, except that
+when
+.B expandfile
+sees
+.B %[... something ...]%
+it
+.I expands
+it:
+that is, replaces the bracketed expression by its
+.I value
+in the output.
+Expandfile maintains a symbol table of the values of variables.
+Values come from variables set by input files,
+command line parameters,
+builtin functions,
+macro execution,
+external calls,
+and shell environment variables.
+.\" ================
+.PP
+If a filename is specified as a single hyphen, standard input will be read.
+.\" dont know how come backslash hyphen renders as a, tried all kinds of escapes
+.\" ================
+.PP
+It is often useful to create a file containing a series of
+.B %[*set]%
+commands to set parameters, and provide it as the first filename on the command line.
+.\" ================
+.PP
+One of the main uses for
+.B expandfile
+is translating an extension language for HTML called
+.B HTMX
+into regular HTML.
+.\" ================
+.PP
+.B expandfile
+enables you to 
+provide common formatting and features to multiple web pages.
+You can edit one file instead of many when making a global change, and
+automatically generate content in one page that refers to the content or status of another page.
+.B expandfile
+can extract content from data files and format it.
+.\" ================
+.PP
+.B expandfile
+does not know the syntax of the text it is expanding.
+It can be used for many kinds of text transformation, such as
+structured data to data transformations,
+e.g. CSV to CSV;
+CSV to XML,
+SQL to XML (e.g. sitemaps),
+SQL to procmail,
+SQL to GraphViz, etc.
+.\" ================
+.PP
+Some Web APIs return their values in XML,
+which
+.B expandfile
+can translate into reports or into SQL that can be joined with other data.
+.\" ================================================================
+.SH TEMPLATE SYNTAX
+Text not inside
+.B [ ... ]%
+is just copied.
+Backslash makes the next character unspecial.
+Quotes, commas, etc are not special.
+.\" ================
+.PP
+Inside
+.B %[ ... ]%
+there are three constructs: variable expansion, formatting expansions and builtin function expansions.
+.\" ================================
+.SH Variable Expansion
+The simple case of variable expansion looks like %[variable].
+Writing
+.B %[varname1,varname2,...]%
+returns the value from the first non-empty variable.
+Writing
+.B %[a|pre|post]%
+returns the value of variable "a" prefixed by the string "pre" and suffixed by "post".
+Variables that were never set have the same value as the empty string.
+.\" ================
+.PP
+"pre" and "post" can contain \\n to generate a newline.
+.\" ================================
+.SH Formatting Expansions
+These were developed for formatting multicians.org.
+Expandfile replaces
+.IP \(lC:string:\(rC
+with <span class="%[bracketcolonclass]%">string</span>
+.IP \(lC=string=\(rC
+with <span class="%[bracketequalclass]%">string</span>
+.IP \(lC\(lCtag\ string\(rC\(rC
+.PP
+Expandfile looks up "tag" in SQL table
+.I %[glosstable]%
+column
+.I %[glosskeycol]%
+and replaces with <a href="%[glossbase]%x.html#id" title="...">string</a>
+.IP \(lC\(lBid\ str\(rB\(rC
+looks up "tag" in SQL
+.I %[multicianstable]%
+database column
+.I %[multicianskeycol]%
+and replaces with <a href="%[peoplefile]%#id" title="...">str</a>
+.IP \(lC!word\ string!\(rC
+looks up "word" in SQL table
+.I %[extreftable]%
+column
+.I %[extrefkeycol]%
+and replaces with <a href="url" title="..." target=_blank>(globe) string</a>
+.\" ================================
+.SH Builtin Function Expansions
+Builtin function expansion looks like
+.B %[*function,arg,arg,...]%.
+Builtin functions may have arguments.  These are either literal strings preceded by = or variable names.
+Double quotes are used to prevent interpretation of argument strings.
+For example, ="%[" is a literal value containing percent and open bracket.
+Backslash makes the following character unspecial, so ="\\\\"" is a literal value of a double quote character.
+Builtin arguments that are set by the builtin are prefixed by &.
+.\" ================================================================
+.SH BUILTIN FUNCTIONS
+There are 37 builtin functions.
+.\" ================
+.IP %[**any_text]%
+is a comment.
+.IP %[*set,&result,value]%
+Bind
+.B varname
+to
+.I value.
+.\" ================
+.IP %[*block,&result,regex]%
+Accumulate text, without any variable or builtin execution or macro expansion,
+until a line matching
+.I regex
+is encountered, and assign it to
+.B result.
+.\" ================
+.IP %[*include,=filename]%
+Insert the contents of
+.B filename
+expanding variables and builtins.
+.\" ================
+.IP %[*includeraw=filename]%
+Insert the contents of
+.B filename
+without expanding variables and builtins.
+.\" ================
+.IP %[*if,rel,val1,val2,statement..]%
+Perform the comparison
+.I v1
+.B rel
+.I v2
+and if it is TRUE, expand
+.B statement
+which can be any set of HTMX evaluations, including more "if" builtins.
+.B rel
+is the name of a comparison operator. The supported operators are:
+.I eq, ne, gt, lt, ge, =~, !~, teq, tne, tgt, eqlc, nelc
+The =~ operator is Perl regexp match, and !~ is its negation.
+The 
+.I eqlc
+and
+.I nelc
+operators compare lowercased strings.
+The 
+.I teq, tne, tgt 
+operators do text comparison instead of numeric.
+.\" ================
+.IP %[*expand,varname]%
+Expand variable
+.i varname
+.\" ================
+.IP %[*expandv,&result,varname]%
+Expand variable
+.I varname
+and store the result in
+.B result
+.\" ================
+.IP %[*concat,&result,varname]%
+Concatenate the value of
+.I varname
+to the value in
+.B result
+.\" ================
+.IP %[*bindcsv,=filename_or_url]%
+Read the contents of
+.I filename_or_url
+which should be a 2-line Comma Separated Values file (RFC 4180).
+The first line contains variable names, and the second line contains corresponding values.
+Bind the variables to their values in the symbol table.
+.\" ================
+.IP %[*format,&result,formatvalue,value1,value2,value3...]%
+Replace strings of the form $1, $2, ... in
+.I formatvalue
+with the corresponding
+.I valueI
+and store the result in
+.B result
+.\" ================
+.IP %[*ncopies,&result,numval,value]%
+Concatenate
+.I numval
+copies of
+.I value
+and store the result in
+.B result
+.\" ================
+.IP %[*increment,&result,numval]%
+Increment the value in
+.B result
+with the value in
+.I numval
+and store the result in
+.B result
+.\" ================
+.IP %[*decrement,&result,numval]%
+Decrement the value in
+.B result
+with the value in
+.I numval
+and store the result in
+.B result
+.\" ================
+.IP %[*product,&result,numval]%
+Multiply the value in
+.B result
+by the value in
+.I numval
+and store the result in
+.B result
+.\" ================
+.IP %[*quotient,&result,numval,numval]%
+Divide the value in
+.B result
+by the value in
+.I numval
+discarding the fractional part.
+and store the result in
+.B result
+If divide by zero is attempted, the value is 0.
+.\" ================
+.IP %[*quotientrounded,&result,numval,numval]%
+Divide the value in
+.B result
+by the value in
+.I numval
+rounded to the nearest integer.
+If divide by zero is attempted, the value is 0.
+.IP %[*scale,&result,numval,base,range]%
+Compute
+.I int((numval*range)/base)
+and store the result in
+.B result
+.\" ================
+.IP %[*subst,&result,leftval,rightval]%
+Replace the value in
+.B result
+with the Perl substitution
+.I s/left/right/ig
+and store the result in
+.B result
+.\" ================
+.IP %[*fread,&result,=filename]%
+Reads the contents of file
+.I filename
+into
+.B result
+Does not expand variables or blocks.
+.\" ================
+.IP %[*urlfetch,&result,url]%
+Fetches the contents of the Internet URL
+.I url
+into
+.B result
+Does not expand variables or blocks.
+.\" ================
+.IP %[*fwrite,=filename,varname]%
+Write the contents of
+.I varname
+into file
+.B filename
+Replaces any previous contents of
+.B filename
+.\" ================
+.IP %[*fappend,=filename,varname]%
+Append the contents of
+.I varname
+to the contents (if any) of file
+.B filename
+.\" ================
+.IP %[*shell,&result,cmd]%
+Execute the shell command
+.I cmd</i>
+and capture its output in
+.B result
+If multiple lines are returned, replace the newline separators by the contents of
+.i _ssvsep
+.\" ================
+.IP %[*callv,function_block,param1,param2,param3,...]%
+Save all the variables
+.I parami.
+Assign each variable
+.I parami = vari.
+Expand block
+.I function_block
+which will refer to the variables
+.I parami.
+After expansion, restore all the variables
+.I parami.
+.\" ================
+.IP %[*sqlloop,&result,iterator_block,query]%
+The variables
+.I hostname, database, username, password
+must be set up to point to the database server.
+Execute the SQL query
+.I query</i>
+which returns a number of rows. Each row returns a set of variables.
+For each row, bind the variables in the symbol table using names like
+.I table.varname
+and then expand
+.I iterator_block
+which will refer to these variables.
+Append the result of the expansion to
+.B result
+Set
+.B _nrows
+to the number of rows returned
+and
+.B _colnames
+to an SSV list of the names of the variables bound.
+Computed values such as COUNT are bound to names like
+.B .count
+Exit if there is a database error.
+.\" ================
+.IP %[*csvloop,&result,iterator_block,=filename]%
+Process a Comma Separated Values file (RFC 4180) named
+.I filename
+with a first row that names the variables for each column.
+(The CSV file may be gzipped.)
+For each row, bind the values in the symbol table using names like
+.I colname
+and then expand
+.I iterator_block
+which will refer to these variables.
+Append the result of the expansion to
+.B result
+Set
+.B _nrows
+to the number of rows returned
+and
+.B _colnames
+to an SSV list of the names of the variables bound.
+Exit if the CSV file is not found.
+.\" ================
+.IP %[*xmlloop,&result,iterator_block,=xmlfile,xpath]%
+Process an XML file named
+.I filename
+that contains a list of similar items.
+(The XML file may be gzipped.)
+If
+.B Xpath
+is provided, use it to access the items: otherwise the default is "/*/*".
+For each item, bind the values of sub-items "./*" the values of attributes "./@*" in the symbol table using names like
+.I person
+and then expand
+.B iterator_block
+which will refer to these variables.
+Append the result of the expansion to
+.B result
+Set the value of
+.B _nxml
+to the count of items processed.
+Set
+.B _nxml
+to the count of items found by the query.
+Set
+.B _xmlfields
+to an SSV list of variable names bound.
+If the XML file is missing, exit with an error.
+.\" ================
+.IP %[*ssvloop,&result,iterator_block,varname]%
+An SSV (space separated values) list is a variable value composed of tokens separated by the value in
+.I _ssvsep
+(usually space). Break 
+.B varname
+Into tokens; for each token, bind
+.I _ssvitem
+to the value (null tokens are skipped), and then expand
+.B iterator_block,
+which will refer to
+.I _ssvitem
+Append the result of the expansion to
+.B result.
+This loop works on a copy of
+.I varname
+so the input SSV is not changed.
+The variable
+.B _nssv
+is set to the count of items found by the query.
+.\" ================
+.IP %[*popssv,&result,&value]%
+Remove the first element from the SSV and store it in
+.B result
+Rewrite
+.B value
+without the element.
+.\" ================
+.IP %[*dirloop,&result,iterator,value]%
+Operate on each file system file in a directory whose name matches
+.I starrex
+For each file, do a
+.I stat()
+operation on the file and
+bind variables to the values of the file attributes,
+and then expand
+.I iterator_block
+Append the result of the expansion to
+.B result
+Set
+.B _nrows
+to the number of directory entries processed.
+.\" ================
+.IP %[*onchange,var,statement]%
+If the value of
+.I var
+has changed, execute the
+.I statement
+.\" ================
+.IP %[*onnochangevar,statement]%
+If the value of
+.I var
+has NOT changed, execute the
+.I statement
+.\" ================
+.IP %[*exit]%
+Exit from
+.B expandfile
+.\" ================
+.IP %[*dump]%
+Output the entire symbol table of variables for debugging.
+.\" ================
+.IP %[*warn,string]%
+Write a warning message {:mess:} on STDERR.
+.\" ================
+.IP %[*htmlescape,value]%
+Output the html-escaped representation of
+.I value
+.\" ================================================================
+.SH OPTIONS
+You can optionally specify variable bindings on the command line in the format
+.I varname=value
+.\" ================================================================
+.SH SEE ALSO
+perl, mysql
+.\" ================================================================
+.SH BUGS
+No known bugs.
+.\" ================================================================
+.SH LICENSE
+.B expandfile
+is Open Source software, MIT license.  Share and enjoy.
+.\" ================================================================
+.SH AUTHOR
+Tom Van Vleck (thvv@multicians.org)
+.\" end

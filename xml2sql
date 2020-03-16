@@ -1,0 +1,96 @@
+#!/usr/local/bin/perl
+# Convert an XML file to a SQL file.
+#
+# XML file should have a structure like
+#    <?xml version='1.0'?>
+#    <list>
+#     <item type="" sequence="">
+#       <title></title>
+#       <authors></authors>
+#     </item>
+#     <item type="" sequence="">
+#       <title></title>
+#       <authors></authors>
+#     </item>
+#     ...
+#     </list>
+#
+#
+# THVV 03/31/15
+# THVV 10/12/18 add optional xpath argument
+
+use readbindxml;
+
+if ($#ARGV < 0) {
+    warn "USAGE: xml2sql gork.xml [tablename] [xpath] > gork.sql\n";
+    exit(1);
+}
+
+my $xmlfile = shift;
+my $tablename = $xmlfile;
+my $xpath = '/*/*';		# default
+if ($#ARGV < 0) {
+    $tablename =~ s/^(.*?)\..*$/$1/;  # if not supplied, generate from $xmlfile
+} else {
+    $tablename = shift;
+    if ($#ARGV < 0) {
+	# use default
+    } else {
+	$xpath = shift;
+    }
+}
+
+my %vx;				# each field's values are set here as each item is processed
+my %vmax;			# hash with longest value for each fieldname
+my $mysqlvalues = '';
+
+if (!open(IN, $xmlfile)) {
+    warn "xml2sql: missing XML file '$xmlfile' $!\n";
+    exit(1);
+}
+my @lines = <IN>;		# read whole file
+close(IN);
+my $xmlstring = join('', @lines);
+my $xmlexpand = sub {           # closure invoked after reading each item in the XML
+    my @fldlist = split(/ /, $vx{'_xmlfields'}); # set in first pass before we read any data
+    my $temprow = '(';
+    foreach $field (@fldlist) {
+	if ($field ne '') {	# field shd not be blank
+	    my $fv = $vx{$field};	# all fields have been set whether or not this XML item has them
+	    $fv =~ s/'/\\'/g;	# escape internal quotes
+	    $vmax{$field} = length($fv) if !defined($vmax{$field}) || ($vmax{$field} < length($fv));
+	    $temprow .= '\'' . $fv . '\','; # ravel the field value onto the VALUES row
+	} 
+    } # foreach
+    $temprow =~ s/.$/),\n/;     # .. change the last comma in $temprow to '),\n'
+    $mysqlvalues .= $temprow;
+};
+my $nitems = &readbindxml($xmlstring, \%vx, $xmlexpand, $xpath);  # for each item, generate a row for adding to SQL
+
+# output the header
+print "-- created by xml2sql from $xmlfile\n";
+print "DROP TABLE IF EXISTS $tablename;\n";
+print "CREATE TABLE $tablename (\n";
+
+# output the CREATE TABLE declarations for each field
+my $tempdcl = '';
+my @fldlist2 = split(/ /, $vx{'_xmlfields'});
+foreach $field (@fldlist2) {
+    if ($field ne '') {	# field shd not be blank
+	my $maxch = $vmax{$field};
+	my $ff = "VARCHAR(255)";	# create quantized length
+	$ff = "TEXT" if $maxch > 255;
+	$ff = "CHAR(1)" if $maxch == 1;
+	$field =~ s/^.*?\.//;
+	$tempdcl .= "  $field $ff,\n";
+    }
+}
+$tempdcl =~ s/,\n$/);/;         # change the last comma-nl in $tempdcl to closeparen-semi
+print "$tempdcl\n";
+
+# output the rows to be INSERTed
+print "\n-- $nitems entries\nINSERT INTO $tablename VALUES\n";
+$mysqlvalues =~ s/,\n$/;\n/;    # change the last comma-nl in $mysqlvalues to semi-nl
+print $mysqlvalues;
+
+# end
