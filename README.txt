@@ -15,17 +15,17 @@ Unix/Linux/Mac
 -- install Perl if not already installed
 -- install MySQL
 -- install CPAN modules LWP::Simple, Term::ANSIColor, DBI, DBD::mysql, XML::LibXML, XML::Simple 
--- fetch the expandfile-kit tarfile
--- expand the tarfile and put expandfile and Perl modules in your /bin
+-- fetch the contents of the repository
+-- move expandfile, the .pm modules, and the commands into your /bin
 
 Windows
 -- TBD
 
 Smoke test:
-expandfile
+   expandfile
 should get no errors and no output.
 
-RTFM for more.
+See the web page for more.
 
 MIT License:
 #  Permission is hereby granted, free of charge, to any person obtaining
