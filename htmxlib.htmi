@@ -8,6 +8,8 @@
  .. 2017-05-30 THVV add getimgpopdiv75, getimgdiv75, and getimgtag75
  .. 2017-06-05 THVV use showLightBox2, fix bug in getimbpopdiv75, warning on file not found
  .. 2017-06-15 THVV clean args to avoid errors
+ .. 2020-04-22 THVV fix to eliminate class="" in images
+ .. 2020-05-22 THVV add getfancybox_li
  ================================================================
  Contents
    getimgtag
@@ -129,10 +131,14 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&getimgdiv,^END]%
-%[*set,&_fmtstring0,="<div class=\"$5\">$10<img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\">$11<p class=\"caption\">$6</p></div>\\n"]%
-%[*set,&_fmtstring1,="<div class=\"$5\" style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
-%[*set,&_fmtstring2,="<div class=\"$5\" style=\"width: $7px;\">$10<img src=\"$9\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
-%[*set,&_fmtstring3,="<div class=\"$5\" style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\">$11$12</div>\\n"]%
+%[*set,&_class,=""]%
+%[*if,ne,param5,="",*set,&_class,=" class=\""]%
+%[*if,ne,param5,="",*concat,&_class,param5]%
+%[*if,ne,param5,="",*concat,&_class,="\""]%
+%[*set,&_fmtstring0,="<div$5>$10<img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\">$11<p class=\"caption\">$6</p></div>\\n"]%
+%[*set,&_fmtstring1,="<div$5 style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
+%[*set,&_fmtstring2,="<div$5 style=\"width: $7px;\">$10<img src=\"$9\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
+%[*set,&_fmtstring3,="<div$5 style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\">$11$12</div>\\n"]%
 %[*set,&_beglink,=""]%
 %[*set,&_endlink,=""]%
 %[*set,&_fmtstring,=""]%
@@ -161,7 +167,7 @@ ENDDOC
 %[** .. if param6 is given, set the caption **]%
 %[*if,ne,param6,="",*format,&_cap,="<p class=\"caption\">$1</p>",param6]%
 %[** .. generate the div tag **]%
-%[*format,&_getimgdiv_result,_fmtstring,param1,param2,param3,param4,param5,param6,_width,_height,_filename2x,_beglink,_endlink,_cap]%
+%[*format,&_getimgdiv_result,_fmtstring,param1,param2,param3,param4,_class,param6,_width,_height,_filename2x,_beglink,_endlink,_cap]%
 %[** .. expand twice, once to get the braces, again to do the Multics lookup **]%
 %[*expandv,&_getimgdiv_result,_getimgdiv_result]%
 %[*expandv,&_getimgdiv_result,_getimgdiv_result]%
@@ -192,11 +198,15 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&getimgpopdiv,^END]%
+%[*set,&_class,=""]%
+%[*if,ne,param5,="",*set,&_class,=" class=\""]%
+%[*if,ne,param5,="",*concat,&_class,param5]%
+%[*if,ne,param5,="",*concat,&_class,="\""]%
 %[*subst,&param7,="'",="&#39;"]%
-%[*set,&_fmtstring0,="<div class=\"$5\"><img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\"$10><p class=\"caption\">$6</p></div>\\n"]%
-%[*set,&_fmtstring1,="<div class=\"$5\" style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
-%[*set,&_fmtstring2,="<div class=\"$5\" style=\"width: $7px;\"><img src=\"$9\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
-%[*set,&_fmtstring3,="<div class=\"$5\" style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\"$10>$12</div>\\n"]%
+%[*set,&_fmtstring0,="<div$5><img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\"$10><p class=\"caption\">$6</p></div>\\n"]%
+%[*set,&_fmtstring1,="<div$5 style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
+%[*set,&_fmtstring2,="<div$5 style=\"width: $7px;\"><img src=\"$9\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
+%[*set,&_fmtstring3,="<div$5 style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\"$10>$12</div>\\n"]%
 %[*set,&_ocl,=""]%
 %[*set,&_cap,=""]%
 %[*set,&_fmtstring,=""]%
@@ -243,7 +253,7 @@ ENDDOC
 %[*if,ne,param2,="",*if,ne,_tfilename2x,="",*if,ne,_gifsizer,="",*set,&_oclfmt,_oclfmt2]%
 %[*if,ne,param2,="",*format,&_ocl,_oclfmt,param2,_twidth,_theight,param3,param4,param7,_tfilename2x]%
 %[** .. generate the div tag **]%
-%[*format,&_getimgpopdiv_result,_fmtstring,param1,param2,param3,param4,param5,param6,_width,_height,_filename2x,_ocl,junk,_cap]%
+%[*format,&_getimgpopdiv_result,_fmtstring,param1,param2,param3,param4,_class,param6,_width,_height,_filename2x,_ocl,junk,_cap]%
 %[** .. expand twice, once to get the braces, again to do the Multics lookup **]%
 %[*expandv,&_getimgpopdiv_result,_getimgpopdiv_result]%
 %[*expandv,&_getimgpopdiv_result,_getimgpopdiv_result]%
@@ -283,7 +293,11 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&getimgdiv75,^END]%
-%[*set,&_fmtstring1,="<div class=\"$5\" style=\"width: 75px;\">$7<img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\">$8$9</div>\\n"]%
+%[*set,&_class,=""]%
+%[*if,ne,param5,="",*set,&_class,=" class=\""]%
+%[*if,ne,param5,="",*concat,&_class,param5]%
+%[*if,ne,param5,="",*concat,&_class,="\""]%
+%[*set,&_fmtstring1,="<div$5 style=\"width: 75px;\">$7<img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\">$8$9</div>\\n"]%
 %[*set,&_beglink,=""]%
 %[*set,&_endlink,=""]%
 %[*set,&_cap,=""]%
@@ -295,7 +309,7 @@ ENDDOC
 %[** .. if param6 is given, set the caption **]%
 %[*if,ne,param6,="",*format,&_cap,="<p class=\"caption\">$1</p>",param6]%
 %[** .. generate the div tag **]%
-%[*format,&_getimgdiv_result,_fmtstring1,param1,param2,param3,param4,param5,param6,_beglink,_endlink,_cap]%
+%[*format,&_getimgdiv_result,_fmtstring1,param1,param2,param3,param4,_class,param6,_beglink,_endlink,_cap]%
 %[** .. expand twice, once to get the braces, again to do the Multics lookup **]%
 %[*expandv,&_getimgdiv_result,_getimgdiv_result]%
 %[*expandv,&_getimgdiv_result,_getimgdiv_result]%
@@ -324,8 +338,12 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&getimgpopdiv75,^END]%
+%[*set,&_class,=""]%
+%[*if,ne,param5,="",*set,&_class,=" class=\""]%
+%[*if,ne,param5,="",*concat,&_class,param5]%
+%[*if,ne,param5,="",*concat,&_class,="\""]%
 %[*subst,&param7,="'",="&#39;"]%
-%[*set,&_fmtstring1,="<div class=\"$5\" style=\"width: 75px;\"><img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\"$7>$8</div>\\n"]%
+%[*set,&_fmtstring1,="<div$5 style=\"width: 75px;\"><img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\"$7>$8</div>\\n"]%
 %[*set,&_ocl,=""]%
 %[*set,&_cap,=""]%
 %[*set,&_tfilename2x,=""]%
@@ -353,11 +371,72 @@ ENDDOC
 %[*if,ne,param2,="",*if,ne,_tfilename2x,="",*set,&_oclfmt,_oclfmt2]%
 %[*if,ne,param2,="",*format,&_ocl,_oclfmt,param2,_twidth,_theight,param3,param4,param7,_tfilename2x]%
 %[** .. generate the div tag **]%
-%[*format,&_getimgpopdiv_result,_fmtstring1,param1,param2,param3,param4,param5,param6,_ocl,_cap]%
+%[*format,&_getimgpopdiv_result,_fmtstring1,param1,param2,param3,param4,_class,param6,_ocl,_cap]%
 %[** .. expand twice, once to get the braces, again to do the Multics lookup **]%
 %[*expandv,&_getimgpopdiv_result,_getimgpopdiv_result]%
 %[*expandv,&_getimgpopdiv_result,_getimgpopdiv_result]%
 %[_getimgpopdiv_result]%
+END
+%[*block,&doc,^ENDDOC]%
+================================================================
+ Macro to generate an <LI> block for use with fancybox jquery plugin -- see http://fancyapps.com/fancybox/3/
+ Uses Perl program 'gifsize2' which returns pathname width height; 'gifsize2 xxx-2x.jpg 2x' returns 'width height 2xpath'
+ Include "usefancybox.htmi" to get the CSS defs.
+   usage:  *callv,getfancybox_li,="gal1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"
+ parameters:
+   param1 - gallery ID tag
+   param2 - thumbnails dirname without slash
+   param3 - image file name for both thumbnail and big image
+   param4 - caption
+   param5 - optional directory name in /mxs where large images reside .. if not specified, use "mulimg"
+   output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" border="0" alt=""></a></li>
+ THVV 05/05/19 1.0
+ THVV 05/23/20 2.0 support variable imgdir in param5, do RESPONSIVE html if 2x version is provided
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&getfancybox_li,^END]%
+%[**warn,getfancybox_li,%[param1]%,%[param2]%,%[param3]%,%[param4]%,%[param5]%]%
+%[*set,&_imgdir,="mulimg"]%
+%[*if,ne,param5,="",*set,&_imgdir,param5]%
+%[*if,!~,_imgdir,="/$",*concat,&_imgdir,="/"]%
+%[**  **]%
+%[*set,&_thumbdir,param2]%
+%[*if,!~,_thumbdir,="/$",*concat,&_thumbdir,="/"]%
+%[**  **]%
+%[*set,&_bigfilepath,_imgdir]%
+%[*concat,&_bigfilepath,param3]%
+%[*set,&_bigfilepath2x,=""]%
+%[**  **]%
+%[*set,&_fmt_no1x_no2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"$4\"></a></li>\\n"]%
+%[*set,&_fmt_1x_no2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" data-width=\"$8\" data-height=\"$9\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"$4\"></a></li>\\n"]%
+%[*set,&_fmt_no1x_2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" data-width=\"$8\" data-height=\"$9\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"$4\"></a></li>\\n"]%
+%[*set,&_fmt_1x_2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" data-width=\"$8\" data-height=\"$9\" data-srcset=\"$6 1x, $7 2x\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"$4\"></a></li>\\n"]%
+%[*set,&_fmt,_fmt_1x_no2x]%
+%[**  **]%
+%[** .. look for thumb using helper Perl program **]%
+%[*shell,&_gifsizer,=gifsize2 \"%[_thumbdir]%%[param3]%\"]%
+%[*if,eq,_gifsizer,="",*warn,missing file: %[_thumbdir]%%[param3]%]%
+%[**  **]%
+%[** .. look for 1x version using helper Perl program **]%
+%[*shell,&_gifsizer,=gifsize2 \"%[_bigfilepath]%\"]%
+%[*if,eq,_gifsizer,="",*warn,missing file: %[_bigfilepath]%]%
+%[*if,ne,_gifsizer,="",*popssv,&_width,&_gifsizer]%
+%[*if,ne,_gifsizer,="",*popssv,&_height,&_gifsizer]%
+%[** .. look for 2x version using helper Perl program **]%
+%[*shell,&_gifsizer2x,=gifsize2 \"%[_bigfilepath]%\" 2x]%
+%[** .. 4 cases: have 1x and no 2x, have no 1x and no 2x, have 2x and no 1x, have both **]%
+%[*if,eq,_gifsizer,="",*if,eq,_gifsizer2x,="",*set,&_fmt,_fmt_no1x_no2x]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*set,&_fmt,_fmt_no1x_2x]%
+%[*if,ne,_gifsizer,="",*if,ne,_gifsizer2x,="",*set,&_fmt,_fmt_1x_2x]%
+%[** .. if have have 2x and no 1x, make width and height half of dimensions **]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_width2x,&_gifsizer2x]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_height2x,&_gifsizer2x]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*quotient,&_width,_width2x,=2]%
+%[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*quotient,&_height,_height2x,=2]%
+%[*if,ne,_gifsizer2x,="",*popssv,&_bigfilepath2x,&_gifsizer2x]%
+%[**  **]%
+%[*format,&_result,_fmt,param1,_thumbdir,param3,param4,_imgdir,_bigfilepath,_bigfilepath2x,_width,_height]%
+%[_result]%
 END
 %[*block,&doc,^ENDDOC]%
  ================================================================
@@ -502,14 +581,18 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&imgdiv,^END]%
+%[*set,&_class,=""]%
+%[*if,ne,param5,="",*set,&_class,=" class=\""]%
+%[*if,ne,param5,="",*concat,&_class,param5]%
+%[*if,ne,param5,="",*concat,&_class,="\""]%
 %[*shell,&_gifsizer,=gifsize \"%[param1]%\"]%
 %[*if,eq,_gifsizer,="",*set,&_gifsizer,="\"\""]%
 %[*set,&_width,_gifsizer]%
 %[*subst,&_width,="^.*width=\"",=""]%
 %[*subst,&_width,="\".*$",=""]%
-%[*set,&_imgdiv_result,="<div class=\""]%
-%[*concat,&_imgdiv_result,param5]%
-%[*concat,&_imgdiv_result,="\" style=\"width: "]%
+%[*set,&_imgdiv_result,="<div"]%
+%[*concat,&_imgdiv_result,_class]%
+%[*concat,&_imgdiv_result,=" style=\"width: "]%
 %[*concat,&_imgdiv_result,_width]%
 %[*concat,&_imgdiv_result,="px;\">"]%
 %[*if,ne,param2,="",*concat,&_imgdiv_result,="<a href=\""]%
@@ -550,6 +633,10 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&imgpopdiv,^END]%
+%[*set,&_class,=""]%
+%[*if,ne,param5,="",*set,&_class,=" class=\""]%
+%[*if,ne,param5,="",*concat,&_class,param5]%
+%[*if,ne,param5,="",*concat,&_class,="\""]%
 %[*subst,&param7,="'",="&#39;"]%
 %[*shell,&_gifsizer,=gifsize \"%[param1]%\"]%
 %[*if,eq,_gifsizer,="",*set,&_gifsizer,="\"\""]%
@@ -560,9 +647,9 @@ ENDDOC
 %[*subst,&_height,="^.*height=\"",=""]%
 %[*subst,&_height,="\".*$",=""]%
 %[** generate the div tag **]%
-%[*set,&_imgpopdiv_result,="<div class=\""]%
-%[*concat,&_imgpopdiv_result,param5]%
-%[*concat,&_imgpopdiv_result,="\" style=\"width: "]%
+%[*set,&_imgpopdiv_result,="<div"]%
+%[*concat,&_imgpopdiv_result,_class]%
+%[*concat,&_imgpopdiv_result,=" style=\"width: "]%
 %[*concat,&_imgpopdiv_result,_width]%
 %[*concat,&_imgpopdiv_result,="px;\">"]%
 %[** generate the onclick **]%
