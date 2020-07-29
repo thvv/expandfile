@@ -1,6 +1,7 @@
 Basic tests for expandfile
     THVV 02/22/05
     THVV 05/18/15 revised
+    THVV 07/29/20 revised
 
 ================================================================
 Test 1, should see these words.
@@ -32,27 +33,15 @@ result is %[y]% shd be 12345hello
 ================================================================
 %[*increment,&testno,=1]%
 Test %[testno]%, multiple values
-%[*set,&y,=33]%
-%[*set,&z,=%[queep,quap,y,quop]%]%
-result is %[z]% shd be 33
-%[** **]%
-%[*if,ne,z,=33,=ERROR6]%
+test retired, feature removed
 ================================================================
 %[*increment,&testno,=1]%
 Test %[testno]%, prefix and suffix
-%[*set,&y,=33]%
-%[*set,&z,=%[y|aaa|bbb]%]%
-result is %[z]% shd be aaa33bbb
-%[** **]%
-%[*if,ne,z,=aaa33bbb,=ERROR7]%
+test retired, feature removed
 ================================================================
 %[*increment,&testno,=1]%
 Test %[testno]%, prefix and suffix with multiple values
-%[*set,&y,=33]%
-%[*set,&z,=%[queep,quap,y,quop|aaa|bbb]%]%
-result is %[z]% shd be aaa33bbb
-%[** **]%
-%[*if,ne,z,=aaa33bbb,=ERROR8]%
+test retired, feature removed
 ================================================================
 %[*increment,&testno,=1]%
 Test %[testno]%, comment
@@ -373,10 +362,6 @@ result is %[x]%  shd be --10-- --11-- ----.
 # getting variable values from the shell
 # setting variables in one file and using them in another file
 # prefix and suffix .. e.g
-#   %[*set,&fred,=999]%
-#     The value of "fred" is %[fred|(|)]%.
-#     The value of "mike" is %[mike|(|)]%.
-# selecting the first nonempty value .. The value of "fred,mike" is %[fred,mike|(|)]%.
 # quote marks
 # quote marks inside expansions
 # backslashes inside expansions

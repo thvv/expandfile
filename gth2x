@@ -28,7 +28,7 @@ f=$1
 grav=$2
 if test -z "$f"
 then
-  echo "usage: gthumb filename [center|north|northeast|...]"
+  echo "usage: gth2x filename [center|north|northeast|...]"
   exit 1
 fi
 if test -z "$grav"

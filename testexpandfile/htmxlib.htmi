@@ -1,15 +1,16 @@
 %[** Common HTMX macros **]%
-%[** Copyright (c) 2005-2017 by Tom Van Vleck **]%
+%[** Copyright (c) 2005-2020 by Tom Van Vleck **]%
 %[*block,&doc,^ENDDOC]%
  .. 2017-03-31 THVV use "format" operator in imgtag
  .. 2017-04-02 THVV add get--- macros and responsive 2x image handling
  .. 2017-05-06 THVV bug fixes in the 2x-only case for getimgxxx
  .. 2017-05-10 THVV bug fixes to getimgpopdiv
  .. 2017-05-30 THVV add getimgpopdiv75, getimgdiv75, and getimgtag75
- .. 2017-06-05 THVV use showLightBox2, fix bug in getimbpopdiv75, warning on file not found
+ .. 2017-06-05 THVV use showLightBox2, fix bug in getimgpopdiv75, warning on file not found
  .. 2017-06-15 THVV clean args to avoid errors
  .. 2020-04-22 THVV fix to eliminate class="" in images
  .. 2020-05-22 THVV add getfancybox_li
+ .. 2020-07-29 THVV add wrap and firstnonempty
  ================================================================
  Contents
    getimgtag
@@ -34,6 +35,8 @@
    heading2
    heading3
    heading4
+   wrap
+   firstnonempty
  naming convention: macros "get..." return a value               
  see bin/textexpandfile/marcrotest.tpt for tests                 
  ================================================================
@@ -379,17 +382,18 @@ ENDDOC
 END
 %[*block,&doc,^ENDDOC]%
 ================================================================
- Macro to generate an <LI> block for use with fancybox jquery plugin -- see http://fancyapps.com/fancybox/3/
+ Macro to generate a responsive <LI> block for use with fancybox jquery plugin -- see http://fancyapps.com/fancybox/3/
  Uses Perl program 'gifsize2' which returns pathname width height; 'gifsize2 xxx-2x.jpg 2x' returns 'width height 2xpath'
  Include "usefancybox.htmi" to get the CSS defs.
-   usage:  *callv,getfancybox_li,="gal1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"
+   *callv,lightbox_li,galtag,thumbdir,imgfile,title[,imgdir]
  parameters:
-   param1 - gallery ID tag
+   param1 - gallery DIV ID tag
    param2 - thumbnails dirname without slash
    param3 - image file name for both thumbnail and big image
    param4 - caption
    param5 - optional directory name in /mxs where large images reside .. if not specified, use "mulimg"
-   output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" border="0" alt=""></a></li>
+ usage:  *callv,getfancybox_li,="gal1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"
+ output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" border="0" alt=""></a></li>
  THVV 05/05/19 1.0
  THVV 05/23/20 2.0 support variable imgdir in param5, do RESPONSIVE html if 2x version is provided
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -436,6 +440,25 @@ ENDDOC
 %[*if,ne,_gifsizer2x,="",*popssv,&_bigfilepath2x,&_gifsizer2x]%
 %[**  **]%
 %[*format,&_result,_fmt,param1,_thumbdir,param3,param4,_imgdir,_bigfilepath,_bigfilepath2x,_width,_height]%
+%[_result]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ macro to generate an <LI> block for use with fancybox jquery plugin -- see http://fancyapps.com/fancybox/3/
+  *callv,lightbox_li,galtag,thumbdir,imgfile,title
+ parameters:
+   param1 - gallery ID
+   param2 - thumbnails dirname
+   param3 - image file name
+   param4 - caption
+ usage:  *callv,lightbox_li,="gal1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"
+ output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" border="0" alt=""></a></li>
+ THVV 05/05/19 1.0
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&lightbox_li,^END]%
+%[*set,&_fmt,="<li><a href=\"mulimg/$3\" data-fancybox=\"$1\" data-caption=\"$4\" title=\"$4\"><img src=\"$2/$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\"></a></li>\\n"]%
+%[*format,&_result,_fmt,param1,param2,param3,param4]%
 %[_result]%
 END
 %[*block,&doc,^ENDDOC]%
@@ -869,19 +892,42 @@ ENDDOC
 END
 %[*block,&doc,^ENDDOC]%
  ================================================================
- macro to generate an <LI> block for use with fancybox jquery plugin -- see http://fancyapps.com/fancybox/3/
-   usage:  *callv,lightbox_li,="gal1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"
- parameters:
-   param1 - gallery ID
-   param2 - thumbnails dirname
-   param3 - image file name
-   param4 - caption
- output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" border="0" alt=""></a></li>
- THVV 05/05/19 1.0
+ Wrap a variable with prefix and suffix
+   *callv,wrap,var,pre,suf
+ Parameters:
+ - param1 = variable value
+ - param2 = prefix
+ - param3 = suffix
+ Output: if variable is nonempty, prefix+value+suffix
+ (this macro replaces a peculiar syntax that is removed from expandfile)   
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
-%[*block,&lightbox_li,^END]%
-%[*set,&_fmt,="<li><a href=\"mulimg/$3\" data-fancybox=\"$1\" data-caption=\"$4\" title=\"$4\"><img src=\"$2/$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\"></a></li>\\n"]%
-%[*format,&_result,_fmt,param1,param2,param3,param4]%
-%[_result]%
+%[*block,&wrap,^END$]%
+%[*set,&_temp,param1]%
+%[*if,ne,param1,="",*set,&_temp,param2]%
+%[*if,ne,param1,="",*concat,&_temp,param1]%
+%[*if,ne,param1,="",*concat,&_temp,param3]%
+%[_temp]%
+END
+%[*block,&doc,^ENDDOC]%
+ ================================================================
+ Return first nonempty argument value
+   *callv,firstnonempty,homephone,workphone,mobile,landline
+ Output: first nonblank value
+ (this macro replaces a peculiar syntax that is removed from expandfile)   
+ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+ENDDOC
+%[*block,&firstnonempty,^END$]%
+%[*set,&_temp,=""]%
+%[** --- really need to know how many args we were called with so we don't use more than we were given **]%
+%[*if,ne,param9,="",*set,&_temp,param9]%
+%[*if,ne,param8,="",*set,&_temp,param8]%
+%[*if,ne,param7,="",*set,&_temp,param7]%
+%[*if,ne,param6,="",*set,&_temp,param6]%
+%[*if,ne,param5,="",*set,&_temp,param5]%
+%[*if,ne,param4,="",*set,&_temp,param4]%
+%[*if,ne,param3,="",*set,&_temp,param3]%
+%[*if,ne,param2,="",*set,&_temp,param2]%
+%[*if,ne,param1,="",*set,&_temp,param1]%
+%[_temp]%
 END
