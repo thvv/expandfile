@@ -2,12 +2,12 @@
 %[** Copyright (c) 2020, Tom Van Vleck **]%
 %[** ================================================================ **]%
 %[*block,iterator,^END]%
-%[_ssvitem]% = %[%[_ssvitem]%]%
+%[_xf_ssvitem]% = %[%[_xf_ssvitem]%]%
 END
 ==== Testing bindcsv local file ====
 %[*bindcsv,=testbind.csv]%
-column names are %[_colnames]%
-%[*ssvloop,&result,iterator,_colnames]%
+column names are %[_xf_colnames]%
+%[*ssvloop,&result,iterator,_xf_colnames]%
 -------- result is
 %[result]%
 -------- should be
@@ -15,10 +15,11 @@ x = hello
 t =
 z = Boston, MA
 w = gotta quote "
+================================================================
 ==== Testing bindcsv with URL ====
 %[*bindcsv,="https://multicians.org/thvv/htmx/testbind.csv"]%
-column names are %[_colnames]%
-%[*ssvloop,&result,iterator,_colnames]%
+column names are %[_xf_colnames]%
+%[*ssvloop,&result,iterator,_xf_colnames]%
 -------- result is
 %[result]%
 -------- should be

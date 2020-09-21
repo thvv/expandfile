@@ -22,5 +22,5 @@ END
 %[** ================================================================ **]%
 Testing sqlloop
 %[*sqlloop,&result,iterator,="SELECT * FROM testexpandfile"]%
-nrows is %[_nrows]%
+nrows is %[_xf_nrows]%
 result is %[result]%

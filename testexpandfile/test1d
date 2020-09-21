@@ -2,12 +2,15 @@ Basic tests for expandfile
     THVV 02/22/05
     THVV 05/18/15 revised
     THVV 07/29/20 revised
+    THVV 08/30/20 revised
+    THVV 10/14/20 added test for multiple args to SET
 
 ================================================================
 Test 1, should see these words.
 %[*warn,** %[timestamp]% This is what a warning looks like. It will come out before any of the output. **]%
 ================================================================
 Test 2, the "set" should not generate a line.
+%[*set,&test2,=33]%
 ================================================================
 Test 3, y should be set to 33 and then expanded.
 %[*set,&y,=33]%
@@ -15,11 +18,11 @@ result is %[y]% shd be 33, and no blank line above
 %[** **]%
 %[*if,ne,y,=33,=ERROR3]%
 ================================================================
-Test 4, increment
+%[*set,&testno,=4]%
+Test %[testno]%, increment
 %[*set,&x,=33]%
 %[*increment,&x,=1]%
 result is %[x]% shd be 34
-%[*set,&testno,=4]%
 %[** **]%
 %[*if,ne,x,=34,=ERROR4]%
 ================================================================
@@ -32,12 +35,21 @@ result is %[y]% shd be 12345hello
 %[*if,ne,y,=12345hello,=ERROR5]%
 ================================================================
 %[*increment,&testno,=1]%
-Test %[testno]%, multiple values
-test retired, feature removed
+Test %[testno]%, multiple values concatenated in set
+%[*set,&htt,="https://multicians.org/thvv/htmx/expandfile.html"]%
+%[*set,&anchorstring,="Expandfile"]%
+%[*set,&test6,="<a href=",quote,htt,quote,=">",anchorstring,"=</a>"]%
+result is ||%[test6]%||
+shd be == ||<a href="https://multicians.org/thvv/htmx/expandfile.html">Expandfile</a>||
+%[*if,ne,test6,="<a href=\"https://multicians.org/thvv/htmx/expandfile.html\">Expandfile</a>",*warn,ERROR6]%
 ================================================================
 %[*increment,&testno,=1]%
-Test %[testno]%, prefix and suffix
-test retired, feature removed
+Test %[testno]%, multiple values concatenated in concat
+%[*set,&y,=12345]%
+%[*concat,&y,=hello,=" world"]%
+result is %[y]% shd be 12345hello world
+%[** **]%
+%[*if,ne,y,=12345hello world,=ERROR7]%
 ================================================================
 %[*increment,&testno,=1]%
 Test %[testno]%, prefix and suffix with multiple values
@@ -219,9 +231,9 @@ This should say hello: %[*if,=,x,=33,y]%
 %[*if,ne,y,=hello,=ERROR30]%
 ================================================================
 %[*increment,&testno,=1]%
-Test %[testno]%, ssv and _ssvsep
+Test %[testno]%, ssv and _xf_ssvsep
 %[*set,&x,=a;b;c;d;e]%
-%[*set,&_ssvsep,=;]%
+%[*set,&_xf_ssvsep,=;]%
 %[*popssv,&y,&x]%
 This should say b;c;d;e: %[x]%
 This should say a: %[y]%
@@ -335,17 +347,18 @@ Test %[testno]%, *dump
 %[*increment,&testno,=1]%
 Test %[testno]%, *format
 %[*format,&x,="<a href=\"$1\">$2</a>",="fred",="jack"]%
-result is %[x]% shd be <a href="fred">jack</a>
+result is %[x]%
+...shd be <a href="fred">jack</a>
 # second test
-%[*format,&x,="--$10-- --$11-- --$12--",=1,=2,=3,=4,=5,=6,=7,=8,=9,=10,=11]%
-result is %[x]%  shd be --10-- --11-- ----.
-# multicians.org uses the getimgdiv (etc) macros which do a lot of *format calls
+%[*format,&x,="--$11-- --$10-- --$12--",=1,=2,=3,=4,=5,=6,=7,=8,=9,=10,=11]%
+result is %[x]%
+...shd be --11-- --10-- ----.
 %[** **]%
 ================================================================
 
 
-# Untested features.. multics-stories does a good job on the first four
-#  \%[*callv,var,v1,v2,...]%    binds v1 to param1, etc, then expands var
+# Untested features..
+#  \%[*callv,var,v1,v2,...]%    binds v1 to param1, etc, then expands var.. see results of macrotest.tpt
 #     check   *callv shd return null if it was returning just a NL
 #     check   *callv should nest, pushing and popping args correctly
 #  \%[*expand,val]%              expands val (including mult), outputs expanded value
@@ -353,6 +366,8 @@ result is %[x]%  shd be --10-- --11-- ----.
 #  \%[*fread,&var,=filename]%   reads contents of filename into var, returns nothing
 #  \%[*fwrite,=filename,val]%    writes val to filename, returns nothing
 #  \%[*fappend,=filename,val]%   appends val to filename, returns nothing
+
+# .. multics-stories does a good job on the first four
 
 # Value of a variable that was never set.
 # Single quote is not a special character.

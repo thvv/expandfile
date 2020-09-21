@@ -1,1 +1,1 @@
-expandfile: teste2.htmt error: missing end of *block foo -- ^END
+[31mexpandfile3: teste2.htmt error: missing end of *block foo -- ^END[0m

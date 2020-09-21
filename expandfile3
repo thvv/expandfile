@@ -1,0 +1,147 @@
+#!/usr/local/bin/perl
+# Expand a template. Heavy version.
+#   Usage:  expandfile [name=value]... template... > outfile
+#
+# - can access values in the command environment
+# - can bind values as arguments
+# - sets a few other values such as date and time
+#
+# - expands variables in the input and writes to stdout
+#
+# - can also 
+# --- set variables to values
+# --- include other files, expanding vars while including
+# --- execute other commands and use their output
+# --- do string concatenation, arithmetic, and subsitution
+# --- write files 
+# see expandfile.pm for syntax of how it works
+#  -mult mode expands special multics abbreviations in {: ... :}
+#
+# used by the mail-sending macros
+# also used by the site maintenance tools
+#
+# 11/25/02 THVV 2.0 added -mult mode and -e, added ! and =
+# 11/27/02 THVV 2.1 added | (later removed)
+# 01/07/03 THVV 2.2 added ?< (later removed)
+# 04/10/03 THVV 2.3 moved multics-specific stuff to config
+# 05/23/03 THVV 3.0 changed input language, added features, separated thvvExpander
+# 09/12/03 THVV 3.1 added SQL search
+# 11/29/03 THVV 3.2 moved SQL expansion to thvvExpander
+# 01/14/05 THVV 3.3 add expandblocks, use thvve.pm instead
+# 02/15/05 THVV 3.4 use thvve.pm version 1.6
+# 02/20/05 THVV 4.0 use thvve.pm version 2.0, different language, nesting, quoting
+# 06/24/05 THVV 4.1 add bracketplus and bracketminus
+# 06/24/05 THVV 4.2 add -config for new config file
+# 02/07/07 THVV 4.3 add support for XML configuration
+# 02/22/07 THVV 4.4 remove support for XML configuration, dumb idea
+# 12/01/08 THVV 4.41 add prevmonth
+# 05/31/15 THVV 4.42 bind _currentfilename to the input file for use in error messages.
+# 05/31/15 THVV 5.0 Split into 2 versions, lite and heavy, rename thvve.pm to expandfile.pm
+
+# idea: if "_ENDFIX" is bound, bind "_result" and "_ENDFIX" it before writing out, could fixup output. (idea from 'awk' command)
+
+# Copyright (c) 2003-2020 Tom Van Vleck
+
+#  Permission is hereby granted, free of charge, to any person obtaining
+#  a copy of this software and associated documentation files (the
+#  "Software"), to deal in the Software without restriction, including
+#  without limitation the rights to use, copy, modify, merge, publish,
+#  distribute, sublicense, and/or sell copies of the Software, and to
+#  permit persons to whom the Software is furnished to do so, subject to
+#  the following conditions:
+
+#  The above copyright notice and this permission notice shall be included
+#  in all copies or substantial portions of the Software.
+
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+#  EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+#  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+#  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+#  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+#  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+#  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
+
+use expandfile3;
+
+$values{'_xf_version'} = '6.0';
+
+$incl = 'fh0000';
+
+&setup3("expandfile3");		# Nonstandard setup, binds dates
+
+# fail if no args
+if ($#ARGV < 0) {
+    die "USAGE: $values{'me'} [var=value]... tpt...\n";
+}
+
+# process all arguments
+while ($#ARGV >= 0) {
+    $arg = shift;
+    if ($arg =~ /^(.*)=(.*)$/) { # explicit setting
+	$values{$1} = $2;
+	# warn "bound $1 = $2\n";
+    } elsif ($arg eq "-config") {
+	# noise word
+    } elsif ($arg eq "-mult") {
+	# noise word
+    } else {			# template name
+	# Read in and expand a template file.
+	$tpt = '';
+        $/ = undef;
+	if ($arg eq "-") {
+	    $tpt = <STDIN>;	# read file from STDIN so we can pipe
+	} else {
+	    if (open(TPT, "$arg")) { # regular file
+		$tpt = <TPT>;
+		close(TPT);
+	    } else {
+		die "$values{'me'}: $arg not found $!\n";
+	    }
+	}
+	$/ = "\n";
+
+	$values{'_xf_mainfilename'} = $arg if $arg ne '-'; # may want to know this (expandfile2 will pass)
+	$values{'_xf_currentfilename'} = $values{'_xf_mainfilename'}; # for error messages
+	# Template may have block constructs. Rip them out and bind them.
+	$tpt = &expandblocks($tpt, \%values);
+	# Expand the template and print its output if any.
+	$tpt = &expandMulticsBody($tpt, \%values);
+	print &expandstring($tpt, \%values);
+    } # template name
+} # while argv
+exit(0);
+
+# ================================================================
+# prettifier for dates
+# $val = &twodigit ($field)
+sub twodigit {			# returns field with leading zero if necessary
+    local($x) = $_[0];
+    return "$x" if ($x > 9);
+    return "0$x";
+} # twodigit
+
+# ================================================================
+# slightly modified timestamp
+sub setup3 {
+    $values{'me'} = $_[0];
+    @moname = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan');
+    ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+    $year += 1900;
+    $values{'year'} = $year;
+    $values{'prevyear'} = $year-1;
+    $values{'month'} = $moname[$mon];
+    $values{'prevmonth'} = $moname[$mon-1] if $mon>0;
+    $values{'prevmonth'} = 'Dec' if $mon==0;
+    $values{'monthx'} = &twodigit($mon+1);
+    $values{'monthno'} = &twodigit($mon+1);
+    #$values{'month'} = &twodigit($mon+1);
+    $values{'monthname'} = $moname[$mon];
+    $values{'day'} = &twodigit($mday);
+    $values{'hour'} = &twodigit($hour);
+    $values{'min'} = &twodigit($min);
+    $values{'minute'} = &twodigit($min);
+    $values{'date'} = &twodigit($mday) . ' ' . $moname[$mon] . ' ' . $year;
+    $values{'timestamp'} = "$year".'-'.&twodigit($mon+1).'-'.&twodigit($mday).' '.&twodigit($hour).':'.&twodigit($min);
+} # setup3
+
+# end

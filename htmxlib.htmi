@@ -79,8 +79,9 @@ ENDDOC
    param3 - title tag
  output: (resulting IMG tag)
  gets width and height from inside the graphic. if file not found, leave dimensions out.
- uses 'gifsize2' perl program, which prints '' if file is not found, else 'w h filename'
- also looks for file-2x.jpg, and makes use of it if it exists 
+ uses 'gifsize2' perl program
+  gifsize2 x.jpg  prints '' if x.jpg is not found, else 'w h filename'
+  gifsize2 x.jpg -2x  prints '' if x-2x.jpg is not found, else 'w h filename'
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
  .. case 0 = no files found -- do not specify width and height
  .. case 1 = only 1x found -- get width and height from image
@@ -96,12 +97,13 @@ ENDDOC
 %[*set,&_fmtstring,fmtstring1]%
 %[*set,&_width,=""]%
 %[*set,&_height,=""]%
+%[** .. look for 1x version **]%
 %[*shell,&_gifsizer,=gifsize2 \"%[param1]%\"]%
 %[*if,eq,_gifsizer,="",*warn,missing: %[param1]%]%
 %[*if,ne,_gifsizer,="",*set,&_fmtstring,_fmtstring1]%
 %[*if,ne,_gifsizer,="",*popssv,&_width,&_gifsizer]%
 %[*if,ne,_gifsizer,="",*popssv,&_height,&_gifsizer]%
-%[** .. look for 2x version **]%
+%[** .. look for 2x version .. not an error if not found **]%
 %[*shell,&_gifsizer2x,=gifsize2 \"%[param1]%\" 2x]%
 %[*if,eq,_gifsizer,="",*if,eq,_gifsizer2x,="",*set,&_fmtstring,_fmtstring0]%
 %[*if,eq,_gifsizer,="",*if,ne,_gifsizer2x,="",*set,&_fmtstring,_fmtstring2]%
@@ -135,9 +137,7 @@ END
 ENDDOC
 %[*block,&getimgdiv,^END]%
 %[*set,&_class,=""]%
-%[*if,ne,param5,="",*set,&_class,=" class=\""]%
-%[*if,ne,param5,="",*concat,&_class,param5]%
-%[*if,ne,param5,="",*concat,&_class,="\""]%
+%[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
 %[*set,&_fmtstring0,="<div$5>$10<img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\">$11<p class=\"caption\">$6</p></div>\\n"]%
 %[*set,&_fmtstring1,="<div$5 style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
 %[*set,&_fmtstring2,="<div$5 style=\"width: $7px;\">$10<img src=\"$9\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
@@ -202,9 +202,7 @@ END
 ENDDOC
 %[*block,&getimgpopdiv,^END]%
 %[*set,&_class,=""]%
-%[*if,ne,param5,="",*set,&_class,=" class=\""]%
-%[*if,ne,param5,="",*concat,&_class,param5]%
-%[*if,ne,param5,="",*concat,&_class,="\""]%
+%[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
 %[*subst,&param7,="'",="&#39;"]%
 %[*set,&_fmtstring0,="<div$5><img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\"$10><p class=\"caption\">$6</p></div>\\n"]%
 %[*set,&_fmtstring1,="<div$5 style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
@@ -297,9 +295,7 @@ END
 ENDDOC
 %[*block,&getimgdiv75,^END]%
 %[*set,&_class,=""]%
-%[*if,ne,param5,="",*set,&_class,=" class=\""]%
-%[*if,ne,param5,="",*concat,&_class,param5]%
-%[*if,ne,param5,="",*concat,&_class,="\""]%
+%[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
 %[*set,&_fmtstring1,="<div$5 style=\"width: 75px;\">$7<img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\">$8$9</div>\\n"]%
 %[*set,&_beglink,=""]%
 %[*set,&_endlink,=""]%
@@ -342,9 +338,7 @@ END
 ENDDOC
 %[*block,&getimgpopdiv75,^END]%
 %[*set,&_class,=""]%
-%[*if,ne,param5,="",*set,&_class,=" class=\""]%
-%[*if,ne,param5,="",*concat,&_class,param5]%
-%[*if,ne,param5,="",*concat,&_class,="\""]%
+%[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
 %[*subst,&param7,="'",="&#39;"]%
 %[*set,&_fmtstring1,="<div$5 style=\"width: 75px;\"><img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\"$7>$8</div>\\n"]%
 %[*set,&_ocl,=""]%
@@ -474,8 +468,7 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&gettwodigit,^END$]%
-%[*set,&_x0,="00"]%
-%[*concat,&_x0,param1]%
+%[*set,&_x0,="00",param1]%
 %[*subst,&_x0,="^.*(..)$",="$1"]%
 %[_x0]%
 END
@@ -506,9 +499,7 @@ ENDDOC
 %[*concat,&_h1,=":"]%
 %[*if,eq,_h1,="0:",*set,&_h1,=""]%
 %[*if,ne,_h1,="",*set,&_m1,=%[*callv,gettwodigit,_m1]%]%
-%[*concat,&_h1,_m1]%
-%[*concat,&_h1,=":"]%
-%[*concat,&_h1,=%[*callv,gettwodigit,_s1]%]%
+%[*concat,&_h1,_m1,=":",=%[*callv,gettwodigit,_s1]%]%
 %[_h1]%
 END
 %[*block,&doc,^ENDDOC]%
@@ -580,13 +571,7 @@ ENDDOC
 %[*block,&imgtag,^END]%
 %[*shell,&_gifsizer,=gifsize \"%[param1]%\"]%
 %[*if,eq,_gifsizer,="",*set,&_gifsizer,="\"\""]%
-%[*set,&imgtag_result,="<img src="]%
-%[*concat,&imgtag_result,_gifsizer]%
-%[*concat,&imgtag_result,=" border=\"0\" alt=\""]%
-%[*concat,&imgtag_result,param2]%
-%[*concat,&imgtag_result,="\" title=\""]%
-%[*concat,&imgtag_result,param3]%
-%[*concat,&imgtag_result,="\">"]%
+%[*set,&imgtag_result,="<img src=",_gifsizer,=" border=\"0\" alt=\"",param2,="\" title=\"",param3,="\">"]%
 END
 %[*block,&doc,^ENDDOC]%
  ================================================================
@@ -605,33 +590,17 @@ END
 ENDDOC
 %[*block,&imgdiv,^END]%
 %[*set,&_class,=""]%
-%[*if,ne,param5,="",*set,&_class,=" class=\""]%
-%[*if,ne,param5,="",*concat,&_class,param5]%
-%[*if,ne,param5,="",*concat,&_class,="\""]%
+%[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
 %[*shell,&_gifsizer,=gifsize \"%[param1]%\"]%
 %[*if,eq,_gifsizer,="",*set,&_gifsizer,="\"\""]%
 %[*set,&_width,_gifsizer]%
 %[*subst,&_width,="^.*width=\"",=""]%
 %[*subst,&_width,="\".*$",=""]%
-%[*set,&_imgdiv_result,="<div"]%
-%[*concat,&_imgdiv_result,_class]%
-%[*concat,&_imgdiv_result,=" style=\"width: "]%
-%[*concat,&_imgdiv_result,_width]%
-%[*concat,&_imgdiv_result,="px;\">"]%
-%[*if,ne,param2,="",*concat,&_imgdiv_result,="<a href=\""]%
-%[*if,ne,param2,="",*concat,&_imgdiv_result,param2]%
-%[*if,ne,param2,="",*concat,&_imgdiv_result,="\">"]%
-%[*concat,&_imgdiv_result,="<img src="]%
-%[*concat,&_imgdiv_result,_gifsizer]%
-%[*concat,&_imgdiv_result,=" border=\"0\" alt=\""]%
-%[*concat,&_imgdiv_result,param3]%
-%[*concat,&_imgdiv_result,="\" title=\""]%
-%[*concat,&_imgdiv_result,param4]%
-%[*concat,&_imgdiv_result,="\" />"]%
+%[*set,&_imgdiv_result,="<div",_class,=" style=\"width: ",_width,="px;\">"]%
+%[*if,ne,param2,="",*concat,&_imgdiv_result,="<a href=",quote,param2,quote,=">"]%
+%[*concat,&_imgdiv_result,="<img src=",_gifsizer,=" border=\"0\" alt=",quote,param3,quote,=" title=",quote,param4,quote,=" />"]%
 %[*if,ne,param2,="",*concat,&_imgdiv_result,="</a>"]%
-%[*concat,&_imgdiv_result,="<p class=\"caption\">"]%
-%[*concat,&_imgdiv_result,param6]%
-%[*concat,&_imgdiv_result,="</p></div>\\n"]%
+%[*concat,&_imgdiv_result,="<p class=\"caption\">",param6,="</p></div>\\n"]%
 %[*expandv,&_imgdiv_result,_imgdiv_result]%
 %[*expandv,&_imgdiv_result,_imgdiv_result]%
 %[_imgdiv_result]%
@@ -657,9 +626,7 @@ END
 ENDDOC
 %[*block,&imgpopdiv,^END]%
 %[*set,&_class,=""]%
-%[*if,ne,param5,="",*set,&_class,=" class=\""]%
-%[*if,ne,param5,="",*concat,&_class,param5]%
-%[*if,ne,param5,="",*concat,&_class,="\""]%
+%[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
 %[*subst,&param7,="'",="&#39;"]%
 %[*shell,&_gifsizer,=gifsize \"%[param1]%\"]%
 %[*if,eq,_gifsizer,="",*set,&_gifsizer,="\"\""]%
@@ -671,46 +638,21 @@ ENDDOC
 %[*subst,&_height,="\".*$",=""]%
 %[** generate the div tag **]%
 %[*set,&_imgpopdiv_result,="<div"]%
-%[*concat,&_imgpopdiv_result,_class]%
-%[*concat,&_imgpopdiv_result,=" style=\"width: "]%
-%[*concat,&_imgpopdiv_result,_width]%
-%[*concat,&_imgpopdiv_result,="px;\">"]%
-%[** generate the onclick **]%
+%[*concat,&_imgpopdiv_result,_class,=" style=\"width: ",_width,="px;\">"]%
+%[** generate the onclick .. uses old 'gifsize' Perl function **]%
 %[*set,&_imgpopdiv_ocl,=""]%
 %[*if,ne,param2,="",*shell,&_tgifsizer,=gifsize \"%[param2]%\"]%
-%[*if,ne,param2,="",*if,eq,_tgifsizer,="",*set,&_tgifsizer,="\"\""]%
+%[*if,ne,param2,="",*if,eq,_tgifsizer,="",*set,&_tgifsizer,quote,quote]%
 %[*if,ne,param2,="",*set,&_twidth,_tgifsizer]%
 %[*if,ne,param2,="",*set,&_theight,_tgifsizer]%
 %[*if,ne,param2,="",*subst,&_twidth,="^.*width=\"",=""]%
 %[*if,ne,param2,="",*subst,&_twidth,="\".*$",=""]%
 %[*if,ne,param2,="",*subst,&_theight,="^.*height=\"",=""]%
 %[*if,ne,param2,="",*subst,&_theight,="\".*$",=""]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,=" onClick=\"showLightBox('"]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,param2]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,_twidth]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,_theight]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,param3]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,=""]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="','"]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,param7]%
-%[*if,ne,param2,="",*concat,&_imgpopdiv_ocl,="')\""]%
+%[*if,ne,param2,="",*set,&_imgpopdiv_ocl,=" onClick=",quote,="showLightBox('",param2,="','",_twidth,="','",_theight,="','",param3,="','','",param7,="')",quote]%
 %[** generate the img tag **]%
-%[*concat,&_imgpopdiv_result,="<img src="]%
-%[*concat,&_imgpopdiv_result,_gifsizer]%
-%[*concat,&_imgpopdiv_result,=" border=\"0\" alt=\""]%
-%[*concat,&_imgpopdiv_result,param3]%
-%[*concat,&_imgpopdiv_result,="\" title=\""]%
-%[*concat,&_imgpopdiv_result,param4]%
-%[*concat,&_imgpopdiv_result,="\""]%
-%[*concat,&_imgpopdiv_result,_imgpopdiv_ocl]%
-%[*concat,&_imgpopdiv_result,=" />"]%
-%[*concat,&_imgpopdiv_result,="<p class=\"caption\">"]%
-%[*concat,&_imgpopdiv_result,param6]%
-%[*concat,&_imgpopdiv_result,="</p></div>\\n"]%
+%[*concat,&_imgpopdiv_result,="<img src=",_gifsizer,=" border=\"0\" alt=",quote,param3,quote,=" title=",quote,param4,quote,_imgpopdiv_ocl,=" />"]%
+%[*concat,&_imgpopdiv_result,="<p class=\"caption\">",param6,="</p></div>\\n"]%
 %[*expandv,&_imgpopdiv_result,_imgpopdiv_result]%
 %[*expandv,&_imgpopdiv_result,_imgpopdiv_result]%
 %[_imgpopdiv_result]%
@@ -728,8 +670,7 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&twodigit,^END$]%
-%[*set,&x0,="00"]%
-%[*concat,&x0,param1]%
+%[*set,&x0,="00",param1]%
 %[*subst,&x0,="^.*(..)$",="$1"]%
 END
 %[*block,&doc,^ENDDOC]%
@@ -771,16 +712,14 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&dumpsql,^END$]%
-%[*set,&x0,="<p>"]%
-%[*concat,&x0,param1]%
-%[*concat,&x0,="</p><dl>"]%
-%[*set,&x1,_colnames]%
+%[*set,&x0,="<p>",param1,="</p><dl>"]%
+%[*set,&x1,_xf_colnames]%
 %[*ssvloop,&x0,dumpsqliter,x1]%
 %[*concat,&x0,="</dl>"]%
 END
 %[** - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - **]%
 %[*block,&dumpsqliter,^END$]%
-<dt>%[_ssvitem]%</dt><dd>%[%[_ssvitem]%]%</dd>
+<dt>%[_xf_ssvitem]%</dt><dd>%[%[_xf_ssvitem]%]%</dd>
 END
 %[*block,&doc,^ENDDOC]%
  ================================================================
@@ -832,13 +771,7 @@ ENDDOC
 %[*increment,&level2,=1]%%[*set,&level3,=0]%
 %[*set,&x0,=section%[level2]%]%
     <h2 id="%[x0]%">%[level2]%. %[param1]%</h2>
-%[*concat,&toc,="<li class=\"tocitem2\"><a href=\"#"]%
-%[*concat,&toc,x0]%
-%[*concat,&toc,="\">"]%
-%[*concat,&toc,level2]%
-%[*concat,&toc,=". "]%
-%[*concat,&toc,param1]%
-%[*concat,&toc,="</a></li>"]%
+%[*concat,&toc,="<li class=\"tocitem2\"><a href=\"#",x0,="\">",level2,=". ",param1,="</a></li>"]%
 END
 %[*block,&doc,^ENDDOC]%
  ================================================================
@@ -854,15 +787,7 @@ ENDDOC
 %[*increment,&level3,=1]%%[*set,&level4,=0]%
 %[*set,&x0,=section%[level2]%x%[level3]%]%
     <h3 id="%[x0]%">%[level2]%.%[level3]%. %[param1]%</h3>
-%[*concat,&toc,="<li class=\"tocitem3\"><a href=\"#"]%
-%[*concat,&toc,x0]%
-%[*concat,&toc,="\">"]%
-%[*concat,&toc,level2]%
-%[*concat,&toc,="."]%
-%[*concat,&toc,level3]%
-%[*concat,&toc,=". "]%
-%[*concat,&toc,param1]%
-%[*concat,&toc,="</a></li>"]%
+%[*concat,&toc,="<li class=\"tocitem3\"><a href=\"#",x0,="\">",level2,=".",level3,=". ",param1,="</a></li>"]%
 END
 %[*block,&doc,^ENDDOC]%
  ================================================================
@@ -878,17 +803,7 @@ ENDDOC
 %[*increment,&level4,=1]%%[*set,&level5,=0]%
 %[*set,&x0,=section%[level2]%x%[level3]%x%[level4]%]%
     <h4 id="%[x0]%">%[level2]%.%[level3]%.%[level4]%. %[param1]%</h4>
-%[*concat,&toc,="<li class=\"tocitem4\"><a href=\"#"]%
-%[*concat,&toc,x0]%
-%[*concat,&toc,="\">"]%
-%[*concat,&toc,level2]%
-%[*concat,&toc,="."]%
-%[*concat,&toc,level3]%
-%[*concat,&toc,="."]%
-%[*concat,&toc,level4]%
-%[*concat,&toc,=". "]%
-%[*concat,&toc,param1]%
-%[*concat,&toc,="</a></li>"]%
+%[*concat,&toc,="<li class=\"tocitem3\"><a href=\"#",x0,="\">",level2,=".",level3,=". ",level4,=". ",param1,="</a></li>"]%
 END
 %[*block,&doc,^ENDDOC]%
  ================================================================
@@ -903,10 +818,9 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&wrap,^END$]%
+%[**warn,wrap %[param1]% %[param2]% %[param3]%]%
 %[*set,&_temp,param1]%
-%[*if,ne,param1,="",*set,&_temp,param2]%
-%[*if,ne,param1,="",*concat,&_temp,param1]%
-%[*if,ne,param1,="",*concat,&_temp,param3]%
+%[*if,ne,param1,="",*set,&_temp,param2,param1,param3]%
 %[_temp]%
 END
 %[*block,&doc,^ENDDOC]%

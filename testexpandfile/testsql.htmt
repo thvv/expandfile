@@ -1,25 +1,30 @@
 %[** test SQL file for expandfile **]%
 %[** Copyright (c) 2007, Tom Van Vleck **]%
 %[** 02/21/07 THVV add test for columnames **]%
+%[** 09/15/20 THVV turn on tracing **]%
+%[*set,&_xf_tracebind,=all]%
 %[** ================================================================ **]%
 %[*block,iterator,^END]%
 %[*set,&proto,="|"]%
-%[*ssvloop,&junk,iterator2,_colnames]%
+%[*ssvloop,&junk,iterator2,_xf_colnames]%
 %[*expand,proto]%
 
 END
+%[** ---------------------------------------------------------------- **]%
 %[*block,iterator2,^END]%
 %[*concat,&proto,pct]%
 %[*concat,&proto,lbkt]%
-%[*concat,&proto,_ssvitem]%
+%[*concat,&proto,_xf_ssvitem]%
 %[*concat,&proto,rbkt]%
 %[*concat,&proto,pct]%
 %[*concat,&proto,="|"]%
 END
+%[** ================================================================ **]%
 ==== Testing sqlloop ====
+(_xf_tracebind is ON, should see warnings)
 %[*sqlloop,&result,iterator,="SELECT * FROM testexpandfile"]%
-nrows is %[_nrows]%
-colnames are "%[_colnames]%"
+nrows is %[_xf_nrows]%
+colnames are "%[_xf_colnames]%"
 .. iterated over colnames to get values
 result is
 %[result]%

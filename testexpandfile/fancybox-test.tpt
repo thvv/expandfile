@@ -1,0 +1,66 @@
+Macro tests for expandfile and fancybox %[timestamp]%
+================================================================
+Including fancy.htmi
+%[*shell,&_t,=ls -l fancy.htmi]%
+%[_t]%
+%[*include,=fancy.htmi]%
+================================================================
+setup vars
+%[** 1x files are files that have no -2x **]%
+%[*set,&bigpath,="m50-fano.jpg"]%
+%[*set,&bigpath1x,="6180-lights1x.jpg"]%
+%[*set,&bigpath2x,="dmj-rar-6180-big-2x.jpg"]%
+%[*set,&nonxpath,="nonexist.jpg"]%
+%[*set,&thupath,="thumb-dmj-rar-6180-big.jpg"]%
+%[*set,&thupath2x,="thumb-6180-lights-2x.jpg"]%
+%[*set,&thupath3x,="thumb-6180-lights3x-2x.jpg"]%
+%[*set,&alttag,="Alt"]%
+%[*set,&titletag,="Title"]%
+%[*set,&targeth,="http://multicians.org/"]%
+%[*set,&caption,="Hiya Froggy"]%
+%[*set,&popupcaption,="this is the MIT 6180"]%
+
+%[*callv,testsetup]%
+%[** ----------------------------------------------------------------  **]%
+%[*block,&testsetup,^END]%
+%[*set,&ntests,=0]%
+%[*set,&nerrs,=0]%
+END
+%[** ----------------------------------------------------------------  **]%
+%[*block,&teststart,^END]%
+%[*increment,&ntests,=1]%
+Test %[param1]%, %[param2]%
+END
+%[** ----------------------------------------------------------------  **]%
+%[*block,&testfail,^END]%
+%[*increment,&nerrs,=1]%
+!%[*expand,=ERROR]%!
+END
+%[** ----------------------------------------------------------------  **]%
+%[*block,&testpass,^END]%
+!%[*expand,=OK]%!
+END
+================================================================
+================================================================
+testing getfancybox_li
+-- total 20 cases: 4 cases with no target, 4 with nonext target, 4 with 1x target only, 4 with 2x target only, 4 with both targets
+--    usage:  *callv,getfancybox_li,="gal1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"
+================================================================
+%[*callv,teststart,="3",="*callv,getfancybox_li,="g1",="thumbnails150",bigpath,titletag -- 1x thumb, 1x target"]%
+%[*set,&x,=%[*callv,getfancybox_li,="g1",="thumbnails150",bigpath,titletag]%]%
+%[*set,&y,="<li><a href=mulimg/m50-fano.jpg data-fancybox=\"g1\" data-caption=\"Title\" data-width=976 data-height=648 title=Title><img src=\"thumbnails150/m50-fano.jpg\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"Title\"></a></li>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3c",="*callv,getfancybox_li,="g1",="thumbnails150",nonxpath,titletag -- nonext thumb/target"]%
+%[*set,&x,=%[*callv,getfancybox_li,="g1",="thumbnails150",nonxpath,titletag]%]%
+%[*set,&y,="<li><img src=\"nonexist.jpg\" border=\"0\" title=\"Title\"></li>"]%
+result is %[x]%
+should be %[y]%
+%[*if,ne,x,y,*callv,testfail]%
+%[*if,eq,x,y,*callv,testpass]%
+================================================================
+%[*callv,teststart,="3c",="*callv,getfancybox_li,="g1",="thumbnails150",nonxpath,titletag -- nonext thumb/target"]%
+

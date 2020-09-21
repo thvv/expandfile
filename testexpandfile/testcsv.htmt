@@ -7,8 +7,8 @@
 END
 ==== Testing csvloop ====
 %[*csvloop,&result,iterator,=test.csv]%
-column names are %[_colnames]%
-nrows is %[_nrows]%
+column names are %[_xf_colnames]%
+nrows is %[_xf_nrows]%
 result is %[result]%
 -------- should be
 |1|2|3

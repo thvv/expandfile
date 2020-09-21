@@ -1,0 +1,82 @@
+%[*set,&title,="Project MAC 50th Anniversary and Multics Reunion"]%
+%[*set,&description,="50th anniversary celebration of MIT Project MAC, LCS, CSAIL."]%
+%[** fancytest **]%
+%[*include,=mxlib.htmi]%
+%[** Copyright (c) 2014-2019 by Tom Van Vleck **]%
+%[** ================================================================ **]%
+%[*block,&extrastyle,^END$]%
+%[*include,=usefancybox.htmi]%
+<style>
+ .fancybox-caption {font-family: helvetica,arial,sans-serif; font-style: italic;}
+ .boxed {font-family: Sans-serif; font-size: 9pt; background-color: #e0e0f0; margin: 0 10px 0 20px; padding: 0 5px 0 5px;}
+ .boxed td {padding: 5px 15px 5px 0;}
+ .thead {font-weight: bold; font-size: 10pt;}
+ #g1 {padding: 5px; }
+ #g2 {padding: 5px; }
+ #g3 {padding: 5px; }
+</style>
+END
+%[** ================================================================ **]%
+%[*block,&body,^ENDBODY$]%
+<p class="author">Tom Van Vleck</p> 
+
+<!--
+<div id="g1" class="gallery">
+  <ul>
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-whs.jpg",="Bill Southworth [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-mills.jpg",="Richard G. Mills [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-green1.jpg",="Paul Green [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-rollow-gintell.jpg",="David Rollow, John Gintell [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-mullen-freiburghouse.jpg",="Bob Mullen, Bob Freiburghouse [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50whs-southworths.jpg",="Bill and Barbara Southworth [WHS]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50whs-ktp-rg-x.jpg",="Ken Pogran, Richard Gardner, Len Evenchick [WHS]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50whs-ktp-rms-bsg.jpg",="Ken Pogran, Richard Soley, BSG [WHS]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50whs-jwg.jpg",="John Gintell [WHS]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50whs-thvv.jpg",="Tom Van Vleck [WHS]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50whs-audience.jpg",="audience [WHS]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="mac50-ivan.jpg",="Ivan Sutherland [Clip from MIT video]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-love-green.jpg",="J. Spencer Love, Paul Green [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-gintell-klensin.jpg",="John Gintell, John Klensin [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-gardner.jpg",="Richard Gardner [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-dern.jpg",="Daniel Dern [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-bernie.jpg",="BSG [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50-crowd.jpg",="hallway crowd at Stata Center [THVV]"]%
+%[*callv,lightbox_li,="g1",="thumbnails150",="m50whs-cake.jpg",="there was cake [WHS]"]%
+  </ul>
+</div>
+-->
+<p>these tests work as well as the old lightbox_li macro</p>
+<div id="g2" class="gallery">
+  <ul>
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-whs.jpg",="Bill Southworth [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-mills.jpg",="Richard G. Mills [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-green1.jpg",="Paul Green [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-rollow-gintell.jpg",="David Rollow, John Gintell [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-mullen-freiburghouse.jpg",="Bob Mullen, Bob Freiburghouse [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50whs-southworths.jpg",="Bill and Barbara Southworth [WHS]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50whs-ktp-rg-x.jpg",="Ken Pogran, Richard Gardner, Len Evenchick [WHS]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50whs-ktp-rms-bsg.jpg",="Ken Pogran, Richard Soley, BSG [WHS]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50whs-jwg.jpg",="John Gintell [WHS]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50whs-thvv.jpg",="Tom Van Vleck [WHS]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50whs-audience.jpg",="audience [WHS]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="mac50-ivan.jpg",="Ivan Sutherland [Clip from MIT video]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-love-green.jpg",="J. Spencer Love, Paul Green [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-gintell-klensin.jpg",="John Gintell, John Klensin [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-gardner.jpg",="Richard Gardner [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-dern.jpg",="Daniel Dern [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-bernie.jpg",="BSG [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50-crowd.jpg",="hallway crowd at Stata Center [THVV]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="m50whs-cake.jpg",="there was cake [WHS]"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="wyman-tty.jpg",="test with regular and 2x image"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="wes-burner.jpg",="test with regular and 2x image"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="mrt-gfc-hats.jpg",="test with regular and 2x image"]%
+%[*callv,getfancybox_li,="g2",="thumbnails150",="mrt-gfc-drw-635.jpg",="test with regular and 2x image"]%
+  </ul>
+</div>
+ENDBODY
+%[*block,&extratail,^END]%
+<p class="textnav">{@-mac50.html Next story@}</p>
+END
+%[*include,=pagewrapper.htmi]%

@@ -1,0 +1,10 @@
+%[** Test e10, bad variable names **]%
+%[**set,&_xf_debug,=all]%
+testing expansion of garbage varname aa$%^&!^{}
+%[aa$%^&!^{}]%
+
+testing use of garbage varname reference in set
+%[*set,&a,bb$%^&!^{}]%
+
+testing use of garbage varname as target
+%[*set,&cc$%^&!^{},=3]%

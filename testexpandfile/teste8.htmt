@@ -1,7 +1,7 @@
 %[** teste8, dirloop **]%
-%[*dirloop,&outvar,iter,="froop",".*"]%
+%[*dirloop,&outvar,iter,="nonexist_dir",".*"]%
 expected: warning message if dir cannot be found, binds nothing, returns _nrows=0, outvar empty
-_nrows=%[_nrows]%
+_xf_nrows=%[_xf_nrows]%
 outvar='%[outvar]%'
 %[*block,iter,^END]%
 file=%[file_name]%

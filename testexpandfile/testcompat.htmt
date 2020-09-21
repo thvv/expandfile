@@ -1,0 +1,107 @@
+%[** expandfile3 **]%
+%[**  compatibility feature test **]%
+%[**  thvv 2020-09-03 **]%
+
+There are 3 kinds of variables
+1. plain variables like x
+2. listed variables like _xf_currentfunction
+3. unlisted variables like _xf_foo.  should there be any of these?
+#
+%[*warn,test expandfile3 compatibility feature]%
+%[*set,&testno,=0]%
+turn on debug
+%[*warn,turn on debug]%
+%[*set,&_xf_debug,="all"]%
+----
+%[*increment,&testno,=1]%
+%[*warn,%[testno]%. ----]%
+1. setold_only, not onlist
+%[*warn,1. setold_only, not onlist, case1]%
+%[*set,&case1,="123"]%
+%[case1]% .. shd return 123
+%[*if,ne,case1,="123",*warn,case1= %[case1]% s/b 123]%
+%[_xf_case1]% .. shd return nothing
+%[*if,ne,_xf_case1,="",*warn,_xf_case1= %[_xf_case1]% s/b empty]%
+----
+%[*increment,&testno,=1]%
+%[*warn,%[testno]%. ----]%
+2. setold_only, onlist, _nrows
+%[*warn,2. setold_only, onlist, _nrows]%
+%[*set,&_nrows,="123"]%
+%[_nrows]% .. shd return 123
+%[*if,ne,_nrows,="123",*warn,_nrows= %[_nrows]% s/b 123]%
+%[_xf_nrows]% .. _nrows is on the list, shd return 123, should fuss
+%[*if,ne,_xf_nrows,="123",*warn,_xf_nrows= %[_xf_nrows]% s/b 123]%
+error should have shadowed, _nrows is on list, did not
+----
+%[*increment,&testno,=1]%
+%[*warn,%[testno]%. ----]%
+3. setnew_only, not onlist, case2
+%[*warn,3. setnew_only, not onlist]%
+%[*set,&_xf_case2,="345"]%
+%[case2]% .. shd return nothing because not onlist
+%[*if,ne,case2,="",*warn,case2= %[case2]% s/b empty]%
+%[_xf_case2]% .. shd return 345
+%[*if,ne,_xf_case2,="345",*warn,_xf_case2= %[_xf_case2]% s/b 345]%
+----
+%[*increment,&testno,=1]%
+%[*warn,%[testno]%. ----]%
+4. setnew_only, onlist, _xf_nxml
+%[*warn,4. setnew_only, onlist, _xf_nxml]%
+%[*set,&_xf_nxml,="345"]%
+%[nxml]% .. shd return 345, set should fuss
+%[*if,ne,_xf_nxml,="345",*warn,_xf_nxml= %[_xf_nxml]% s/b 345]%
+%[_nxml]% .. shd return 345
+%[*if,ne,_nxml,="345",*warn,_nxml= %[_nxml]% s/b 345]%
+----
+%[*increment,&testno,=1]%
+%[*warn,%[testno]%. ----]%
+5. setboth, old first, not onlist, case3
+%[*warn,5. setboth, old first, not onlist]%
+%[*set,&case3,="567old"]%
+%[*set,&_xf_case3,="567new"]%
+%[case3]% .. should return 567old
+%[*if,ne,case3,="567old",*warn,case3= %[case3]% s/b 567old]%
+%[_xf_case3]% .. should return 567new
+%[*if,ne,_xf_case3,="567new",*warn,_xf_case3= %[_xf_case3]% s/b 567new]%
+----
+%[*increment,&testno,=1]%
+%[*warn,%[testno]%. ----]%
+6. setboth, old first, onlist, _xf_ssvsep
+%[*warn,6. setboth, old first, onlist]%
+%[*set,&_ssvsep,="567old"]%
+%[*set,&_xf_ssvsep,="567new"]%
+%[ssvsep]% .. should return 567new because onlist, should fuss
+%[*if,ne,ssvsep,="567new",*warn,ssvsep= %[ssvsep]% s/b 567new]%
+%[_xf_ssvsep]% .. should return 567new
+%[*if,ne,_xf_ssvsep,="567new",*warn,_xf_ssvsep= %[_xf_ssvsep]% s/b 567new]%
+----
+%[*increment,&testno,=1]%
+%[*warn,%[testno]%. ----]%
+7. setboth, new first, not onlist, case4
+%[*warn,7. setboth, new first, not onlist]%
+%[*set,&_xf_case4,="789new"]%
+%[*set,&case4,="789old"]% .. should not fuss
+%[_xf_case4]% .. should return 789new
+%[*if,ne,_xf_case4,="789new",*warn,_xf_case4= %[_xf_case4]% s/b 789new]%
+%[case4]% .. should return 789old
+%[*if,ne,case4,="789old",*warn,case4= %[case4]% s/b 789old]%
+----
+%[*increment,&testno,=1]%
+%[*warn,%[testno]%. ----]%
+8. setboth, new first, onlist, _xf_colnames
+%[*warn,8. setboth, new first, onlist]%
+%[*set,&_xf_colnames,="789new"]%
+%[*set,&_colnames,="789old"]% .. should fuss, setting when already set
+%[_xf_colnames]% .. should return 789old
+%[*if,ne,_xf_colnames,="789old",*warn,_xf_colnames= %[_xf_colnames]% s/b 789old]%
+%[colnames]% .. should return 789old
+%[*if,ne,colnames,="789old",*warn,colnames= %[colnames]% s/b 789old]%
+----
+%[*increment,&testno,=1]%
+%[*warn,%[testno]%. ----]%
+9. noset_get, not onlist
+%[*warn,9. noset_get, not onlist]%
+%[case7]% .. shd warn not set
+%[_xf_case8]% .. shd warn not set
+

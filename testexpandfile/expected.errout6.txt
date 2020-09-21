@@ -1,1 +1,1 @@
-expandfile: teste6.htmt error: unknown builtin *gork,foo =string
+[31mexpandfile3: teste6.htmt error: unknown builtin *gork,foo =string[0m

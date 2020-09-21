@@ -1,12 +1,12 @@
 #!/bin/sh
-# make test configuration for testexpandfile
+# make test configuration for testexpandfile.3
 #
-# if config.htmi exists, just list its date
+# if config2.htmi exists, just list its date
 # else if $HOME/.my.cnf exists, adopt values from it
 # if variables username, password, hostname, database do not exist, ask for them
-# expand config.tpt info config.htmi
+# expand config.tpt info config2.htmi
 #
-# THVV 2020-02024
+# THVV 2020-02-24
 
 checkvar()
 {
@@ -53,13 +53,13 @@ readmycnf()
 }
 # ================================================================
 
-if [ -f config.htmi ] ; then
-    ls -l config.htmi
+if [ -f $CONFIG ] ; then
+    ls -l $CONFIG
 else
-    echo "==== setting up config.htmi"
+    echo "==== setting up $CONFIG"
     # check .my.cnf
     if [ -f $HOME/.my.cnf ] ; then
-	# some vars are renamed between .my.cnf and expandfile
+	# some vars are renamed between .my.cnf and expandfile3
 	readmycnf password
 	readmycnf user
 	export username=$user
@@ -76,6 +76,6 @@ else
     checkvar host localhost
     export prompt="MySQL database"
     checkvar database stats
-    expandfile config.tpt > config.htmi
-    ls -l config.htmi
+    $EXPANDFILE config.tpt > $CONFIG
+    ls -l $config
 fi

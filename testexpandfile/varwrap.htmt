@@ -1,0 +1,24 @@
+%[** var syntax and  wrap test **]%
+%[** THVV 08/31/20 **]%
+%[** ================================================================ **]%
+--- variable syntax and wrap test %[me]%
+--- .. first with basic variable expansion
+%[*set,&foo1,=""]%
+%[*set,&foo2,="12345"]%
+%[*set,&foo3,=""]%
+foo2 is %[foo2]%, shd be no error
+foo1,foo2,foo3 is %[foo1,foo2,foo3]% old was 12345, shd be warning
+foo1,foo2,foo3|<<|>> is %[foo1,foo2,foo3|<<|>>]% old was <<12345>> shd be 2 warnings
+================================================================
+%[*include,=htmxlib.htmi]%
+now test firstnonempty and wrap with macros
+-- firstnonempty shd be 12345
+%[*callv,firstnonempty,=%[foo1]%,=%[foo2]%,=%[foo3]%]%
+
+-- wrap shd be <<12345>>
+%[*callv,wrap,foo2,="<<",=">>"]%
+
+-- both shd be <<12345>>
+%[*callv,wrap,=%[*callv,firstnonempty,=%[foo1]%,=%[foo2]%,=%[foo3]%]%,="<<",=">>"]%
+
+----- end -----

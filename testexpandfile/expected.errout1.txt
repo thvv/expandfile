@@ -1,1 +1,1 @@
-expandfile: teste1.htmt error: unclosed quoted string beginning 'set,&foo,="'
+[31mexpandfile3: teste1.htmt error: unclosed quoted string beginning 'set,&foo,="'[0m

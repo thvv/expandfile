@@ -69,6 +69,6 @@ END
       </tr>
       %[content]%
     </table>
-    %[_nrows]%
+    %[_xf_nrows]%
   </body>
 </html>

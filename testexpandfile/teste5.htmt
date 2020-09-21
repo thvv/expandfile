@@ -1,6 +1,7 @@
 %[** Test e5, complain if setting a varname that does not exist **]%
-%[** only fires if _HTMXDEBUG2 = yes **]%
+%[** only fires if _xf_debug is nonblank **]%
+%[*set,&_xf_debug,='all']%
 grooble=%[grooble]%
 3=%[3]%
-%[*if,=,a,3,*warn,gribble]%
+%[*if,=,a,3,*warn,undefined var a equal to undefined var 3]%
 %[** end of test **]%

@@ -1,0 +1,2 @@
+%[** test file invoked by testvar.sh **]%
+%[*warn,magic_var=%[magic_var]%]%

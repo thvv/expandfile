@@ -1,4 +1,2 @@
-expandfile: teste8.htmt warning: 'froop' not a dir in *dirloop
-expected: warning message if dir cannot be found, binds nothing, returns _nrows=0, outvar empty
-_nrows=0
-outvar=''
+[32mexpandfile3: teste8.htmt warning: invalid chars in varname '.*' in *dirloop[0m
+[32mexpandfile3: teste8.htmt warning: 'nonexist_dir' not a dir in *dirloop[0m

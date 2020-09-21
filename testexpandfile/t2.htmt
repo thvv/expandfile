@@ -7,8 +7,8 @@
 END
 ==== Testing xmlloop ====
 %[*xmlloop,&result,iterator,=test.xml]%
-_nxml is %[_nxml]%
-_xmlfields is %[_xmlfields]%
+_xf_nxml is %[_xf_nxml]%
+_xf_xmlfields is %[_xf_xmlfields]%
 result is
 %[result]%
 -------- should be
