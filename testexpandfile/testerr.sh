@@ -8,7 +8,7 @@
 #
 ### error messages should indicate what file is being expanded and what line .. blocks screw that up though ..
 #
-export EXPAND=expandfile3
+export EXPAND=expandfile
 #
 # missing close quote
 # err msg shows context for the open quote
