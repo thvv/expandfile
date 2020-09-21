@@ -40,7 +40,7 @@
 
 # idea: if "_ENDFIX" is bound, bind "_result" and "_ENDFIX" it before writing out, could fixup output. (idea from 'awk' command)
 
-# Copyright (c) 2003-2019 Tom Van Vleck
+# Copyright (c) 2003-2020 Tom Van Vleck
 
 #  Permission is hereby granted, free of charge, to any person obtaining
 #  a copy of this software and associated documentation files (the
@@ -61,28 +61,17 @@
 #  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
-use expandfile;
+use expandfile3;
 
-$values{'version'} = '5.0';
+$values{'_xf_version'} = '6.0';
 
 $incl = 'fh0000';
-$values{'pct'} = '%';		# used for double expansion
-$values{'lbkt'} = '[';
-$values{'rbkt'} = ']';
-$values{'quote'} = '"';
-# make sure these have a value.. can be overriden by config
-$values{'bracketcolonclass'} = 'cmd';
-$values{'bracketequalclass'} = 'pathname';
-$values{'bracketplusclass'} = 'code';
-$values{'bracketminusclass'} = 'special';
-$values{'peoplefile'} = 'multicians';
-$values{'glossbase'} = 'mg';
 
 &setup3("expandfile");		# Nonstandard setup, binds dates
 
 # fail if no args
 if ($#ARGV < 0) {
-    die "USAGE: $values{'me'} [var=value]... tpt...";
+    die "USAGE: $values{'me'} [var=value]... tpt...\n";
 }
 
 # process all arguments
@@ -111,8 +100,8 @@ while ($#ARGV >= 0) {
 	}
 	$/ = "\n";
 
-	$values{'mainfilename'} = $arg if $arg ne '-'; # may want to know this (expandfile2 will pass)
-	$values{'_currentfilename'} = $values{'mainfilename'}; # for error messages
+	$values{'_xf_mainfilename'} = $arg if $arg ne '-'; # may want to know this (expandfile2 will pass)
+	$values{'_xf_currentfilename'} = $values{'_xf_mainfilename'}; # for error messages
 	# Template may have block constructs. Rip them out and bind them.
 	$tpt = &expandblocks($tpt, \%values);
 	# Expand the template and print its output if any.
