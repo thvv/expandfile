@@ -93,11 +93,11 @@ sub iterateXML {
     my $fh = $incl++;		# increase global filehandle counter
     if ($xmlfile =~ /\.gz$|\.z$/i) {
     	if (!open($fh, "gzcat $xmlfile |")) {
-	    &expandfile3::&errmsg($symtbptr, 1, "error: missing compressed XML file '$xmlfile' $! in *xmlloop");
+	    &expandfile3::errmsg($symtbptr, 1, "error: missing compressed XML file '$xmlfile' $! in *xmlloop");
 	}
     } else {
     	if (!open($fh, "$xmlfile")) {
-	    &expandfile3::&errmsg($symtbptr, 1, "error: missing XML file '$xmlfile' $! in *xmlloop");
+	    &expandfile3::errmsg($symtbptr, 1, "error: missing XML file '$xmlfile' $! in *xmlloop");
 	}
     }
     my @lines = <$fh>; # read whole file

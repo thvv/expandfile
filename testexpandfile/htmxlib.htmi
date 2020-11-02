@@ -189,7 +189,7 @@ END
    param6 - thumb caption or ""
    param7 - popup caption, may not contain refs like {[ ... ]} directly because they would be expanded to things with commas and generate extra params
             .. instead of ="{[ ... ]}" use ="%[lbrace]%[ ... ]%[rbrace]%"
-            .. may not contain single quote (because is an arg to ShowLightBox2), use &#39 instead
+            .. may not contain single quote (because is an arg to ShowLightBox2), &#39 will not work either
  gets width and height from inside the graphic. if file is not found, leave dimensions out.
  also looks for file-2x.jpg, and if it is found, uses that file, with the size of the base file 
  output: (resulting DIV)
@@ -327,6 +327,7 @@ END
    param6 - thumb caption or ""
    param7 - popup caption, may not contain refs like {[ ... ]} directly because they would be expanded to things with commas and generate extra params
             .. instead of ="{[ ... ]}" use ="%[lbrace]%[ ... ]%[rbrace]%"
+            .. may not contain single quote or &#39;
  also looks for file-2x.jpg, and if it is found, uses that file, with the size of the base file 
  output: (resulting DIV)
  .. requires use-dhtml-lightbox.htmi to be included in the HEAD
@@ -401,8 +402,7 @@ ENDDOC
 %[*set,&_thumbdir,param2]%
 %[*if,!~,_thumbdir,="/$",*concat,&_thumbdir,="/"]%
 %[**  **]%
-%[*set,&_bigfilepath,_imgdir]%
-%[*concat,&_bigfilepath,param3]%
+%[*set,&_bigfilepath,_imgdir,param3]%
 %[*set,&_bigfilepath2x,=""]%
 %[**  **]%
 %[*set,&_fmt_no1x_no2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"$4\"></a></li>\\n"]%
@@ -637,8 +637,7 @@ ENDDOC
 %[*subst,&_height,="^.*height=\"",=""]%
 %[*subst,&_height,="\".*$",=""]%
 %[** generate the div tag **]%
-%[*set,&_imgpopdiv_result,="<div"]%
-%[*concat,&_imgpopdiv_result,_class,=" style=\"width: ",_width,="px;\">"]%
+%[*set,&_imgpopdiv_result,="<div",_class,=" style=\"width: ",_width,="px;\">"]%
 %[** generate the onclick .. uses old 'gifsize' Perl function **]%
 %[*set,&_imgpopdiv_ocl,=""]%
 %[*if,ne,param2,="",*shell,&_tgifsizer,=gifsize \"%[param2]%\"]%
