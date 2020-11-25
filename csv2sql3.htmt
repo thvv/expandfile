@@ -1,0 +1,75 @@
+%[** convert CSV file to SQL input **]%
+%[** ..  **]%
+%[** USAGE: expandfile in=csvfile.csv table=csvfile prefix=csv csv2sql.htmt  **]%
+%[** . input: specified in the in= arg, default csvfile.csv  **]%
+%[** . output: MySQL table definition and initialization on stdout  **]%
+%[** ..  **]%
+%[** THVV 03/27/18 v1 **]%
+%[** THVV 09/15/20 v2 expandfile3 **]%
+%[** ================================================================ **]%
+%[** .. setup, parse args **]%
+%[*set,&_xf_ssvsep,="~"]%
+%[*set,&inputfile,="csvfile.csv"]%
+%[*if,ne,in,="",*set,&inputfile,in]%
+%[*set,&tablename,inputfile]%
+%[*subst,&tablename,=".csv$",=""]%
+%[*if,ne,table,="",*set,&tablename,table]%
+%[*set,&pfx,="csv"]%
+%[*if,ne,prefix,="",*set,&pfx,prefix]%
+%[** ---------------------------------------------------------------- **]%
+%[** .. read the csv file once to find out the column names **]%
+%[**set,&_xf_tracebind,=yes]%
+%[*csvloop,&junk,="",=%[inputfile]%]%
+%[*if,eq,_xf_nrows,=0,*warn,zero rows]%
+%[*if,eq,_xf_nrows,=0,*exit]%
+%[*set,&nitems,_xf_nrows]%
+%[** .. loop over the column names to write out the table defs **]%
+%[*ssvloop,&tabledefs,defiter,_xf_colnames]%
+%[*subst,&tabledefs,=",$",=""]%
+%[** .. read the csv file again and generate a VALUES initializer for each row **]%
+%[*set,&inits,=""]%
+%[*csvloop,&junk,inititer,=%[inputfile]%]%
+%[*subst,&inits,=",\\n$",=";\\n"]%
+%[** .. all content generated **]%
+%[** ================================================================ **]%
+%[** .. iterator over column names to generate table defs **]%
+%[*block,&defiter,^END]%
+%[*set,&v,_xf_ssvitem]%
+%[*subst,&v,=" ",="_"]%
+  %[pfx]%%[v]%  VARCHAR(255),
+END
+%[** ---------------------------------------------------------------- **]%
+%[** .. iterator over CSV rows to generate initializers **]%
+%[*block,&inititer,^END]%
+%[*concat,&inits,="("]%
+%[*set,&vals,=""]%
+%[*ssvloop,&junk,valiter,_xf_colnames]%
+%[*subst,&vals,=",$",=""]%
+%[*concat,&inits,vals]%
+%[*concat,&inits,="),\\n"]%
+END
+%[** ---------------------------------------------------------------- **]%
+%[** .. iterator over column names in each row to fetch column values **]%
+%[*block,&valiter,^END]%
+%[*set,&v1,=%[%[_xf_ssvitem]%]%]%
+%[*subst,&v1,="'",="''"]%
+%[*concat,&vals,="'"]%
+%[*concat,&vals,v1]%
+%[*concat,&vals,="',"]%
+END
+%[** ================================================================ **]%
+%[** ================================================================ **]%
+%[** .. actual output template **]%
+-- generated %[timestamp]%
+-- data definitions for Jira report
+-- thvv 03/27/18
+--
+-- Data converted from a CSV file extracted from NetSuite
+
+DROP TABLE IF EXISTS %[tablename]%;
+CREATE TABLE %[tablename]%(
+%[tabledefs]%
+);
+INSERT INTO %[tablename]% VALUES
+-- %[nitems]% items
+%[inits]%

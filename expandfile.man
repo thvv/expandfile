@@ -2,7 +2,7 @@
 .\" see https://wpollock.com/AUnix2/manpages.pdf
 .\" Contact thvv@multicians.org to correct errors or typos.
 .\" ================================================================
-.TH man 8 "01 Jan 2020" "1.1" "expandfile man page"
+.TH man 8 "21 Sep 2020" "1.2" "expandfile man page"
 .\" ================================================================
 .SH NAME
 expandfile \- expand template files
@@ -88,16 +88,7 @@ there are three constructs: variable expansion, formatting expansions and builti
 .\" ================================
 .SH Variable Expansion
 The simple case of variable expansion looks like %[variable].
-Writing
-.B %[varname1,varname2,...]%
-returns the value from the first non-empty variable.
-Writing
-.B %[a|pre|post]%
-returns the value of variable "a" prefixed by the string "pre" and suffixed by "post".
 Variables that were never set have the same value as the empty string.
-.\" ================
-.PP
-"pre" and "post" can contain \\n to generate a newline.
 .\" ================================
 .SH Formatting Expansions
 These were developed for formatting multicians.org.
@@ -124,7 +115,7 @@ looks up "word" in SQL table
 .I %[extreftable]%
 column
 .I %[extrefkeycol]%
-and replaces with <a href="url" title="..." target=_blank>(globe) string</a>
+and replaces with <a href="url" title="..." target=_blank>(globeicon) string</a>
 .\" ================================
 .SH Builtin Function Expansions
 Builtin function expansion looks like
@@ -139,29 +130,30 @@ Builtin arguments that are set by the builtin are prefixed by &.
 There are 37 builtin functions.
 .\" ================
 .IP %[**any_text]%
-is a comment.
-.IP %[*set,&result,value]%
+contains a comment.
+.IP %[*set,&result,value...]%
 Bind
 .B varname
 to
 .I value.
+Concatenates all the values with no separator.
 .\" ================
-.IP %[*block,&result,regex]%
+.IP %[*block,&blockname,regex]%
 Accumulate text, without any variable or builtin execution or macro expansion,
 until a line matching
 .I regex
-is encountered, and assign it to
-.B result.
+is encountered, and assign it to variable
+.B blockname.
 .\" ================
 .IP %[*include,=filename]%
 Insert the contents of
 .B filename
-expanding variables and builtins.
+expanding blocks, variables, and builtins.
 .\" ================
 .IP %[*includeraw=filename]%
 Insert the contents of
 .B filename
-without expanding variables and builtins.
+without expanding blocks, variables or builtins.
 .\" ================
 .IP %[*if,rel,val1,val2,statement..]%
 Perform the comparison
@@ -194,9 +186,10 @@ Expand variable
 and store the result in
 .B result
 .\" ================
-.IP %[*concat,&result,varname]%
-Concatenate the value of
-.I varname
+.IP %[*concat,&result,value...]%
+Concatenate all the
+.I value
+arguments with no separator
 to the value in
 .B result
 .\" ================
@@ -247,26 +240,29 @@ by the value in
 and store the result in
 .B result
 .\" ================
-.IP %[*quotient,&result,numval,numval]%
+.IP %[*quotient,&result,dividend,divisor]%
 Divide the value in
-.B result
+.B dividend
 by the value in
-.I numval
-discarding the fractional part.
+.I divisor
+discarding the fractional part
 and store the result in
 .B result
 If divide by zero is attempted, the value is 0.
 .\" ================
-.IP %[*quotientrounded,&result,numval,numval]%
+.IP %[*quotientrounded,&result,dividend,divisor]%
 Divide the value in
-.B result
+.B dividend
 by the value in
-.I numval
-rounded to the nearest integer.
+.I divisor
+rounded to the nearest integer
+and store the result in
+.B result
 If divide by zero is attempted, the value is 0.
+.\" ================
 .IP %[*scale,&result,numval,base,range]%
 Compute
-.I int((numval*range)/base)
+.I int(((numval*range)/base)+0.5)
 and store the result in
 .B result
 .\" ================
@@ -312,7 +308,7 @@ Execute the shell command
 and capture its output in
 .B result
 If multiple lines are returned, replace the newline separators by the contents of
-.i _ssvsep
+.i _xf_ssvsep
 .\" ================
 .IP %[*callv,function_block,param1,param2,param3,...]%
 Save all the variables
@@ -328,7 +324,7 @@ After expansion, restore all the variables
 .\" ================
 .IP %[*sqlloop,&result,iterator_block,query]%
 The variables
-.I hostname, database, username, password
+.i _xf_hostname, _xf_database, _xf_username, _xf_password
 must be set up to point to the database server.
 Execute the SQL query
 .I query</i>
@@ -341,10 +337,10 @@ which will refer to these variables.
 Append the result of the expansion to
 .B result
 Set
-.B _nrows
+.B _xf_nrows
 to the number of rows returned
 and
-.B _colnames
+.B _xf_colnames
 to an SSV list of the names of the variables bound.
 Computed values such as COUNT are bound to names like
 .B .count
@@ -363,10 +359,10 @@ which will refer to these variables.
 Append the result of the expansion to
 .B result
 Set
-.B _nrows
+.B _xf_nrows
 to the number of rows returned
 and
-.B _colnames
+.B _xf_colnames
 to an SSV list of the names of the variables bound.
 Exit if the CSV file is not found.
 .\" ================
@@ -386,34 +382,34 @@ which will refer to these variables.
 Append the result of the expansion to
 .B result
 Set the value of
-.B _nxml
+.B _xf_nxml
 to the count of items processed.
 Set
-.B _nxml
+.B _xf_nxml
 to the count of items found by the query.
 Set
-.B _xmlfields
+.B _xf_xmlfields
 to an SSV list of variable names bound.
 If the XML file is missing, exit with an error.
 .\" ================
 .IP %[*ssvloop,&result,iterator_block,varname]%
 An SSV (space separated values) list is a variable value composed of tokens separated by the value in
-.I _ssvsep
+.i _xf_ssvsep
 (usually space). Break 
 .B varname
 Into tokens; for each token, bind
-.I _ssvitem
+.i _xf_ssvitem
 to the value (null tokens are skipped), and then expand
 .B iterator_block,
 which will refer to
-.I _ssvitem
+.i _xf_ssvitem
 Append the result of the expansion to
 .B result.
 This loop works on a copy of
 .I varname
 so the input SSV is not changed.
 The variable
-.B _nssv
+.B _xf_nssv
 is set to the count of items found by the query.
 .\" ================
 .IP %[*popssv,&result,&value]%
@@ -435,7 +431,7 @@ and then expand
 Append the result of the expansion to
 .B result
 Set
-.B _nrows
+.B _xf_nrows
 to the number of directory entries processed.
 .\" ================
 .IP %[*onchange,var,statement]%
@@ -458,7 +454,7 @@ Exit from
 Output the entire symbol table of variables for debugging.
 .\" ================
 .IP %[*warn,string]%
-Write a warning message {:mess:} on STDERR.
+Write a warning message on STDERR.
 .\" ================
 .IP %[*htmlescape,value]%
 Output the html-escaped representation of
@@ -480,4 +476,8 @@ is Open Source software, MIT license.  Share and enjoy.
 .\" ================================================================
 .SH AUTHOR
 Tom Van Vleck (thvv@multicians.org)
+.\" ================================================================
+.SH ADDITIONAL INFORMATION
+More info, tutorial, etc at
+.URL "https://multicians.org/thvv/htmx/expandfile.html" "expandfile"
 .\" end
