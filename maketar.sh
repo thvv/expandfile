@@ -1,3 +1,8 @@
+#!/bin/sh
+### maketar.sh - generate htmxkit.tar.gz
+#
+# USAGE: cd htmxkit; sh maketar.sh
+#
 COPYFILE_DISABLE=1 tar cf htmxkit.tar README.txt
 COPYFILE_DISABLE=1 tar rf htmxkit.tar checknonempty
 COPYFILE_DISABLE=1 tar rf htmxkit.tar cr2nl
