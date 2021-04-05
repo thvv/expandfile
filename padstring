@@ -1,9 +1,9 @@
 #!/usr/local/bin/perl
 #
 # pad a string with blanks to a fixed length
-#    usage: padstring 19 "argumne nt"
+#    usage: padstring 19 "argument"
 #
-# used by exopandfile to create fixed width fields.
+# used by expandfile to create fixed width fields.
 #
 # THVV 09/06/16
 #

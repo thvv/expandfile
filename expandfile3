@@ -37,10 +37,12 @@
 # 12/01/08 THVV 4.41 add prevmonth
 # 05/31/15 THVV 4.42 bind _currentfilename to the input file for use in error messages.
 # 05/31/15 THVV 5.0 Split into 2 versions, lite and heavy, rename thvve.pm to expandfile.pm
+# 07/31/20 THVV 6.0 simplify this wrapper and use expandfile3.pm, remove -config arg and control Multics expansions with _xf_expand_multics
+# 03/17/21 THVV 6.01 bump version, make *bindcsv warn and return if input file is missing
 
 # idea: if "_ENDFIX" is bound, bind "_result" and "_ENDFIX" it before writing out, could fixup output. (idea from 'awk' command)
 
-# Copyright (c) 2003-2020 Tom Van Vleck
+# Copyright (c) 2003-2021 Tom Van Vleck
 
 #  Permission is hereby granted, free of charge, to any person obtaining
 #  a copy of this software and associated documentation files (the
@@ -63,7 +65,7 @@
 
 use expandfile3;
 
-$values{'_xf_version'} = '6.0';
+$values{'_xf_version'} = '6.01';
 
 $incl = 'fh0000';
 

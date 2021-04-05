@@ -30,7 +30,7 @@ command line parameters,
 builtin functions,
 macro execution,
 external calls,
-and shell environment variables.
+and shell environment variablesset by 'export'.
 .\" ================
 .PP
 If a filename is specified as a single hyphen, standard input will be read.

@@ -74,8 +74,9 @@
 # 07/31/20 THVV 5.0 Make Multics expansions optional, depending on '_xf_expand_multics' switch which can be '', 'nosql', or 'all', add getter(), setter(), catter()
 # 09/03/20 THVV 5.1 Add tracing tag to &validvarname, internal check on pointers, empty macro and query warnings, remove pre|post and firstnonempty
 # 09/03/20 THVV 5.2 Allow multiple args to *set and *concat, concatenate them with no separator
+# 03/17/21 THVV 5.21 make *bindcsv warn and return if input file is missing
 #
-# Copyright (c) 2003-2020 Tom Van Vleck
+# Copyright (c) 2003-2021 Tom Van Vleck
  
 #  Permission is hereby granted, free of charge, to any person obtaining
 #  a copy of this software and associated documentation files (the
@@ -1125,16 +1126,16 @@ sub bindCSV {
 	# call  LWP::Simple::get $csvfile 
 	$content = LWP::Simple::get $csvfile;
 	$content = '' if !defined($content); # if not found, set varname empty
-	&errmsg($symtbptr, 1, "error: missing remote CSV file '$csvfile' in *bindcsv") if $content eq '';
+	&errmsg($symtbptr, 0, "error: missing remote CSV file '$csvfile' in *bindcsv") if $content eq '';
     } else {			# not http, local file
 	my $fh = $incl++;
 	if ($csvfile =~ /\.gz$|\.z$/i) {
 	    if (!open($fh, "gzcat $csvfile |")) {
-		&errmsg($symtbptr, 1, "error: missing compressed CSV file '$csvfile' $! in *bindcsv");
+		&errmsg($symtbptr, 0, "error: missing compressed CSV file '$csvfile' $! in *bindcsv");
 	    }
 	} else {
 	    if (!open($fh, "$csvfile")) {
-		&errmsg($symtbptr, 1, "error: missing CSV file '$csvfile' $! in *bindcsv");
+		&errmsg($symtbptr, 0, "error: missing CSV file '$csvfile' $! in *bindcsv");
 	    }
 	}
 	my $olddelim = $/;
@@ -1147,7 +1148,10 @@ sub bindCSV {
     $content =~ s/\r/\n/g;	# change CR to NL in case Mac
     $content =~ s/\n\n/\n/g;	# change NL NL to NL in case Windows
     my $j = index($content, "\n");	# look for the NL delimiting the header line from the body line
-    &errmsg($symtbptr, 1, "error: no values in CSV file '$csvfile' in *bindcsv") if $j < 0;
+    if ($j < 0) {
+	&errmsg($symtbptr, 0, "error: no values in CSV file '$csvfile' in *bindcsv");
+	return;
+    }
     $line = substr($content, 0, $j); 
     @labels = &csvparse($line);
     # .. could check the labels to see if they contain illegal stuff
