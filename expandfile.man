@@ -2,7 +2,7 @@
 .\" see https://wpollock.com/AUnix2/manpages.pdf
 .\" Contact thvv@multicians.org to correct errors or typos.
 .\" ================================================================
-.TH man 8 "21 Sep 2020" "1.2" "expandfile man page"
+.TH man 8 "14 Apr 2021" "1.3" "expandfile man page"
 .\" ================================================================
 .SH NAME
 expandfile \- expand template files
@@ -288,24 +288,24 @@ into
 .B result
 Does not expand variables or blocks.
 .\" ================
-.IP %[*fwrite,=filename,varname]%
-Write the contents of
-.I varname
-into file
+.IP %[*fwrite,=filename,value...]%
+Write the concatenated
+.I value
+arguments into file
 .B filename
 Replaces any previous contents of
 .B filename
 .\" ================
-.IP %[*fappend,=filename,varname]%
-Append the contents of
-.I varname
-to the contents (if any) of file
+.IP %[*fappend,=filename,value...]%
+Append the concatenated
+.I value
+args to the contents (if any) of file
 .B filename
 .\" ================
-.IP %[*shell,&result,cmd]%
-Execute the shell command
-.I cmd</i>
-and capture its output in
+.IP %[*shell,&result,value...]%
+Concatenate the
+.I value</i>
+arguemnts and send the string to the command environment and capture its output in
 .B result
 If multiple lines are returned, replace the newline separators by the contents of
 .i _xf_ssvsep
@@ -456,7 +456,7 @@ Output the entire symbol table of variables for debugging.
 .IP %[*warn,string]%
 Write a warning message on STDERR.
 .\" ================
-.IP %[*htmlescape,value]%
+.IP %[*htmlescape,value...]%
 Output the html-escaped representation of
 .I value
 .\" ================================================================

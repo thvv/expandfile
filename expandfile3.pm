@@ -75,6 +75,9 @@
 # 09/03/20 THVV 5.1 Add tracing tag to &validvarname, internal check on pointers, empty macro and query warnings, remove pre|post and firstnonempty
 # 09/03/20 THVV 5.2 Allow multiple args to *set and *concat, concatenate them with no separator
 # 03/17/21 THVV 5.21 make *bindcsv warn and return if input file is missing
+# 04/09/21 THVV 5.3 Allow multiple args to *shell, *fwrite, *fappend, and *htmlescape, concatenate them with no separator
+# 04/11/21 THVV 5.3 do not let *bindcsv set vars beginning with _ or . for security 
+# 04/12/21 THVV 5.3 remove debugging code for old comma and vbar syntax. Expanding %[x,y,z]% will look for a var "x,y,z". Expanding %[x|<|>]% will get an error.
 #
 # Copyright (c) 2003-2021 Tom Van Vleck
  
@@ -297,45 +300,45 @@ sub expandblocks {
 #
 #  %[** comment]% is a comment, replaced by nothing.
 #
-#  %[*set,&var,val]%          assigns val to var, returns nothing
-#    if val begins with = it is a literal
+#  %[*set,&var,val...]%       assigns concatenated vals to var, returns nothing
+#    if a val begins with = it is a literal
 #    else it is a variable name
 #
-#  %[*include,=filename]%     returns expanded contents of filename, processes *block
-#  %[*includeraw,=filename]%  returns non-expanded contents of filename
-#  %[*callv,val,v1,v2,...]%   binds v1 to param1, etc, then expands val
-#  %[*expand,val]%            expands val, returns expanded value
-#  %[*expandv,&var,val]%      expands val, assigns to var, returns nothing
-#  %[*concat,&var,val]%       appends val to var, returns nothing
-#  %[*format,&var,fmt,a1,a2,a3,...]%   uses fmt as a format string, replaces $1 $2 $3 etc, result in var, returns nothing
-#  %[*ncopies,&var,val,n]%    appends val to var n times, returns nothing
-#  %[*increment,&var,val]%    adds val to var, returns nothing
-#  %[*decrement,&var,val]%    subtracts val from var, returns nothing
-#  %[*product,&result,val1,val2]% computes val1*val2, stores in result, returns nothing
-#  %[*quotient,&result,val1,val2]% computes int(val1/val2), stores in result, returns nothing
-#  %[*quotientrounded,&result,val1,val2]% computes int((val1+(val2/2))/val2), stores in result, returns nothing
-#  %[*scale,&result,val1,val2,val3]% computes int((val1*val3)/val2), stores in result, returns nothing
-#  %[*popssv,&var,&ssv]%      pops one value off ssv, puts it in var, rewrites ssv, returns nothing
-#  %[*subst,&var,left,right]% does var =~ s/left/right/ig, returns nothing
-#  %[*fread,&var,=filename]%  reads filename or URL into var
-#  %[*fwrite,=filename,val]%  writes val to filename, returns nothing
-#  %[*fappend,=filename,val]% appends val to filename, returns nothing
-#  %[*urlfetch,&var,url]%     reads URL into var
-#  %[*bindcsv,=csvfile]%      read local or remote CSV file, row1 is vars, row2 is values
-#  %[*if,op,v1,v2,rest]%      performs "rest" if (v1 op v2) op may be "==" "!=" ">" "<" "=~" and "!~" (etc)
-#  %[*dirloop,&outvar,iterator,=dirname,starrex]% lists dirname, expands iterator once per entry matching starrex
-#  %[*csvloop,&outvar,iterator,=csvfile]% read CSV file, expands iterator once per row, output in outvar
-#  %[*ssvloop,&outvar,iterator,sslist]% expands iterator once per ssv item binding _ssvitem, output in outvar
-#  %[*sqlloop,&outvar,iterator,query]% runs query, expands iterator once per row, output in outvar
-#  %[*xmlloop,&outvar,iterator,=xmlfile,path]% expands iterator once per item, output in outvar
-#  %[*onchange,var,command]% execute command when var changes
-#  %[*onnochange,var,command]% execute command if var does not change
+#  %[*include,=filename]%     Return expanded contents of filename, processes *block
+#  %[*includeraw,=filename]%  Return non-expanded contents of filename
+#  %[*callv,val,v1,v2,...]%   Bind v1 to param1, etc, then expand val
+#  %[*expand,val]%            Expand val, return expanded value
+#  %[*expandv,&var,val]%      Expand val, assigns to var, return nothing
+#  %[*concat,&var,val...]%    Append val to var, return nothing
+#  %[*format,&var,fmt,a1,a2,a3,...]%   Use fmt as a format string, replace $1 $2 $3 etc, result in var, return nothing
+#  %[*ncopies,&var,val,n]%    Append val to var n times, return nothing
+#  %[*increment,&var,val]%    Add val to var, return nothing
+#  %[*decrement,&var,val]%    Subtract val from var, return nothing
+#  %[*product,&result,val1,val2]% Compute val1*val2, store in result, return nothing
+#  %[*quotient,&result,val1,val2]% Compute int(val1/val2), store in result, return nothing
+#  %[*quotientrounded,&result,val1,val2]% Compute int((val1+(val2/2))/val2), store in result, return nothing
+#  %[*scale,&result,val1,val2,val3]% Compute int((val1*val3)/val2), store in result, return nothing
+#  %[*popssv,&var,&ssv]%      Pop one value off ssv, put it in var, rewrite ssv, return nothing
+#  %[*subst,&var,left,right]% Do var =~ s/left/right/ig, return nothing
+#  %[*fread,&var,=filename]%  Read filename or URL into var
+#  %[*fwrite,=filename,val...]%  Write val to filename, return nothing
+#  %[*fappend,=filename,val...]% Append val to filename, return nothing
+#  %[*urlfetch,&var,url]%     Read URL into var
+#  %[*bindcsv,=csvfile]%      Read local or remote CSV file, row1 is vars, row2 is values
+#  %[*if,op,v1,v2,rest]%      Perform "rest" if (v1 op v2) .. op may be "==" "!=" ">" "<" "=~" and "!~" (etc)
+#  %[*dirloop,&outvar,iterator,=dirname,starrex]% List dirname, expand iterator once per entry matching starrex
+#  %[*csvloop,&outvar,iterator,=csvfile]% Read CSV file, expand iterator once per row, output in outvar
+#  %[*ssvloop,&outvar,iterator,sslist]% Expand iterator once per ssv item binding _ssvitem, output in outvar
+#  %[*sqlloop,&outvar,iterator,query]% Run SQL query, expand iterator once per row, output in outvar
+#  %[*xmlloop,&outvar,iterator,=xmlfile,path]% Expand iterator once per XML item, output in outvar
+#  %[*onchange,var,command]%  Execute command when var changes
+#  %[*onnochange,var,command]% Execute command if var does not change
 #                             (put before onchange if using both)
-#  %[*htmlescape,s]%          Escapes HTML constructs in s, returns value
-#  %[*shell,&result,varnameorliteral]%  executes a shell command and puts output (if any) in result
+#  %[*htmlescape,s...]%       Escape HTML constructs in s, returns value
+#  %[*shell,&result,str...]%  Execute a shell command and put output (if any) in result
 #  %[*dump]%                  Output entire symbol table
-#  %[*exit,anything]%         print error message on STDERR and call exit(0)
-#  %[*warn,anything]%         print message on STDERR and keep going
+#  %[*exit,anything]%         Print error message on STDERR and call exit(0)
+#  %[*warn,anything]%         Print message on STDERR and keep going
 #
 # Notable useful external functions: filemodshort, filesizek, filedaysold, dbcounts, gifsize, nargs
 # Notable interesting include files: fileinfo.htmi, htmxlib.htmi
@@ -382,14 +385,14 @@ sub getv {
 	return '';		    # do nothing
     } elsif ($cmd =~ /^\*(.*)$/) {  # * is followed by a command name
 	$cmd = $1;		    # extract command
-	&setter ($symtbptr, '_xf_currentfunction', $cmd);
-	if ($cmd eq 'set') {	    # set a variable in symtb
+	&setter($symtbptr, '_xf_currentfunction', $cmd);
+	if ($cmd eq 'set') {	    # *set,&varname,val...
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift);
 	    my $temp = '';
 	    foreach $val (@_) {	# concatenate all args with no separator
 		$temp .= &gvalue($val, $symtbptr); # get variable value or literal value
 	    }
-	    &setter ($symtbptr, $varname, $temp); # set
+	    &setter($symtbptr, $varname, $temp); # *set symbol table
 	    #&errmsg($symtbptr, 0, "trace: bound $varname = \"$temp\"") if &getter($symtbptr, '_xf_tracebind') ne ''; ## DEBUG
 	} elsif ($cmd eq 'include') { # *include,=filename
 	    $fn = &argshouldbeginwith($symtbptr, '=', shift); # **************** fix to gvalue later
@@ -448,13 +451,13 @@ sub getv {
 	    &checkextraargs($symtbptr, @_);
 	    $val = &gvalue($v0, $symtbptr); # fetch value to expand
 	    &setter($symtbptr, $varname, &expandstring(&expandMulticsBody($val, $symtbptr), $symtbptr)); # optional Multics expansion
-	} elsif ($cmd eq 'concat') { # *concat,&varname,val -- ravels val onto varname
+	} elsif ($cmd eq 'concat') { # *concat,&varname,val... -- ravels val onto varname
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift);
-	    my $temp = '';
+	    my $v0 = '';
 	    foreach $val (@_) {	# concatenate all args with no separator
-		$temp .= &gvalue($val, $symtbptr); # get variable value or literal value
+		$v0 .= &gvalue($val, $symtbptr); # get variable value or literal value
 	    }
-	    &catter($symtbptr, $varname, $temp); #set
+	    &catter($symtbptr, $varname, $v0); # append to varname
 	} elsif ($cmd eq 'format') { # *format,&varname,fmt,a1,a2,... -- replaces $1 $2 etc in fmt, result in varname
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift);
 	    $v0 = &gvalue(shift, $symtbptr); # format string
@@ -538,7 +541,7 @@ sub getv {
 	    } else {
 		&setter($symtbptr, $varname, int((($val * $v3) / $v0) + 0.5));
 	    }
-	} elsif ($cmd eq 'popssv') { # *popssv,&varname,&ssvvar -- pop one item off val into varname
+	} elsif ($cmd eq 'popssv') { # *popssv,&varname,&ssvvar -- pop one item off ssvvar into varname
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift);
 	    $v0 = &argshouldbeginwith($symtbptr, '&', shift); # literal not allowed, cause we rewrite it
 	    &checkextraargs($symtbptr, @_);
@@ -552,7 +555,7 @@ sub getv {
 		&setter($symtbptr, $varname, substr($val, 0, $v1));  # pop off the head of the SSV
 		&setter($symtbptr, $v0, substr($val, $v1+1)); # rewrite the SSV with the tail
 	    }
-	} elsif ($cmd eq 'subst') { # subst,&varname,left,right -- regexp substitution applied to varname
+	} elsif ($cmd eq 'subst') { # *subst,&varname,left,right -- regexp substitution applied to varname
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift);
 	    $pre = shift;
 	    $v1 = &gvalue($pre, $symtbptr);
@@ -588,32 +591,36 @@ sub getv {
 	    $filen = &argshouldbeginwith($symtbptr, '=', shift); # **************** fix to gvalue later
 	    &checkextraargs($symtbptr, @_);
 	    &bindCSV($filen, $symtbptr);
-	} elsif ($cmd eq 'fwrite') { # *fwrite,filename,varname
+	} elsif ($cmd eq 'fwrite') { # *fwrite,filename,varname...
 	    $filen = &argshouldbeginwith($symtbptr, '=', shift); # **************** fix to gvalue later
-	    $v0 = shift;
-	    &checkextraargs($symtbptr, @_);
+	    my $v0 = '';
+	    foreach $val (@_) {	# concatenate all args into the command with no separator
+		$v0 .= &gvalue($val, $symtbptr); # get variable value or literal value
+	    }
 	    if (!open(++$incl, ">$filen")) {
 		&errmsg($symtbptr, 1, "error: cannot *fwrite '$filen' $!");
 	    } else {
-		$v1 = &gvalue($v0, $symtbptr);
-		print $incl "$v1\n";
+		print $incl "$v0\n";
 		close $incl;
 	    }
-	} elsif ($cmd eq 'fappend') { # *fappend,filename,varname
+	} elsif ($cmd eq 'fappend') { # *fappend,filename,varname...
 	    $filen = &argshouldbeginwith($symtbptr, '=', shift); # **************** fix to gvalue later
-	    $v0 = shift;
-	    &checkextraargs($symtbptr, @_);
+	    my $v0 = '';
+	    foreach $val (@_) {	# concatenate all args into the command with no separator
+		$v0 .= &gvalue($val, $symtbptr); # get variable value or literal value
+	    }
 	    if (!open(++$incl, ">>$filen")) {
 		&errmsg($symtbptr, 1, "error: cannot *fappend '$filen' $!");
 	    } else {
-		$v1 = &gvalue($v0, $symtbptr);
-		print $incl "$v1\n";
+		print $incl "$v0\n";
 		close $incl;
 	    }
-	} elsif ($cmd eq 'shell') { # *shell,&varname,command
+	} elsif ($cmd eq 'shell') { # *shell,&varname,command...
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift);
-	    $v0 = &gvalue(shift, $symtbptr);
-	    &checkextraargs($symtbptr, @_);
+	    my $v0 = '';
+	    foreach $val (@_) {	# concatenate all args into the command with no separator
+		$v0 .= &gvalue($val, $symtbptr); # get variable value or literal value
+	    }
 	    &setter($symtbptr, $varname, &execute_command($v0, $symtbptr));
 	} elsif ($cmd eq 'callv') { # *callv,varname -- set up args and expand a var
 	    $v0 = shift;	    # get the template name
@@ -646,7 +653,8 @@ sub getv {
 	    }
 	    return '' if $v2 eq "\n";
 	    return $v2;
-	} elsif ($cmd eq 'dirloop') { # The problem with this one is that you can't select "no symlinks" etc.??
+	} elsif ($cmd eq 'dirloop') { # *dirloop,iterator,dirname,namerexp
+	    # The problem with this one is that you can't select "no symlinks" etc.??
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift); # outvar
 	    $v1 = shift;	# iterator
 	    $v2 = shift;	# dirname
@@ -669,6 +677,7 @@ sub getv {
 	    &setter($symtbptr, $varname, &iterateSSV(&gvalue($v1, $symtbptr), &gvalue($v2, $symtbptr), $symtbptr));
 
 	# ----------------------------------------------------------------
+	# --- external guts in readbindsql.pm
 	} elsif ($cmd eq 'sqlloop') { # *sqlloop,&varname,iteratorvar,query
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift); # outvar
 	    $v1 = shift;	# iterator
@@ -680,6 +689,7 @@ sub getv {
 	    } else {
 		&setter($symtbptr, $varname, &iterateSQL(&gvalue($v1, $symtbptr), &gvalue($v2, $symtbptr), $symtbptr));
 	    }
+	# --- external guts in readbindxml.pm
 	} elsif ($cmd eq 'xmlloop') { # *xmlloop,&varname,iteratorvar,xmlfile[,xpath] -- loop over a XML file
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift); # outvar
 	    $v1 = shift;	# iterator
@@ -687,13 +697,13 @@ sub getv {
 	    $v3 = shift;	# optional XPath
 	    &checkextraargs($symtbptr, @_);
 	    if (defined($v3)) {
-		$v3 =  &gvalue($v3, $symtbptr);
+		$v3 =  &gvalue($v3, $symtbptr); # xpatn
 	    }
-	    &setter($symtbptr, '_xf_ssvsep', ' ') if &getter($symtbptr, '_xf_ssvsep') eq "";
+	    &setter($symtbptr, '_xf_ssvsep', ' ') if &getter($symtbptr, '_xf_ssvsep') eq ""; # if ssvsep is null, make it a space
 	    &setter($symtbptr, $varname, &iterateXML(&gvalue($v1, $symtbptr), &gvalue($v2, $symtbptr), $symtbptr, $v3));
 	# ----------------------------------------------------------------
 
-	} elsif ($cmd eq 'onchange') { # useful in iterators
+	} elsif ($cmd eq 'onchange') { # *onchange,var,command -- useful in iterators
 	    $v0 = shift;	       # var
 	    $v1 = '_xf_old_'.$v0;
 	    $v2 = &getter($symtbptr, $v0);
@@ -704,7 +714,8 @@ sub getv {
 	    } else {
 		return '';	# return with unconsumed args
 	    }
-	} elsif ($cmd eq 'onnochange') { # do this before "onchange" if doing both, else it fires too often
+	} elsif ($cmd eq 'onnochange') { # *onnochange,var,command -- useful in iterators
+	    # do this before "onchange" if doing both, else it fires too often
 	    $v0 = shift; 
 	    $v1 = '_xf_old_'.$v0;
 	    $v2 = &getter($symtbptr, $v0);
@@ -714,43 +725,33 @@ sub getv {
 	    } else {
 		return '';	# return with unconsumed args
 	    }
-	} elsif ($cmd eq 'exit') { # error exit -- should replace this with "*exec" cmd?
+	} elsif ($cmd eq 'exit') { # *exit -- should replace this with "*exec" cmd?
 	    # Calling this function causes the calling program to abort with no output.
 	    # This is pretty brutal.  Currently there is no way to say "simulate an EOF on your input."
 	    &errmsg($symtbptr, 1, "error exit @_");
-	} elsif ($cmd eq 'dump') { # dump the symbol table onto stdout, good for debugging
+	} elsif ($cmd eq 'dump') { # *dump -- dump the symbol table onto stdout, good for debugging
 	    return &dump_symtb($symtbptr);
 	} elsif ($cmd eq 'warn') { # print message on STDERR and keep going
 	    warn color("green")."@_".color("reset")."\n"; # user does not want expandfile in the message
-	} elsif ($cmd eq 'htmlescape') { # *htmlescape,val -- return htmlescaped value
-	    $v0 = shift;
-	    &checkextraargs($symtbptr, @_);
-	    $val = &gvalue($v0, $symtbptr);
-	    return &htmlEscape($val);
+	} elsif ($cmd eq 'htmlescape') { # *htmlescape,val... -- concat all args, return htmlescaped value
+	    my $v0 = '';
+	    foreach $val (@_) {	# concatenate all args into the command with no separator
+		$v0 .= &gvalue($val, $symtbptr); # get variable value or literal value
+	    }
+	    return &htmlEscape($v0);
         } else {
-	    &errmsg($symtbptr, 1, "error: unknown builtin *$cmd,@_");
+	    &errmsg($symtbptr, 1, "error: unknown builtin *$cmd,@_"); # this is a fatal error, stop dead
 	}
 	return '';
     } # * is followed by a command name
     
-# Didn't begin with a *command, variable name case.  Look in symbol table or $ENV
-    my $oldcurfunc = &getter($symtbptr, '_xf_currentfunction');
-    unshift @_, $cmd;          # put the command back on the arglist           # foo1,foo2,foo3|<<|>>
-    my $lastarg = pop;         # get the last arg, may have the pre/post tail  # foo3|<<|>>
-    push @_, $lastarg;	       # put varname part of last arg back on the list
-    ($varname, $pre, $post) = split(/\|/, $lastarg);                           # foo3 << >>
-    $pre = "" if !defined($pre); # avoid errors if invoked under -w
-    $post = "" if !defined($post);
-    &errmsg($symtbptr, 0, "warning: more than one varname '@_'") if @_ > 1;
-    &errmsg($symtbptr, 0, "warning: |pre|post used '@_'") if $pre ne "" || $post ne "";
-    my $vgetv = "";
-    foreach $varname (@_) {    # find the first nonempty variable
-	&setter($symtbptr, '_xf_currentfunction', "eval '@_'");
-	&validvarname($symtbptr, $varname, "eval");   # .. catch vbar or comma in varname
-	$vgetv = &getter($symtbptr, $varname); # look it up and return its value
-	#warn "trace foreach $varname = $vgetv\n";
-	last if $vgetv ne "";
-    }
+# Didn't begin with a *command, so it is the variable name case, e.g. %[fred]%.  Look in symbol table or $ENV
+    unshift @_, $cmd;	      # put the varname back on the arglist
+    $varname = join(',', @_); # create a varname from all args, with the commas as chars, e.g. %[fred,jane]% (comma is legal in varname)
+    $oldcurfunc = &getter($symtbptr, '_xf_currentfunction');
+    &setter($symtbptr, '_xf_currentfunction', "eval '$varname'"); # set current function name to indicate evaluation
+    &validvarname($symtbptr, $varname, "eval");   # .. complain if illegal chars in varname (comma ok, pipe and backtick not ok)
+    $vgetv = &getter($symtbptr, $varname); # look it up and return its value
     &setter($symtbptr, '_xf_currentfunction', $oldcurfunc);
     return $vgetv;
 } # getv
@@ -1147,14 +1148,13 @@ sub bindCSV {
 
     $content =~ s/\r/\n/g;	# change CR to NL in case Mac
     $content =~ s/\n\n/\n/g;	# change NL NL to NL in case Windows
-    my $j = index($content, "\n");	# look for the NL delimiting the header line from the body line
+    my $j = index($content, "\n"); # look for the NL delimiting the header line from the body line
     if ($j < 0) {
 	&errmsg($symtbptr, 0, "error: no values in CSV file '$csvfile' in *bindcsv");
 	return;
     }
     $line = substr($content, 0, $j); 
     @labels = &csvparse($line);
-    # .. could check the labels to see if they contain illegal stuff
     $line = substr($content, $j+1); # rest of file should be one line of comma separated values
     chomp $line;		# trim trailing NL if any
     #warn "trace $line\n";
@@ -1166,9 +1166,14 @@ sub bindCSV {
     @vals = &csvparse($line); # parse the row into an array of strings
     for ($i=0;  $i<@labels; $i++) {
 	$tablecol = $labels[$i];
-	$v = shift @vals;	  # if there are too few values, this will be empty, so missing ones will be set to ""
-	&setter($symtbptr, $tablecol, $v);
-	&errmsg($symtbptr, 0, "trace: bound $tablecol = $v") if (&getter($symtbptr, '_xf_tracebind') ne '');
+	$v = shift @vals;     # if there are too few values, this will be empty, so missing ones will be set to ""
+	my $firstletter = substr($tablecol, 0, 1);
+	if ($firstletter eq '_' || $firstletter eq '.') { # cannot set vars beginning with underscore or period
+	    &errmsg($symtbptr, 0, "*bindcsv: invalid CSV column $tablecol ignored");
+	} else {
+	    &setter($symtbptr, $tablecol, $v);
+	    &errmsg($symtbptr, 0, "trace: bound $tablecol = $v") if (&getter($symtbptr, '_xf_tracebind') ne '');
+	}
     } # for
     return;
 } # bindCSV
@@ -1228,6 +1233,7 @@ my %xf_keys = (
     tinyglob => 1,
  );
 
+# ================================================================
 # [not exported]
 # $value = &getter(\%symtb, $varname);
 sub getter {
@@ -1240,7 +1246,7 @@ sub getter {
 
     if (defined($$xptr{$x})) {	  # check symtb
 	$v = $$xptr{$x};	  # .. return its value
-    } elsif (defined($ENV{$x})) { # check shell ENV
+    } elsif (defined($ENV{$x})) { # check shell ENV (set by export command)
 	$v = $ENV{$x};		  # .. return shell value
     } else {			  # don't have a value, fuss
 	&errmsg($xptr, 0, "warning: Undefined val ref $x, returned empty") if $$xptr{'_xf_debug'} ne ''; # failed to find _xf_ version and no alternative
@@ -1255,10 +1261,13 @@ sub setter {
     my $xptr = shift;		# symtb ptr
     my $x = shift;		# var name
     my $v = shift;		# value to set
+
     my $argptrcheck = ref $xptr; # safety check
     die "badcall" if $argptrcheck !~ /HASH/;
+
 #warn "trace calling setter $x $v\n";
     $$xptr{$x} = $v;		# set requested in symtb
+
     # check if setting X when _xf_X is defined, and fuss if debugging
     if (substr($x, 0, 4) ne '_xf_') {
 	my $xhat = '_xf_' . $x;
@@ -1277,11 +1286,14 @@ sub catter {
     my $xptr = shift;
     my $x = shift;
     my $v = shift;
+
     my $argptrcheck = ref $xptr;
     die "badcall" if $argptrcheck !~ /HASH/;
+
 #warn "trace calling catter $x $v\n";
     $$xptr{$x} .= $v;		# concat arg onto the value
-    # check if setting X when _xf_X is defined, and fuss
+
+    # check if setting X when _xf_X is defined, and fuss if debugging
     if (substr($x, 0, 4) ne '_xf_') {
 	my $xhat = '_xf_' . $x;
 	if (defined($$xptr{$xhat})) {

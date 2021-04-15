@@ -39,6 +39,7 @@
 # 05/31/15 THVV 5.0 Split into 2 versions, lite and heavy, rename thvve.pm to expandfile.pm
 # 07/31/20 THVV 6.0 simplify this wrapper and use expandfile3.pm, remove -config arg and control Multics expansions with _xf_expand_multics
 # 03/17/21 THVV 6.01 bump version, make *bindcsv warn and return if input file is missing
+# 04/13/21 THVV 6.02 prevent *bindcsv setting values beginning with _; *shell, *fwrite, *fappend, *htmlescape concatenate multiple args; remove comma and vbar syntax
 
 # idea: if "_ENDFIX" is bound, bind "_result" and "_ENDFIX" it before writing out, could fixup output. (idea from 'awk' command)
 
@@ -65,7 +66,7 @@
 
 use expandfile3;
 
-$values{'_xf_version'} = '6.01';
+$values{'_xf_version'} = '6.02';
 
 $incl = 'fh0000';
 
