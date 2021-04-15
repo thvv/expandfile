@@ -1,10 +1,11 @@
 %[** test bindCSV for expandfile **]%
 %[** Copyright (c) 2020, Tom Van Vleck **]%
+%[** 2021-04-12 THVV try to set _u **]%
 %[** ================================================================ **]%
 %[*block,iterator,^END]%
 %[_xf_ssvitem]% = %[%[_xf_ssvitem]%]%
 END
-==== Testing bindcsv local file ====
+==== Testing bindcsv local file, shd get error on _u ====
 %[*bindcsv,=testbind.csv]%
 column names are %[_xf_colnames]%
 %[*ssvloop,&result,iterator,_xf_colnames]%
@@ -15,6 +16,7 @@ x = hello
 t =
 z = Boston, MA
 w = gotta quote "
+_u =
 ================================================================
 ==== Testing bindcsv with URL ====
 %[*bindcsv,="https://multicians.org/thvv/htmx/testbind.csv"]%

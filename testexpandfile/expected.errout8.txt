@@ -1,2 +1,2 @@
-[32mexpandfile: teste8.htmt warning: invalid chars in varname '.*' in *dirloop[0m
-[32mexpandfile: teste8.htmt warning: 'nonexist_dir' not a dir in *dirloop[0m
+[32mexpandfile3: teste8.htmt warning: invalid chars in varname '.*' in *dirloop[0m
+[32mexpandfile3: teste8.htmt warning: 'nonexist_dir' not a dir in *dirloop[0m

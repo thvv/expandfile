@@ -2,7 +2,7 @@
 # make sure we can access ENV values
 # thvv 2020-08-31
 #
-echo test expandfile access to ENV values
+echo test expandfile3 access to ENV values
 export magic_var=
 echo expanding vartest.htmt when ENV.magic_var=$magic_var
 $EXPAND vartest.htmt

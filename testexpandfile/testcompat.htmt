@@ -1,4 +1,4 @@
-%[** expandfile **]%
+%[** expandfile3 **]%
 %[**  compatibility feature test **]%
 %[**  thvv 2020-09-03 **]%
 
@@ -7,7 +7,7 @@ There are 3 kinds of variables
 2. listed variables like _xf_currentfunction
 3. unlisted variables like _xf_foo.  should there be any of these?
 #
-%[*warn,test expandfile compatibility feature]%
+%[*warn,test expandfile3 compatibility feature]%
 %[*set,&testno,=0]%
 turn on debug
 %[*warn,turn on debug]%

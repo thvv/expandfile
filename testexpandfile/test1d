@@ -100,7 +100,7 @@ shd be ab33cd: %[%[z]%]%
 Test %[testno]%, backslashes
 %[*set,&y,=33]%
 %[*set,&x,=ab\%[y]\%cd]%
-result is %[x]% shd be ab-pct-bkt-y-bkt-pct
+result is %[x]% shd be ab-pct-bkt-y-bkt-pct-cd
 %[** **]%
 %[*if,ne,x,="ab%[y]%cd",=ERROR15]%
 ================================================================
@@ -108,7 +108,7 @@ result is %[x]% shd be ab-pct-bkt-y-bkt-pct
 Test %[testno]%, quoting
 %[*set,&y,=33]%
 %[*set,&x,=ab"%[y]%"cd]%
-result is %[x]% shd be ab-pct-lbkt-y-rbkt-pct
+result is %[x]% shd be ab-pct-lbkt-y-rbkt-pct-cd
 %[** **]%
 %[*if,ne,x,="ab%[y]%cd",=ERROR16]%
 ================================================================

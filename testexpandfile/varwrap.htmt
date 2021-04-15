@@ -1,24 +1,41 @@
 %[** var syntax and  wrap test **]%
 %[** THVV 08/31/20 **]%
+%[** THVV 04/12/21 changes to comma and vbar **]%
 %[** ================================================================ **]%
 --- variable syntax and wrap test %[me]%
+%[*set,&_xf_debug,=1]%
+%[*set,&x,=x]%
+%[*set,&y,=y]%
+%[*set,&z,=z]%
+----- test that old comma syntax fails with Undefined warning (old way would pick "x")
+w,x,y,z = %[w,x,y,z]%
+----- test that old vbar syntax fails with invalid chars and undefined warnings (old way would return <<x>>)
+x|<<|>> = %[x|<<|>>]%
+----- test that new expandfile works
 --- .. first with basic variable expansion
 %[*set,&foo1,=""]%
 %[*set,&foo2,="12345"]%
 %[*set,&foo3,=""]%
-foo2 is %[foo2]%, shd be no error
-foo1,foo2,foo3 is %[foo1,foo2,foo3]% old was 12345, shd be warning
-foo1,foo2,foo3|<<|>> is %[foo1,foo2,foo3|<<|>>]% old was <<12345>> shd be 2 warnings
+foo2 is "%[foo2]%", shd be "12345" with no error
+----- should get undefined val ref foo1,foo2,foo3      
+foo1,foo2,foo3 is "%[foo1,foo2,foo3]%" old was 12345, shd be ""
+----- should get invalid chars and undefined warnings
+foo1,foo2,foo3|<<|>> = "%[foo1,foo2,foo3|<<|>>]%" old was <<12345>> shd be empty with warning above
+----- test that commas in variable name are permitted
+%[*set,&"f1,f2,f3",=f1-f2-f3]%
+f1,f2,f3 = %[f1,f2,f3]%  should be f1-f2-f3
 ================================================================
+%[*set,&_xf_debug,=""]%
+(turning off debug, macros get many warnings on param1 etc)	    
 %[*include,=htmxlib.htmi]%
-now test firstnonempty and wrap with macros
--- firstnonempty shd be 12345
+-- .. test firstnonempty() and wrap() macros from htmxlib.htmi
+-- *callv,firstnonempty,foo1,foo2,foo3 shd be 12345
 %[*callv,firstnonempty,=%[foo1]%,=%[foo2]%,=%[foo3]%]%
 
--- wrap shd be <<12345>>
+-- *callv,wrap,foo2 shd be <<12345>>
 %[*callv,wrap,foo2,="<<",=">>"]%
 
--- both shd be <<12345>>
+-- *callv,wrap, of *callv,firstnonempty, shd be <<12345>>
 %[*callv,wrap,=%[*callv,firstnonempty,=%[foo1]%,=%[foo2]%,=%[foo3]%]%,="<<",=">>"]%
 
------ end -----
+----- end variable syntax and wrap test -----

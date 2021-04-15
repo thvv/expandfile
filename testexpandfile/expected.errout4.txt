@@ -1,5 +1,5 @@
-[32mexpandfile: teste4.htmt warning: invalid chars in varname '*' in *set[0m
-[32mexpandfile: teste4.htmt warning: blank varname in *set[0m
-[32mexpandfile: teste4.htmt warning: all numeric varname '7' in *set[0m
-[32mexpandfile: teste4.htmt warning: invalid chars in varname 'a,b' in *set[0m
-[32mexpandfile: teste4.htmt warning: invalid chars in varname 'a|b' in *set[0m
+[32mexpandfile3: teste4.htmt warning: invalid chars in varname '*' in *set[0m
+[32mexpandfile3: teste4.htmt warning: blank varname in *set[0m
+[32mexpandfile3: teste4.htmt warning: all numeric varname '7' in *set[0m
+[32mexpandfile3: teste4.htmt warning: invalid chars in varname 'a,b' in *set[0m
+[32mexpandfile3: teste4.htmt warning: invalid chars in varname 'a|b' in *set[0m

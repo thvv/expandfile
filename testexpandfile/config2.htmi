@@ -1,4 +1,11 @@
-%[** Test configuration, used with testexpandfile **]%
+%[** Multics web pages configuration, used with expandfile **]%
+%[** THVV 11/19/05  **]%
+%[** THVV 02/12/06 redesign for thin header, search box on left **]%
+%[** THVV 03/31/06 add vars for titling glossary and multicians links **]%
+%[** THVV 07/29/06 rename mxmailform.cgi to squirnet.cgi **]%
+%[** THVV 09/25/12 design refresh **]%
+%[** THVV 02/09/17 add external pathnames for mxlib macros **]%
+%[** THVV 07/31/20 add new more portable names **]%
 %[** THVV 08/17/20 expandfile3 **]%
 %[** Copyright (c) 2005-2020 Tom Van Vleck **]%
 %[** ================================================================ **]%
@@ -8,9 +15,10 @@
 %[*set,&_xf_debug,=""]%
 %[** database access on local machine, built into expandfile.pm (sql) **]%
 %[*set,&_xf_hostname,="localhost"]%
-%[*set,&_xf_database,="mydatabase"]%
-%[*set,&_xf_username,="herman"]%
-%[*set,&_xf_password,="herman"]%
+%[*set,&_xf_database,="thvv_userlist"]%
+%[*set,&_xf_username,="root"]%
+%[*set,&_xf_password,="9"]%
+%[*set,&_xf_infotable,="info"]%
 %[** mapping for expandfile.pm::expandMultics() when expanding {+ +} {- -} {: :} and {= =} (no sql needed) **]%
 %[*set,&_xf_bracketcolon,="cmd"]%
 %[*set,&_xf_bracketequal,="pathname"]%
@@ -18,12 +26,95 @@
 %[*set,&_xf_bracketequalclass,="pathname"]%
 %[*set,&_xf_bracketplusclass,="code"]%
 %[*set,&_xf_bracketminusclass,="special"]%
+%[** items built into expandfile.pm but not into printgloss3 etc (sql) **]%
+%[*set,&_xf_bracketcolonclass,="cmd"]%
+%[*set,&_xf_bracketequalclass,="pathname"]%
+%[*set,&_xf_bracketplusclass,="code"]%
+%[*set,&_xf_bracketminusclass,="special"]%
+%[*set,&_xf_peoplefile,="multicians"]%
+%[*set,&_xf_glossbase,="mg"]%
+%[** values used by expandfile.pm::expandMultics() when expanding {! !} (sql) **]%
+%[*set,&_xf_extreftable,="extref"]%
+%[*set,&_xf_extrefkeycol,="extname"]%
+%[*set,&_xf_extrefvalcol,="exturl"]%
+%[*set,&_xf_innewwindow,="new window:"]%
+%[*set,&_xf_newwindow,=" target=\"_blank\" rel=\"noopener\""]%
+%[*set,&_xf_tinyglob,="<img src=\"mulimg/tinyglob.gif\" alt=\"\" width=\"12\" height=\"11\" border=\"0\" style=\"display: inline;\">"]%
+%[** **]%
+%[** values used by expandfile.pm::expandMultics() when expanding {@ @} (sql) **]%
+%[*set,&_xf_loclinktable,="pages"]%
+%[*set,&_xf_loclinkkeycol,="filename"]%
+%[*set,&_xf_fixlocallink,=""]%
+%[*set,&_xf_mxrelative,=""]%
+%[** **]%
+%[** values used by expandfile.pm::expandMultics() when expanding {[ ]} (sql) **]%
+%[*set,&_xf_multicianstable,="m"]%
+%[*set,&_xf_multicianskeycol,="nametag"]%
+%[*set,&_xf_multiciansvalcol,="did"]%
+%[** .. also uses mxrelative **]%
+%[** **]%
+%[** values used by expandfile.pm::expandMultics() when expanding {{ }} (sql) **]%
+%[*set,&_xf_glosstable,="glossary"]%
+%[*set,&_xf_glosskeycol,="tag"]%
+%[*set,&_xf_glossvalcol,="def"]%
+%[** **]%
+%[** values used by expandfile.pm::expandMultics() when expanding {* *} (does not work now) **]%
+%[** **]%
+%[*set,&_xf_multicssourceroot,=""]%
 %[** ================================================================ **]%
+%[** basic items used in expanding multicians.org templates **]%
+%[*set,&contentwidth,="800"]%
+%[*set,&maxwidth,="1000"]%
+%[*set,&minwidth,="200"]%
 %[*set,&tinyglob,="<img src=\"mulimg/tinyglob.gif\" alt=\"\" width=\"12\" height=\"11\" border=\"0\" style=\"display: inline;\">"]%
 %[*set,&tinymultics,="<img src=\"mulimg/tinymultics.gif\" alt=\"\" width=\"16\" height=\"16\" border=\"0\" style=\"display: inline;\">"]%
 %[*set,&tinypdf,="<img src=\"mulimg/pdf5.gif\" alt=\"\" height=\"16\" width=\"16\" border=\"0\" style=\"display: inline;\">"]%
+%[*set,&conf_mhs_ldd,="http://web.mit.edu/multics-history/source/Multics/ldd/"]%
+%[*set,&conf_mhs_src,="http://web.mit.edu/multics-history/source/"]%
+%[*set,&conf_mhs_inf,="http://web.mit.edu/multics-history/source/Multics/doc/info_segments/"]%
+%[*set,&conf_bitsavers_multics,="http://www.bitsavers.org/pdf/honeywell/multics/"]%
 %[*set,&newwindow,=" target=\"_blank\" rel=\"noopener\""]%
 %[*set,&updatedflag,="<span class=\"updatedflag\"> updated </span>"]%
 %[*set,&newflag,="<span class=\"newflag\"> new </span>"]%
+%[*set,&maintainer,="Tom Van Vleck"]%
+%[*set,&maintainer_email,="webmaster@multicians.org"]%
+%[*set,&editorsortkey,="editor"]%
+%[*set,&domainname,="multicians"]%
+%[*set,&domainsuffix,="org"]%
+%[*set,&accountname,="thvv"]%
+%[*set,&stylesheet,="mxstyle.css"]%
+%[*set,&smallscreensize,="600px"]%
+%[** .. default empty **]%
+%[*set,&param1,=""]%
+%[*set,&pages.wdate,=""]%
+%[*set,&pages.crumbs,=""]%
+%[*set,&pages.l2navfile,=""]%
+%[*set,&headingnote,=""]%
+%[*set,&extratail,=""]%
+%[*set,&mxrelative,=""]%
+%[*set,&mxrelativepages_l2navfile,=""]%
+%[** **]%
 %[*set,&innewwindow,="new window:"]%
 %[** **]%
+%[** absolute paths used for access to CGIs **]%
+%[*set,&urlbase,="https://multicians.org/"]%
+%[*set,&cgiwrapbase,="https://multicians.org/cgi-sys/cgiwrap/thvv/"]%
+%[*set,&mxmailform,="https://multicians.org/cgi-sys/cgiwrap/thvv/squirnet.cgi"]%
+%[*set,&phase1cgi,="squirnet.cgi"]%
+%[*set,&phase2cgi,="mxmail.cgi"]%
+%[*set,&mxmailerrtpt,="mxmailerr.txt"]%
+%[** **]%
+%[** data used by the glossary expander **]%
+%[*set,&dftglossauth,="THVV"]%
+%[*set,&glossindex,="mgloss"]%
+%[*set,&glossbase,="mg"]%
+%[*set,&glosssuffix,="htmx"]%
+%[*set,&peoplefile,="multicians"]%
+%[** **]%
+%[** more glossary items **]%
+%[*set,&glosslist,="glosslist.htmi"]%
+%[*set,&glossnav,="glossnav.htmi"]%
+%[** **]%
+%[** where the object files go when compiling **]%
+%[*set,&obj_dir,="../multics"]%
+%[*set,&rtarrow,="&raquo;"]%

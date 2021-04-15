@@ -1,2 +1,2 @@
-[32mexpandfile: teste9.htmt warning: invalid chars in varname '&x' in *shell[0m
-[32mexpandfile: teste9.htmt warning: cannot execute external command 'gorkle teste9.htmt' No such file or directory[0m
+[32mexpandfile3: teste9.htmt warning: invalid chars in varname '&x' in *shell[0m
+[32mexpandfile3: teste9.htmt warning: cannot execute external command 'gorkle teste9.htmt' No such file or directory[0m

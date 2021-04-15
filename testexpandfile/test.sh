@@ -1,5 +1,5 @@
 #!/bin/sh
-# Test harness for expandfile
+# Test harness for expandfile3 and thvve.pm
 # THVV 02/22/05 1.0
 # THVV 09/18/05 1.1 ssv
 # THVV 02/21/06 1.2 new config
@@ -9,9 +9,9 @@
 # THVV 10/15/18 1.6 add testxml2.htmt
 # THVV 01/06/18 1.7 add testbindcsv.htmt
 # THVV 02/24/20 1.8 set up config with setup-config.sh
-# THVV 08/27/20 2.0 test expandfile3 features, add tests for ENV and old syntax
+# THVV 08/27/20 2.0 test expandfile3, add tests for ENV and old syntax
 #
-export EXPAND=expandfile
+export EXPAND=expandfile3
 export CONFIG=config2.htmi
 #
 sh setup-config.sh
