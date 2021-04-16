@@ -73,7 +73,7 @@
 package readbindxml;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT = qw(iterateXML readbindxml3);
+@EXPORT = qw(iterateXML readbindxml);
 # export reaadbindxml because it is used by xml2sql
 
 use XML::LibXML;

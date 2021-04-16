@@ -1234,7 +1234,7 @@ my %xf_keys = (
  );
 
 # ================================================================
-# [not exported]
+# [exported for use by readbindsql and readbindxml]
 # $value = &getter(\%symtb, $varname);
 sub getter {
     my $xptr = shift;		# symtb ptr
@@ -1255,7 +1255,7 @@ sub getter {
 } # getter
 
 # ================================================================
-# [not exported]
+# [exported for use by readbindsql and readbindxml]
 # &setter(\%symtb, $varname, $value);
 sub setter {
     my $xptr = shift;		# symtb ptr
@@ -1280,7 +1280,7 @@ sub setter {
 } # setter
 
 # ================================================================
-# [not exported]
+# [exported for use by readbindsql and readbindxml]
 # &catter(\%symtb, $varname, $value);
 sub catter {
     my $xptr = shift;
@@ -1424,6 +1424,7 @@ sub dump_symtb {
     return $result;
 } # dump_symtb
 # ================================================================
+# [exported for use by readbindsql and readbindxml]
 # write a warning with program name, current filename, message
 # &errmsg(\%v, 0, "message");
 # param2 = 0 if warning, else fatal
