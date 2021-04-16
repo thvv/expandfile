@@ -71,7 +71,7 @@ $values{'_xf_version'} = '6.03';
 
 $incl = 'fh0000';
 
-&setup3("expandfile3");		# Nonstandard setup, binds dates
+&setup("expandfile3");		# Nonstandard setup, binds dates
 
 # fail if no args
 if ($#ARGV < 0) {
