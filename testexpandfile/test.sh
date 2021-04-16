@@ -1,5 +1,5 @@
 #!/bin/sh
-# Test harness for expandfile3 and thvve.pm
+# Test harness for expandfile and thvve.pm
 # THVV 02/22/05 1.0
 # THVV 09/18/05 1.1 ssv
 # THVV 02/21/06 1.2 new config
@@ -10,14 +10,15 @@
 # THVV 01/06/18 1.7 add testbindcsv.htmt
 # THVV 02/24/20 1.8 set up config with setup-config.sh
 # THVV 08/27/20 2.0 test expandfile3, add tests for ENV and old syntax
+# THVV 04/16/21 2.1 better tests for variables, rename things back to expandfile
 #
-export EXPAND=expandfile3
+export EXPAND=expandfile
 export CONFIG=config2.htmi
 #
 sh setup-config.sh
 #
 echo --- test if $EXPAND can reference ENV vars
-echo .. expect 3 warnings
+echo .. expect 6 warnings: 4 Undefined, 2 invalid chars
 echo sh testvar.sh
 sh testvar.sh
 #

@@ -1,10 +1,10 @@
-[32mexpandfile3: teste5.htmt Undefined val ref grooble, returned empty[0m
-[32mexpandfile3: teste5.htmt warning: all numeric varname '3' in *(eval 3)[0m
-[32mexpandfile3: teste5.htmt Undefined val ref 3, returned empty[0m
-[32mexpandfile3: teste5.htmt Undefined val ref a, returned empty[0m
-[32mexpandfile3: teste5.htmt warning: no value for argument 'a'[0m
-[32mexpandfile3: teste5.htmt warning: all numeric varname '3' in *if[0m
-[32mexpandfile3: teste5.htmt Undefined val ref 3, returned empty[0m
-[32mexpandfile3: teste5.htmt warning: missing = before numeric argument '3'[0m
-[32mexpandfile3: teste5.htmt warning: no value for argument '3'[0m
+[32mexpandfile: teste5.htmt Undefined val ref grooble, returned empty[0m
+[32mexpandfile: teste5.htmt warning: all numeric varname '3' in *(eval 3)[0m
+[32mexpandfile: teste5.htmt Undefined val ref 3, returned empty[0m
+[32mexpandfile: teste5.htmt Undefined val ref a, returned empty[0m
+[32mexpandfile: teste5.htmt warning: no value for argument 'a'[0m
+[32mexpandfile: teste5.htmt warning: all numeric varname '3' in *if[0m
+[32mexpandfile: teste5.htmt Undefined val ref 3, returned empty[0m
+[32mexpandfile: teste5.htmt warning: missing = before numeric argument '3'[0m
+[32mexpandfile: teste5.htmt warning: no value for argument '3'[0m
 [32mundefined var a equal to undefined var 3[0m

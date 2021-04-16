@@ -70,7 +70,7 @@
 #  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
-package readbindxml3;
+package readbindxml;
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(iterateXML readbindxml3);
@@ -116,7 +116,7 @@ sub iterateXML {
 	$nitems = &readbindxml($xmlstring, $symtbptr, $xmlexpandfunc, $xpath);  # for each item, bind its vars, expand $iterator and append to $result
     }
     &expandfile::setter($symtbptr, '_xf_nxml', $nitems);  # Report results.
-    &expandfile::errmsg($symtbptr, 0, "trace: _xf_nxml $nitems") if (&expandfile3::getter($symtbptr, '_xf_tracebind') ne '');
+    &expandfile::errmsg($symtbptr, 0, "trace: _xf_nxml $nitems") if (&expandfile::getter($symtbptr, '_xf_tracebind') ne '');
     return $result;
 } # iterateXML
 
@@ -174,7 +174,7 @@ sub readbindxml {
     $tf =~ s/  / /g; # make sure xmlfields has no empty fields
     $tf =~ s/^ //g; # make sure xmlfields does not begin with a space
     &expandfile::setter($vp, '_xf_xmlfields', $tf);	# ensure _xmlfields is bound before iterator uses it in expansion
-    &expandfile::errmsg($vp, 0, "trace: _xf_xmlfields $tf") if &expandfile3::getter($vp, '_xf_tracebind') ne '';
+    &expandfile::errmsg($vp, 0, "trace: _xf_xmlfields $tf") if &expandfile::getter($vp, '_xf_tracebind') ne '';
     
     # Second pass. Go over the items again, bind the values, and call $iteratorclosure on each one.
     my $nitems = 0;
@@ -204,14 +204,14 @@ sub readbindxml {
 	    }
 	    if (&expandfile::getter($vp, $x) ne '') {   # if we have multiple daughters with the same name for an item..
 		#&expandfile::errmsg($vp, 0, "trace: concat $x $$vp{$x} $value") if $$vp{$x} ne ''; # DEBUG
-		&expandfile::catter($vp, $field, ',') if &expandfile3::getter($vp, $field) ne ''; # concatenate values separated by "," (shd this be _ssvsep?)
+		&expandfile::catter($vp, $field, ',') if &expandfile::getter($vp, $field) ne ''; # concatenate values separated by "," (shd this be _ssvsep?)
 		&expandfile::catter($vp, $field, $value);
-		&expandfile::catter($vp, $x, ',') if &expandfile3::getter($vp, $x) ne ''; # concatenate values separated by "," (shd this be _ssvsep?)
+		&expandfile::catter($vp, $x, ',') if &expandfile::getter($vp, $x) ne ''; # concatenate values separated by "," (shd this be _ssvsep?)
 		&expandfile::catter($vp, $x, $value);
 	    } else {
 		&expandfile::setter($vp, $x, $value);
 	    }
-	    &expandfile::errmsg($vp, 0, "trace: bound $x = $value") if &expandfile3::getter($vp, '_xf_tracebind') ne '';
+	    &expandfile::errmsg($vp, 0, "trace: bound $x = $value") if &expandfile::getter($vp, '_xf_tracebind') ne '';
 	} # foreach
 	# process all the attributes of $item and bind their values
 	my $att_field;
@@ -224,7 +224,7 @@ sub readbindxml {
 		$aa .= "_attr";
 	    }
 	    &expandfile::setter($vp, $aa, $value);
-	    &expandfile::errmsg($vp, 0, "trace: bound $aa = $value") if &expandfile3::getter($vp, '_xf_tracebind') ne '';
+	    &expandfile::errmsg($vp, 0, "trace: bound $aa = $value") if &expandfile::getter($vp, '_xf_tracebind') ne '';
 	} # foreach
 	$nitems++;
 	$iteratorclosure -> ();		# all fields bound: invoke the closure to expand the iterator
@@ -238,7 +238,7 @@ sub readbindxml {
 sub flattenRef {
     my $xvp = shift;		# symtb ptr
     my $p = shift;		# value
-    #&expandfile::errmsg($xvp, 0, "debug: flattenRef $p") if &expandfile3::getter($xvp, '_xf_debug') ne '';
+    #&expandfile::errmsg($xvp, 0, "debug: flattenRef $p") if &expandfile::getter($xvp, '_xf_debug') ne '';
     my $v = '';
     my $sep = '';
     if (ref $p eq "") {

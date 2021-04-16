@@ -33,7 +33,7 @@
 #  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
-package readbindsql3;
+package readbindsql;
 require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw(iterateSQL);
@@ -113,7 +113,7 @@ sub iterateSQL {
     }
     $result = '';
     my $nrows = $sth->rows;
-    &expandfile::errmsg($symtbptr, 0, "trace: *sqlloop '$query' => $nrows") if (&expandfile3::getter($symtbptr, '_xf_tracebind') ne '');
+    &expandfile::errmsg($symtbptr, 0, "trace: *sqlloop '$query' => $nrows") if (&expandfile::getter($symtbptr, '_xf_tracebind') ne '');
     &expandfile::setter($symtbptr, '_xf_nrows', $sth->rows);
     my @labels = @{$sth->{NAME}}; # get column names.
     my @tables = @{$sth->{'mysql_table'}}; # .. and table names
@@ -125,7 +125,7 @@ sub iterateSQL {
 	    if ($tablecol =~ /\#sql.+\.count\(\*\)/) { # mySQL specific..
 		$tablecol = 'count';
 	    }
-	    &expandfile::catter($symtbptr, '_xf_colnames', ' ') if (&expandfile3::getter($symtbptr, '_xf_colnames') ne '');
+	    &expandfile::catter($symtbptr, '_xf_colnames', ' ') if (&expandfile::getter($symtbptr, '_xf_colnames') ne '');
 	    &expandfile::catter($symtbptr, '_xf_colnames', $tablecol);
 	    &expandfile::setter($symtbptr, $tablecol, $array[$i]);
 	    # if (&expandfile::getter($symtbptr, '_xf_escape') eq 'y') { # hmm, do I need this
@@ -133,7 +133,7 @@ sub iterateSQL {
 	    # } else {
 	    # 	&expandfile::setter($symtbptr, $tablecol, $array[$i]);
 	    # }
-	    &expandfile::errmsg($symtbptr, 0, "trace: bound $tablecol = $array[$i]") if (&expandfile3::getter($symtbptr, '_xf_tracebind') ne '');
+	    &expandfile::errmsg($symtbptr, 0, "trace: bound $tablecol = $array[$i]") if (&expandfile::getter($symtbptr, '_xf_tracebind') ne '');
 	} # for
 	$result .= &expandfile::expandstring($iterator, $symtbptr);
     } # while fetchrow

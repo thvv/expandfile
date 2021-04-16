@@ -1,13 +1,15 @@
-%[** expandfile3 **]%
+%[** expandfile **]%
 %[**  compatibility feature test **]%
 %[**  thvv 2020-09-03 **]%
+
+This test does not work any more, removed some testing.
 
 There are 3 kinds of variables
 1. plain variables like x
 2. listed variables like _xf_currentfunction
 3. unlisted variables like _xf_foo.  should there be any of these?
 #
-%[*warn,test expandfile3 compatibility feature]%
+%[*warn,test expandfile compatibility feature]%
 %[*set,&testno,=0]%
 turn on debug
 %[*warn,turn on debug]%
@@ -30,7 +32,7 @@ turn on debug
 %[*set,&_nrows,="123"]%
 %[_nrows]% .. shd return 123
 %[*if,ne,_nrows,="123",*warn,_nrows= %[_nrows]% s/b 123]%
-%[_xf_nrows]% .. _nrows is on the list, shd return 123, should fuss
+%[_xf_nrows]% .. _nrows is on the list, shd return 123, should fuss === returned nothing, no fuss
 %[*if,ne,_xf_nrows,="123",*warn,_xf_nrows= %[_xf_nrows]% s/b 123]%
 error should have shadowed, _nrows is on list, did not
 ----
@@ -39,7 +41,7 @@ error should have shadowed, _nrows is on list, did not
 3. setnew_only, not onlist, case2
 %[*warn,3. setnew_only, not onlist]%
 %[*set,&_xf_case2,="345"]%
-%[case2]% .. shd return nothing because not onlist
+%[case2]% .. shd return nothing because not onlist 
 %[*if,ne,case2,="",*warn,case2= %[case2]% s/b empty]%
 %[_xf_case2]% .. shd return 345
 %[*if,ne,_xf_case2,="345",*warn,_xf_case2= %[_xf_case2]% s/b 345]%
@@ -49,9 +51,9 @@ error should have shadowed, _nrows is on list, did not
 4. setnew_only, onlist, _xf_nxml
 %[*warn,4. setnew_only, onlist, _xf_nxml]%
 %[*set,&_xf_nxml,="345"]%
-%[nxml]% .. shd return 345, set should fuss
+%[nxml]% .. shd return 345, set should fuss  === returned nothing, no fuss
 %[*if,ne,_xf_nxml,="345",*warn,_xf_nxml= %[_xf_nxml]% s/b 345]%
-%[_nxml]% .. shd return 345
+%[_nxml]% .. shd return 345 === returned nothing, no fuss
 %[*if,ne,_nxml,="345",*warn,_nxml= %[_nxml]% s/b 345]%
 ----
 %[*increment,&testno,=1]%
@@ -71,7 +73,7 @@ error should have shadowed, _nrows is on list, did not
 %[*warn,6. setboth, old first, onlist]%
 %[*set,&_ssvsep,="567old"]%
 %[*set,&_xf_ssvsep,="567new"]%
-%[ssvsep]% .. should return 567new because onlist, should fuss
+%[ssvsep]% .. should return 567new because onlist, should fuss === returned nothing, no fuss
 %[*if,ne,ssvsep,="567new",*warn,ssvsep= %[ssvsep]% s/b 567new]%
 %[_xf_ssvsep]% .. should return 567new
 %[*if,ne,_xf_ssvsep,="567new",*warn,_xf_ssvsep= %[_xf_ssvsep]% s/b 567new]%
@@ -92,16 +94,16 @@ error should have shadowed, _nrows is on list, did not
 8. setboth, new first, onlist, _xf_colnames
 %[*warn,8. setboth, new first, onlist]%
 %[*set,&_xf_colnames,="789new"]%
-%[*set,&_colnames,="789old"]% .. should fuss, setting when already set
+%[*set,&_colnames,="789old"]% .. should fuss, setting when already set === returned nothing, no fuss
 %[_xf_colnames]% .. should return 789old
 %[*if,ne,_xf_colnames,="789old",*warn,_xf_colnames= %[_xf_colnames]% s/b 789old]%
 %[colnames]% .. should return 789old
-%[*if,ne,colnames,="789old",*warn,colnames= %[colnames]% s/b 789old]%
+%[*if,ne,colnames,="789old",*warn,colnames= %[colnames]% s/b 789old]% === returned nothing, no fuss
 ----
 %[*increment,&testno,=1]%
 %[*warn,%[testno]%. ----]%
 9. noset_get, not onlist
 %[*warn,9. noset_get, not onlist]%
-%[case7]% .. shd warn not set
-%[_xf_case8]% .. shd warn not set
+%[case7]% .. shd warn not set === returned nothing, no fuss
+%[_xf_case8]% .. shd warn not set === returned nothing, no fuss
 

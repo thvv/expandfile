@@ -1,1 +1,1 @@
-[31mexpandfile3: teste3.htmt error: need 1 ]%[0m
+[31mexpandfile: teste3.htmt error: need 1 ]%[0m

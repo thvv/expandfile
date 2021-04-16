@@ -1,0 +1,8 @@
+\%[** configuration for testexpandfile **]\%
+\%[** Copyright (c) 2007-%[year]%, Tom Van Vleck **]\%
+\%[** Generated %[timestamp]% **]\%
+\%[** ================================================================ **]\%
+\%[*set,&hostname,="%[hostname]%"]\%
+\%[*set,&database,="%[database]%"]\%
+\%[*set,&username,="%[username]%"]\%
+\%[*set,&password,="%[password]%"]\%
