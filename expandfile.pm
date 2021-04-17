@@ -162,7 +162,8 @@ sub expandstring {
     $$symtbptr{'lbrace'} = '{';
     $$symtbptr{'rbrace'} = '}';
     $$symtbptr{'_xf_ssvsep'} = ' ' if &getter($symtbptr, '_xf_ssvsep') eq ""; #never useful to have this undefined
-        
+    $$symtbptr{'me'} = 'expandfile' if $$symtbptr{'me'} eq ''; # for error messages
+       
     while ($i < $n) {
 	$c = substr($s, $i, 1);
 	if ($c eq '\\') {	# Always treat backslash as escape.

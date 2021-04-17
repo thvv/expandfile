@@ -1,21 +1,22 @@
  #!/bin/sh
  # run expandfile on an input file, using config2.htmi and an optional extra config
- # USAGE: expandfile3a sourcefile [optional extra config]
+ # USAGE: expandfile_config sourcefile [optional extra config]
  # THVV 09/10/18
  # 08/10/20 -- for testing expandfile3
+ # 04/16/21 -- expandfile3 becomes expandfile
  if [ "$1" = "" ] ; then
      echo >&2 "USAGE: $0 xxx.htmx"
      exit 1
  fi
- xx=`which expandfile3`
+ xx=`which expandfile`
  if [ "$xx" = "" ] ; then
-     echo >&2 "error: expandfile3 is not installed"
+     echo >&2 "error: expandfile is not installed"
      exit 1
  fi
  if [ ! -f "config2.htmi" ] ; then
      echo >&2 "error: config2.htmi not found"
      exit 1
  fi
- echo >&2 "expandfile3 config2.htmi $2 $1"
- expandfile3 config2.htmi $2 $1
+ echo >&2 "expandfile config2.htmi $2 $1"
+ expandfile config2.htmi $2 $1
  #end

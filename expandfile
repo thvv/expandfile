@@ -71,7 +71,7 @@ $values{'_xf_version'} = '6.03';
 
 $incl = 'fh0000';
 
-&setup("expandfile3");		# Nonstandard setup, binds dates
+&setup3("expandfile");		# Nonstandard setup, binds dates
 
 # fail if no args
 if ($#ARGV < 0) {
@@ -127,7 +127,7 @@ sub twodigit {			# returns field with leading zero if necessary
 # ================================================================
 # slightly modified timestamp
 sub setup3 {
-    $values{'me'} = $_[0];
+    $values{'me'} = $_[0];	# get program name from shell args
     @moname = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan');
     ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
     $year += 1900;
