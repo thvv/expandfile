@@ -1713,12 +1713,30 @@ sub lookupSQL {
     my $db;
     my $sth;
     my $em;			# error message
-    if (($hostname eq '') || ($database eq '') || ($username eq '') || ($password eq '') || ($extreftable eq '') || ($extrefkeycol eq '')) {
-	&errmsg($symtbptr, 1,
-		"error: database parameters not set: key=$x _xf_database=$database _xf_hostname=$hostname _xf_username=$username (password) extreftable=$extreftable extrefkeycol=$extrefkeycol");
+    if ($hostname eq 'sqlite') {
+	if (($database eq '') || ($extreftable eq '') || ($extrefkeycol eq '')) {
+	    # should we warn if username and password are nonblank, no, let :sqlite do it if it cares
+	    &expandfile::errmsg($symtbptr, 0, "error: sqlite database parameters not set: key=$x _xf_database=$database extreftable=$extreftable extrefkeycol=$extrefkeycol");
+	    exit 1;
+	}
+    } else {
+	if (($hostname eq '') || ($database eq '') || ($username eq '') || ($password eq '') || ($extreftable eq '') || ($extrefkeycol eq '')) {
+	    &errmsg($symtbptr, 1,
+		    "error: database parameters not set: key=$x _xf_database=$database _xf_hostname=$hostname _xf_username=$username (password) extreftable=$extreftable extrefkeycol=$extrefkeycol");
+	}
     }
     my $query = "SELECT * FROM $extreftable WHERE $extrefkeycol = '$x'$selectcond";
-    if (!($db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password))) {
+    my $fail = 1;
+    if ($hostname eq 'sqlite') {
+	if ($db = DBI->connect("DBI:SQLite:dbname=$database", "", "")) {
+	    $fail = 0;		# success
+	}
+    } else {
+	if (($db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password))) {
+	    $fail = 0;		# success
+	}
+    }
+    if ($fail) {
 	# prints a complaint on stdout whether i want it or not
 	my $tries = 1;
 	my $maxtries = 10; 	# see if database comes back in 10 minutes

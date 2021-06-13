@@ -12,6 +12,7 @@
  .. 2020-05-22 THVV add getfancybox_li
  .. 2020-07-29 THVV add wrap and firstnonempty
  .. 2020-11-13 THVV unique temp file name for wrap and firstnonempty
+ .. 2021-05-25 THVV https
  ================================================================
  Contents
    getimgtag
@@ -378,7 +379,7 @@ ENDDOC
 END
 %[*block,&doc,^ENDDOC]%
 ================================================================
- Macro to generate a responsive <LI> block for use with fancybox jquery plugin -- see http://fancyapps.com/fancybox/3/
+ Macro to generate a responsive <LI> block for use with fancybox jquery plugin -- see https://fancyapps.com/fancybox/3/
  Uses Perl program 'gifsize2' which returns pathname width height; 'gifsize2 xxx-2x.jpg 2x' returns 'width height 2xpath'
  Include "usefancybox.htmi" to get the CSS defs.
    *callv,getfancybox_li,galtag,thumbdir,imgfile,title[,imgdir]

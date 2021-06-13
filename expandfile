@@ -44,7 +44,7 @@
 
 # idea: if "_ENDFIX" is bound, bind "_result" and "_ENDFIX" it before writing out, could fixup output. (idea from 'awk' command)
 
-# Copyright (c) 2003-2021 Tom Van Vleck
+# Written (c) 2003-2021 Tom Van Vleck
 
 #  Permission is hereby granted, free of charge, to any person obtaining
 #  a copy of this software and associated documentation files (the
