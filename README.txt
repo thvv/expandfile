@@ -14,15 +14,15 @@ Unix/Linux/Mac
 -- install programs and libraries you need from your package manager
 -- install Perl if not already installed
 -- install MySQL
--- install CPAN modules LWP::Simple, Term::ANSIColor, DBI, DBD::mysql, XML::LibXML, XML::Simple 
+-- install CPAN modules LWP::Simple, Term::ANSIColor, DBI, DBD::mysql, XML::LibXML, XML::Simple on your $PERL5LIB
 -- fetch the contents of the repository
--- move expandfile, the .pm modules, and the commands into your /bin
+-- move expandfile, the .pm modules, and the commands into your /bin and set PERL5LIB to search that too
 
 Windows
 -- TBD
 
 Smoke test:
-   expandfile
+-- expandfile
 should get no errors and no output.
 
 See the web page for more.
