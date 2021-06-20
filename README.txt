@@ -10,11 +10,13 @@ Mac
 -- install Apple command line tools
 
 Unix/Linux/Mac
+-- install Perl
 -- create ~/bin and add to your PATH
 -- install programs and libraries you need from your package manager
 -- install Perl if not already installed
--- install MySQL
--- install CPAN modules LWP::Simple, Term::ANSIColor, DBI, DBD::mysql, XML::LibXML, XML::Simple on your $PERL5LIB
+-- set environment vars PERL5LIB, VERSIONER_PERL_PREFER_32_BIT, PERL_LOCAL_LIB_ROOT, PERL_MB_OPT, PERL_MM_OPT
+-- install MySQL, set user and password, set up .my.cnf
+-- install CPAN modules LWP::Simple, Term::ANSIColor, DBI, DBD::mysql, XML::LibXML, XML::Simple
 -- fetch the contents of the repository
 -- move expandfile, the .pm modules, and the commands into your /bin and set PERL5LIB to search that too
 
