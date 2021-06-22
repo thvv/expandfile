@@ -78,7 +78,8 @@
 # 04/09/21 THVV 5.3 Allow multiple args to *shell, *fwrite, *fappend, and *htmlescape, concatenate them with no separator
 # 04/11/21 THVV 5.3 do not let *bindcsv set vars beginning with _ or . for security 
 # 04/12/21 THVV 5.3 remove debugging code for old comma and vbar syntax. Expanding %[x,y,z]% will look for a var "x,y,z". Expanding %[x|<|>]% will get an error.
-#
+# 06/22/21 THVV 5.31 Mark the place where sqlite would be inserted, but comment it out, does not work.
+
 # Copyright (c) 2003-2021 Tom Van Vleck
  
 #  Permission is hereby granted, free of charge, to any person obtaining
@@ -1713,13 +1714,13 @@ sub lookupSQL {
     my $db;
     my $sth;
     my $em;			# error message
+    if (($database eq '') || ($extreftable eq '') || ($extrefkeycol eq '')) {
+	&expandfile::errmsg($symtbptr, 0, "error: database parameters not set: key=$x _xf_database=$database extreftable=$extreftable extrefkeycol=$extrefkeycol");
+	exit 1;
+    }
     if ($hostname eq 'sqlite') {
-	if (($database eq '') || ($extreftable eq '') || ($extrefkeycol eq '')) {
-	    # should we warn if username and password are nonblank, no, let :sqlite do it if it cares
-	    &expandfile::errmsg($symtbptr, 0, "error: sqlite database parameters not set: key=$x _xf_database=$database extreftable=$extreftable extrefkeycol=$extrefkeycol");
-	    exit 1;
-	}
-    } else {
+	&errmsg($symtbptr, 1, "error: sqlite is not supported"); # see expandfile-internal.html
+    } else {			# MySQL database
 	if (($hostname eq '') || ($database eq '') || ($username eq '') || ($password eq '') || ($extreftable eq '') || ($extrefkeycol eq '')) {
 	    &errmsg($symtbptr, 1,
 		    "error: database parameters not set: key=$x _xf_database=$database _xf_hostname=$hostname _xf_username=$username (password) extreftable=$extreftable extrefkeycol=$extrefkeycol");
@@ -1727,15 +1728,15 @@ sub lookupSQL {
     }
     my $query = "SELECT * FROM $extreftable WHERE $extrefkeycol = '$x'$selectcond";
     my $fail = 1;
-    if ($hostname eq 'sqlite') {
-	if ($db = DBI->connect("DBI:SQLite:dbname=$database", "", "")) {
-	    $fail = 0;		# success
-	}
-    } else {
-	if (($db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password))) {
-	    $fail = 0;		# success
-	}
+    # if ($hostname eq 'sqlite') { 
+    # 	if ($db = DBI->connect("DBI:SQLite:dbname=$database", "", "")) {
+    # 	    $fail = 0;		# success
+    # 	}
+    # } else {
+    if (($db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password))) {	# MySQL database
+	$fail = 0;		# success
     }
+
     if ($fail) {
 	# prints a complaint on stdout whether i want it or not
 	my $tries = 1;

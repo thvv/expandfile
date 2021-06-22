@@ -11,6 +11,7 @@
 # 2020-08-31 THVV minor changes for expandfile3
 # 2020-09-15 THVV write out error and trace messages using expandfile::errmsg()
 # 2021-04-15 THVV using expandfile.pm
+# 2021-06-22 THVV comment out attempt to use sqlite, does not work
 #
 # Copyright (c) 2018 Tom Van Vleck
  
@@ -63,11 +64,7 @@ sub iterateSQL {
     my $username = &expandfile::getter($symtbptr, '_xf_username');
     my $password = &expandfile::getter($symtbptr, '_xf_password');
     if ($hostname eq 'sqlite') {
-	if ($database eq '') {
-	    # should we warn if username and password are nonblank, no, let :sqlite do it if it cares
-	    &expandfile::errmsg($symtbptr, 0, "error: sqlite database parameter not set for query $query in *sqlloop");
-	    exit 1;
-	}
+	&expandfile::errmsg($symtbptr, 0, "error: sqlite is not supported in *sqlloop"); # see expandfile-internal.html
     } else {
 	if (($hostname eq '') || ($database eq '') || ($username eq '') || ($password eq '')) {
 	    &expandfile::errmsg($symtbptr, 0, "error: database parameters not set: database=$database hostname=$hostname username=$username (password) for query $query in *sqlloop");
@@ -85,24 +82,15 @@ sub iterateSQL {
     my $maxtries = 11; 	# see if database comes back in 2046 seconds
     while ($tries < $maxtries) {
 	sleep $sleeptime if $sleeptime > 1; # sleep 2,4,8,16,32,64,128,256,512,1024 secs
-	if ($hostname eq 'sqlite') {
-	    if ($db = DBI->connect("DBI:SQLite:dbname=$database", "", "")) {
-		last;		# success
-	    }
-	} else {
-	    if (($db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password))) {
-		last;		# success
-	    }
+	# sqlite is not supported.. it would have $db = DBI->connect("DBI:SQLite:dbname=$database", "", "")
+	if (($db = DBI->connect("DBI:mysql:$database:$hostname", $username, $password))) { # MySQL database
+	    last;		# success
 	}
 	$tries++;
 	$sleeptime *= 2;
     } # while
     if ($tries >= $maxtries) {
-	if ($hostname eq 'sqlite') {
-	    &expandfile::errmsg($symtbptr, 0, "warning: cannot open DBI:SQLite:$database for query $query in *sqlloop");
-	} else {
-	    &expandfile::errmsg($symtbptr, 0, "warning: cannot open DBI:mysql:$database:$hostname $username for query $query in *sqlloop");
-	}
+	&expandfile::errmsg($symtbptr, 0, "warning: cannot open DBI:mysql:$database:$hostname $username for query $query in *sqlloop");
 	exit 1;
     }
     # prepare the query
