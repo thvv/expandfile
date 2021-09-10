@@ -40,6 +40,7 @@ require Exporter;
 @EXPORT = qw(iterateSQL);
 
 use DBI;
+use DBD::mysql;
 
 # SQL iteration function used by *sqlloop
 #   $val = &iterateSQL($iterator, $query, \%values)
@@ -54,6 +55,11 @@ use DBI;
 # If there are database errors, prints a warning and aborts.
 
 sub iterateSQL {
+
+    # should have a switch?
+    # if (eval "require DBI") {DBI->import qw(add)} else {warn "couldn't load DBI"; return;}
+    # if (eval "require DBD::mysql") {DBD::mysql->import qw(add)} else {warn "couldn't load DBD::mysql"; return;}
+    
     my $iterator = shift;
     my $query = shift;
     my $symtbptr = shift;

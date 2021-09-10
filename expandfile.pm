@@ -1501,7 +1501,8 @@ sub expandMulticsBody {
 
     # do these first, since some of the DB expansions may surround SPAN shortcuts .. otherwise it fucks up
     # change {:xxx:} to surround it with "bracketcolonclass"
-    $d =~ s/([^\\])\{:([^}]+):\}/$1\<span class=\"$bcc\"\>$2\<\/span\>/g; # TEST
+    #$d =~ s/([^\\])\{:([^}]+):\}/$1\<span class=\"$bcc\"\>$2\<\/span\>/g; # TEST .. fails on string beginning with {
+    $d =~ s/\{:([^}]+):\}/\<span class=\"$bcc\"\>$1\<\/span\>/g;
     # change {=xxx=} to surround it with "bracketequalclass"
     $d =~ s/\{=([^}]+)=\}/\<span class=\"$bec\"\>$1\<\/span\>/g;
     # change {+xxx+} to surround it with "bracketplusclass"
