@@ -92,10 +92,10 @@ ENDDOC
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&getimgtag,^END]%
-%[*set,&_fmtstring0,="<img src=\"$1\" border=\"0\" alt=\"$2\" title=\"$3\">"]%
-%[*set,&_fmtstring1,="<img src=\"$1\" width=\"$4\" height=\"$5\" border=\"0\" alt=\"$2\" title=\"$3\">"]%
-%[*set,&_fmtstring2,="<img src=\"$6\" width=\"$4\" height=\"$5\" border=\"0\" alt=\"$2\" title=\"$3\">"]%
-%[*set,&_fmtstring3,="<img src=\"$1\" width=\"$4\" height=\"$5\" border=\"0\" alt=\"$2\" title=\"$3\" srcset=\"$1 1x, $6 2x\">"]%
+%[*set,&_fmtstring0,="<img src=\"$1\" alt=\"$2\" title=\"$3\">"]%
+%[*set,&_fmtstring1,="<img src=\"$1\" width=\"$4\" height=\"$5\" alt=\"$2\" title=\"$3\">"]%
+%[*set,&_fmtstring2,="<img src=\"$6\" width=\"$4\" height=\"$5\" alt=\"$2\" title=\"$3\">"]%
+%[*set,&_fmtstring3,="<img src=\"$1\" width=\"$4\" height=\"$5\" alt=\"$2\" title=\"$3\" srcset=\"$1 1x, $6 2x\">"]%
 %[*set,&_fmtstring,fmtstring1]%
 %[*set,&_width,=""]%
 %[*set,&_height,=""]%
@@ -140,10 +140,10 @@ ENDDOC
 %[*block,&getimgdiv,^END]%
 %[*set,&_class,=""]%
 %[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
-%[*set,&_fmtstring0,="<div$5>$10<img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\">$11<p class=\"caption\">$6</p></div>\\n"]%
-%[*set,&_fmtstring1,="<div$5 style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
-%[*set,&_fmtstring2,="<div$5 style=\"width: $7px;\">$10<img src=\"$9\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
-%[*set,&_fmtstring3,="<div$5 style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\">$11$12</div>\\n"]%
+%[*set,&_fmtstring0,="<div$5>$10<img src=\"$1\" alt=\"$3\" title=\"$4\">$11<p class=\"caption\">$6</p></div>\\n"]%
+%[*set,&_fmtstring1,="<div$5 style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
+%[*set,&_fmtstring2,="<div$5 style=\"width: $7px;\">$10<img src=\"$9\" width=\"$7\" height=\"$8\" alt=\"$3\" title=\"$4\">$11$12</div>\\n"]%
+%[*set,&_fmtstring3,="<div$5 style=\"width: $7px;\">$10<img src=\"$1\" width=\"$7\" height=\"$8\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\">$11$12</div>\\n"]%
 %[*set,&_beglink,=""]%
 %[*set,&_endlink,=""]%
 %[*set,&_fmtstring,=""]%
@@ -206,10 +206,10 @@ ENDDOC
 %[*set,&_class,=""]%
 %[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
 %[*subst,&param7,="'",="&#39;"]%
-%[*set,&_fmtstring0,="<div$5><img src=\"$1\" border=\"0\" alt=\"$3\" title=\"$4\"$10><p class=\"caption\">$6</p></div>\\n"]%
-%[*set,&_fmtstring1,="<div$5 style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
-%[*set,&_fmtstring2,="<div$5 style=\"width: $7px;\"><img src=\"$9\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
-%[*set,&_fmtstring3,="<div$5 style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" border=\"0\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\"$10>$12</div>\\n"]%
+%[*set,&_fmtstring0,="<div$5><img src=\"$1\" alt=\"$3\" title=\"$4\"$10><p class=\"caption\">$6</p></div>\\n"]%
+%[*set,&_fmtstring1,="<div$5 style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
+%[*set,&_fmtstring2,="<div$5 style=\"width: $7px;\"><img src=\"$9\" width=\"$7\" height=\"$8\" alt=\"$3\" title=\"$4\"$10>$12</div>\\n"]%
+%[*set,&_fmtstring3,="<div$5 style=\"width: $7px;\"><img src=\"$1\" width=\"$7\" height=\"$8\" alt=\"$3\" title=\"$4\" srcset=\"$1 1x, $9 2x\"$10>$12</div>\\n"]%
 %[*set,&_ocl,=""]%
 %[*set,&_cap,=""]%
 %[*set,&_fmtstring,=""]%
@@ -274,7 +274,7 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&getimgtag75,^END]%
-%[*set,&_fmtstring1,="<img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$2\" title=\"$3\">"]%
+%[*set,&_fmtstring1,="<img src=\"$1\" width=\"75\" height=\"75\" alt=\"$2\" title=\"$3\">"]%
 %[*shell,&_gifsizer,=gifsize2 \"%[param1]%\"]%
 %[*if,eq,_gifsizer,="",*warn,missing: %[param1]%]%
 %[*format,&_getimgtag_result,_fmtstring1,param1,param2,param3]%
@@ -298,7 +298,7 @@ ENDDOC
 %[*block,&getimgdiv75,^END]%
 %[*set,&_class,=""]%
 %[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
-%[*set,&_fmtstring1,="<div$5 style=\"width: 75px;\">$7<img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\">$8$9</div>\\n"]%
+%[*set,&_fmtstring1,="<div$5 style=\"width: 75px;\">$7<img src=\"$1\" width=\"75\" height=\"75\" alt=\"$3\" title=\"$4\">$8$9</div>\\n"]%
 %[*set,&_beglink,=""]%
 %[*set,&_endlink,=""]%
 %[*set,&_cap,=""]%
@@ -343,7 +343,7 @@ ENDDOC
 %[*set,&_class,=""]%
 %[*if,ne,param5,="",*set,&_class,=" class=",quote,param5,quote]%
 %[*subst,&param7,="'",="&#39;"]%
-%[*set,&_fmtstring1,="<div$5 style=\"width: 75px;\"><img src=\"$1\" width=\"75\" height=\"75\" border=\"0\" alt=\"$3\" title=\"$4\"$7>$8</div>\\n"]%
+%[*set,&_fmtstring1,="<div$5 style=\"width: 75px;\"><img src=\"$1\" width=\"75\" height=\"75\" alt=\"$3\" title=\"$4\"$7>$8</div>\\n"]%
 %[*set,&_ocl,=""]%
 %[*set,&_cap,=""]%
 %[*set,&_tfilename2x,=""]%
@@ -407,10 +407,10 @@ ENDDOC
 %[*set,&_bigfilepath,_imgdir,param3]%
 %[*set,&_bigfilepath2x,=""]%
 %[**  **]%
-%[*set,&_fmt_no1x_no2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"$4\"></a></li>\\n"]%
-%[*set,&_fmt_1x_no2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" data-width=\"$8\" data-height=\"$9\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"$4\"></a></li>\\n"]%
-%[*set,&_fmt_no1x_2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" data-width=\"$8\" data-height=\"$9\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"$4\"></a></li>\\n"]%
-%[*set,&_fmt_1x_2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" data-width=\"$8\" data-height=\"$9\" data-srcset=\"$6 1x, $7 2x\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\" title=\"$4\"></a></li>\\n"]%
+%[*set,&_fmt_no1x_no2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" alt=\"\" title=\"$4\"></a></li>\\n"]%
+%[*set,&_fmt_1x_no2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" data-width=\"$8\" data-height=\"$9\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" alt=\"\" title=\"$4\"></a></li>\\n"]%
+%[*set,&_fmt_no1x_2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" data-width=\"$8\" data-height=\"$9\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" alt=\"\" title=\"$4\"></a></li>\\n"]%
+%[*set,&_fmt_1x_2x,="<li><a href=\"$6\" data-fancybox=\"$1\" data-caption=\"$4\" data-width=\"$8\" data-height=\"$9\" data-srcset=\"$6 1x, $7 2x\" title=\"$4\"><img src=\"$2$3\" width=\"75\" height=\"75\" alt=\"\" title=\"$4\"></a></li>\\n"]%
 %[*set,&_fmt,_fmt_1x_no2x]%
 %[**  **]%
 %[** .. look for thumb using helper Perl program **]%
@@ -453,7 +453,7 @@ END
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
 %[*block,&lightbox_li,^END]%
-%[*set,&_fmt,="<li><a href=\"mulimg/$3\" data-fancybox=\"$1\" data-caption=\"$4\" title=\"$4\"><img src=\"$2/$3\" width=\"75\" height=\"75\" border=\"0\" alt=\"\"></a></li>\\n"]%
+%[*set,&_fmt,="<li><a href=\"mulimg/$3\" data-fancybox=\"$1\" data-caption=\"$4\" title=\"$4\"><img src=\"$2/$3\" width=\"75\" height=\"75\" alt=\"\"></a></li>\\n"]%
 %[*format,&_result,_fmt,param1,param2,param3,param4]%
 %[_result]%
 END
@@ -573,7 +573,7 @@ ENDDOC
 %[*block,&imgtag,^END]%
 %[*shell,&_gifsizer,=gifsize \"%[param1]%\"]%
 %[*if,eq,_gifsizer,="",*set,&_gifsizer,="\"\""]%
-%[*set,&imgtag_result,="<img src=",_gifsizer,=" border=\"0\" alt=\"",param2,="\" title=\"",param3,="\">"]%
+%[*set,&imgtag_result,="<img src=",_gifsizer,=" alt=\"",param2,="\" title=\"",param3,="\">"]%
 END
 %[*block,&doc,^ENDDOC]%
  ================================================================
@@ -600,7 +600,7 @@ ENDDOC
 %[*subst,&_width,="\".*$",=""]%
 %[*set,&_imgdiv_result,="<div",_class,=" style=\"width: ",_width,="px;\">"]%
 %[*if,ne,param2,="",*concat,&_imgdiv_result,="<a href=",quote,param2,quote,=">"]%
-%[*concat,&_imgdiv_result,="<img src=",_gifsizer,=" border=\"0\" alt=",quote,param3,quote,=" title=",quote,param4,quote,=" />"]%
+%[*concat,&_imgdiv_result,="<img src=",_gifsizer,=" alt=",quote,param3,quote,=" title=",quote,param4,quote,=" />"]%
 %[*if,ne,param2,="",*concat,&_imgdiv_result,="</a>"]%
 %[*concat,&_imgdiv_result,="<p class=\"caption\">",param6,="</p></div>\\n"]%
 %[*expandv,&_imgdiv_result,_imgdiv_result]%
@@ -652,7 +652,7 @@ ENDDOC
 %[*if,ne,param2,="",*subst,&_theight,="\".*$",=""]%
 %[*if,ne,param2,="",*set,&_imgpopdiv_ocl,=" onClick=",quote,="showLightBox('",param2,="','",_twidth,="','",_theight,="','",param3,="','','",param7,="')",quote]%
 %[** generate the img tag **]%
-%[*concat,&_imgpopdiv_result,="<img src=",_gifsizer,=" border=\"0\" alt=",quote,param3,quote,=" title=",quote,param4,quote,_imgpopdiv_ocl,=" />"]%
+%[*concat,&_imgpopdiv_result,="<img src=",_gifsizer,=" alt=",quote,param3,quote,=" title=",quote,param4,quote,_imgpopdiv_ocl,=" />"]%
 %[*concat,&_imgpopdiv_result,="<p class=\"caption\">",param6,="</p></div>\\n"]%
 %[*expandv,&_imgpopdiv_result,_imgpopdiv_result]%
 %[*expandv,&_imgpopdiv_result,_imgpopdiv_result]%
