@@ -181,6 +181,9 @@ sub expandstring {
 	    $o = '';
 	} elsif (($state == 1) && (substr($s, $i, 2) eq "]%")) { # inside brackets, look for end of evaluation
 	    #warn "trace ket push $o\n"; ## DEBUG
+	    #warn "   stack  @stack\n";
+	    #warn "   args   @args\n";
+	    #warn "   svargs @svargs\n";
 	    push @args, $o;	# Save last argument.
 	    $o = pop @stack;	# Restore the saved string from before evaluation started.
 	    #warn "trace popped $o, args @args\n"; ## DEBUG
@@ -201,6 +204,9 @@ sub expandstring {
 	    $i++;		# 2-char item
 	} elsif (($state != 2) && (substr($s, $i, 2) eq "%[")) { # Not inside quotes, look for open pct-bracket
 	    #warn "trace bra\n"; ## DEBUG
+	    #warn "   stack  @stack\n";
+	    #warn "   args   @args\n";
+	    #warn "   svargs @svargs\n";
 	    push @stack, $o;	# Save what we were working on.
 	    $o = '';		# Work on a new string.
 	    push @svargs, @args; # Save the args.
@@ -524,19 +530,19 @@ sub getv {
 	    } else {
 		&setter($symtbptr, $varname, int(($val / $v0) + 0.5));
 	    }
-	} elsif ($cmd eq 'scale') { # *scale,&varname,val,base,range -- store int(((val*base)/range)+0.5) into varname
-	    # for example, *scale,&ans,observedvar,containersize,biggestvalue
+	} elsif ($cmd eq 'scale') { # *scale,&varname,val,range,base -- store int(((val*base)/range)+0.5) into varname
+	    # for example, *scale,&ans,observedvar,biggestvalue,containersize
 	    # or *scale,&percent,observed,max,=100
 	    $varname = &argshouldbeginwith($symtbptr, '&', shift);
 	    $v1 = shift; # val
-	    $v2 = shift; # containersize = v3
-	    $v3 = shift; # maxval = v0
+	    $v2 = shift; # maxval
+	    $v3 = shift; # containersize
 	    &checkextraargs($symtbptr, @_);
 	    $val = &gvalue($v1, $symtbptr); # value to be scaled
 	    $val = 0 if $val eq ""; # avoid -w errors
-	    $v0 = &gvalue($v2, $symtbptr); # max value v0
+	    $v0 = &gvalue($v2, $symtbptr); # max value observed
 	    $v0 = 0 if $v0 eq ""; # avoid -w errors
-	    $v3 = &gvalue($v3, $symtbptr); # max scaled value v3
+	    $v3 = &gvalue($v3, $symtbptr); # max scaled value, container size
 	    $v3 = 0 if $v3 eq ""; # avoid -w errors
 	    if (($v0+0) == 0) {
 		&setter($symtbptr, $varname, 0); # divide by 0
@@ -1501,8 +1507,7 @@ sub expandMulticsBody {
 
     # do these first, since some of the DB expansions may surround SPAN shortcuts .. otherwise it fucks up
     # change {:xxx:} to surround it with "bracketcolonclass"
-    #$d =~ s/([^\\])\{:([^}]+):\}/$1\<span class=\"$bcc\"\>$2\<\/span\>/g; # TEST .. fails on string beginning with {
-    $d =~ s/\{:([^}]+):\}/\<span class=\"$bcc\"\>$1\<\/span\>/g;
+    $d =~ s/([^\\])\{:([^}]+):\}/$1\<span class=\"$bcc\"\>$2\<\/span\>/g; # TEST
     # change {=xxx=} to surround it with "bracketequalclass"
     $d =~ s/\{=([^}]+)=\}/\<span class=\"$bec\"\>$1\<\/span\>/g;
     # change {+xxx+} to surround it with "bracketplusclass"

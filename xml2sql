@@ -38,6 +38,7 @@
 #  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 #  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. 
 
+use expandfile;
 use readbindxml;
 
 if ($#ARGV < 0) {
@@ -71,7 +72,7 @@ my @lines = <IN>;		# read whole file
 close(IN);
 my $xmlstring = join('', @lines);
 my $xmlexpand = sub {           # closure invoked after reading each item in the XML
-    my @fldlist = split(/ /, $vx{'_xmlfields'}); # set in first pass before we read any data
+    my @fldlist = split(/ /, $vx{'_xf_xmlfields'}); # set in first pass before we read any data
     my $temprow = '(';
     foreach $field (@fldlist) {
 	if ($field ne '') {	# field shd not be blank
@@ -85,6 +86,9 @@ my $xmlexpand = sub {           # closure invoked after reading each item in the
     $mysqlvalues .= $temprow;
 };
 my $nitems = &readbindxml($xmlstring, \%vx, $xmlexpand, $xpath);  # for each item, generate a row for adding to SQL
+if ($vx{'_xf_xmlfields'} eq '') {
+    die "_xf_xmlfields is empty for $xpath";
+}
 
 # output the header
 print "-- created by xml2sql from $xmlfile\n";
@@ -93,7 +97,7 @@ print "CREATE TABLE $tablename (\n";
 
 # output the CREATE TABLE declarations for each field
 my $tempdcl = '';
-my @fldlist2 = split(/ /, $vx{'_xmlfields'});
+my @fldlist2 = split(/ /, $vx{'_xf_xmlfields'});
 foreach $field (@fldlist2) {
     if ($field ne '') {	# field shd not be blank
 	my $maxch = $vmax{$field};

@@ -31,6 +31,7 @@ if ($#ARGV < 0) {
     die "Usage: gifsize2 name.type [suffix]";
 } # if $#ARGV
 
+
 my $file = shift;
 $file =~ s/%20/ /g; # fix encoded spaces in pathname
 my $suffix = shift;
@@ -39,9 +40,17 @@ if ($suffix ne "") {
 	$file = "$1-$suffix.$2";
     }
 }
+
+#open(LOG, ">>gf2log") or die;
+#print LOG "-gifsize2 $file $suffix\n";
 my $tags = "0 0";
 if (!open(GRAPHIC, "$file")) {
+    #$ec = $!;
+    #$x = `pwd`;
+    #chomp($x);
+    #print LOG "_gifsize2 $file $suffix $ec $x\n";
     print "\n";
+    close LOG;
     exit(0);
 }
 binmode(GRAPHIC);		# necessary for non UNIX perl. just leave it.
@@ -55,6 +64,8 @@ if ($file =~ /\.gif$/i) {
 } else {
     $tags = "";
 }
+#print LOG "+gifsize2 $file $tags\n";
+close LOG;
 
 close (GRAPHIC);
 # will this work with spaces in the file name

@@ -2,7 +2,7 @@
 .\" see https://wpollock.com/AUnix2/manpages.pdf
 .\" Contact thvv@multicians.org to correct errors or typos.
 .\" ================================================================
-.TH man 8 "14 Apr 2021" "1.3" "expandfile man page"
+.TH man 8 "12 Apr 2022" "1.4" "expandfile man page"
 .\" ================================================================
 .SH NAME
 expandfile \- expand template files
@@ -260,9 +260,9 @@ and store the result in
 .B result
 If divide by zero is attempted, the value is 0.
 .\" ================
-.IP %[*scale,&result,numval,base,range]%
+.IP %[*scale,&result,numval,range,base]%
 Compute
-.I int(((numval*range)/base)+0.5)
+.I int(((numval*base)/range)+0.5)
 and store the result in
 .B result
 .\" ================

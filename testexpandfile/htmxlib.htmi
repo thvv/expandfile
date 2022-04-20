@@ -390,7 +390,7 @@ END
    param4 - caption
    param5 - optional directory name in /mxs where large images reside .. if not specified, use "mulimg"
  usage:  *callv,getfancybox_li,="gal1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"
- output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" border="0" alt=""></a></li>
+ output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" alt=""></a></li>
  THVV 05/05/19 1.0
  THVV 05/23/20 2.0 support variable imgdir in param5, do RESPONSIVE html if 2x version is provided
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -448,7 +448,7 @@ END
    param3 - image file name
    param4 - caption
  usage:  *callv,lightbox_li,="gal1",="thumbnails150",="m50-fano.jpg",="Prof. Robert Fano, Founding Director of Project MAC [THVV]"
- output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" border="0" alt=""></a></li>
+ output: <li><a href="mulimg/m50-fano.jpg" data-fancybox="gal1" data-caption="Prof. Robert Fano, Founding Director of Project MAC [THVV]" title="Prof. Robert Fano, Founding Director of Project MAC [THVV]"><img src="thumbnails150/m50-fano.jpg" width="75" height="75" alt=""></a></li>
  THVV 05/05/19 1.0
  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 ENDDOC
