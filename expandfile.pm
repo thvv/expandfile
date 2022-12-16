@@ -79,8 +79,9 @@
 # 04/11/21 THVV 5.3 do not let *bindcsv set vars beginning with _ or . for security 
 # 04/12/21 THVV 5.3 remove debugging code for old comma and vbar syntax. Expanding %[x,y,z]% will look for a var "x,y,z". Expanding %[x|<|>]% will get an error.
 # 06/22/21 THVV 5.31 Mark the place where sqlite would be inserted, but comment it out, does not work.
+# 12/09/22 THVV 5.32 use gzcat or zcat
 
-# Copyright (c) 2003-2021 Tom Van Vleck
+# Copyright (c) 2003-2022 Tom Van Vleck
  
 #  Permission is hereby granted, free of charge, to any person obtaining
 #  a copy of this software and associated documentation files (the
@@ -1027,11 +1028,22 @@ sub iterateCSV {
     my @labels;
     my @vals;
     my $nrows = 0;
+    my $catter = "";
+    my $zcok = `which zcat`;
+    my $gzcok = `which gzcat`;
+    $catter = "zcat" if $zcok ne "";
+    $catter = "gzcat" if $gzcok ne "";
     
     my $fh = $incl++;
     if ($csvfile =~ /\.gz$|\.z$/i) {
-    	if (!open($fh, "gzcat $csvfile |")) {
-	    &errmsg($symtbptr, 1, "error: missing compressed CSV file '$csvfile' $! in *csvloop");
+	my $catter = "";
+	my $zcok = `which zcat`;
+	my $gzcok = `which gzcat`;
+	$catter = "zcat" if $zcok ne "";
+	$catter = "gzcat" if $gzcok ne "";
+	die "error: neither zcat or gzcat found, cannot open $csvfile" if $catter eq "";
+    	if (!open($fh, "$catter $csvfile |")) {
+	    &errmsg($symtbptr, 1, "error: cannot open compressed CSV file '$csvfile' $! in *csvloop");
 	}
     } else {
     	if (!open($fh, "$csvfile")) {
@@ -1130,6 +1142,11 @@ sub bindCSV {
     my @labels;
     my @vals;
     my $nrows = 0;
+    my $catter = "";
+    my $zcok = `which zcat`;
+    my $gzcok = `which gzcat`;
+    $catter = "zcat" if $zcok ne "";
+    $catter = "gzcat" if $gzcok ne "";
 
     if ($csvfile =~ /^https?:\/\//i) {
 	# call  LWP::Simple::get $csvfile 
@@ -1139,7 +1156,8 @@ sub bindCSV {
     } else {			# not http, local file
 	my $fh = $incl++;
 	if ($csvfile =~ /\.gz$|\.z$/i) {
-	    if (!open($fh, "gzcat $csvfile |")) {
+	    die "error: neither zcat or gzcat found, cannot open $csvfile" if $catter eq "";
+	    if (!open($fh, "$catter $csvfile |")) {
 		&errmsg($symtbptr, 0, "error: missing compressed CSV file '$csvfile' $! in *bindcsv");
 	    }
 	} else {

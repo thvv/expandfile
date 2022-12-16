@@ -48,6 +48,7 @@
 # 2020-08-30 THVV changes for expandfile3
 # 2020-09-15 THVV improve tracing and warning
 # 2021-04-15 THVV using expandfile.pm
+# 2022-12-09 THVV use zcat or gzcat
 #
 # Copyright (c) 2015-2020 Tom Van Vleck
  
@@ -93,7 +94,13 @@ sub iterateXML {
     my $result = '';
     my $fh = $incl++;		# increase global filehandle counter
     if ($xmlfile =~ /\.gz$|\.z$/i) {
-    	if (!open($fh, "gzcat $xmlfile |")) {
+	my $catter = "";
+	my $zcok = `which zcat`;
+	my $gzcok = `which gzcat`;
+	$catter = "zcat" if $zcok ne "";
+	$catter = "gzcat" if $gzcok ne "";
+	die "error: neither zcat or gzcat found, cannot open $xmlfile" if $catter eq "";
+    	if (!open($fh, "$catter $xmlfile |")) {
 	    &expandfile::errmsg($symtbptr, 1, "error: missing compressed XML file '$xmlfile' $! in *xmlloop");
 	}
     } else {
