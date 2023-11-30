@@ -13,6 +13,7 @@
  .. 2020-07-29 THVV add wrap and firstnonempty
  .. 2020-11-13 THVV unique temp file name for wrap and firstnonempty
  .. 2021-05-25 THVV https
+ .. 2023-07-18 THVV remove trailing / in imgdiv
  ================================================================
  Contents
    getimgtag
@@ -600,7 +601,7 @@ ENDDOC
 %[*subst,&_width,="\".*$",=""]%
 %[*set,&_imgdiv_result,="<div",_class,=" style=\"width: ",_width,="px;\">"]%
 %[*if,ne,param2,="",*concat,&_imgdiv_result,="<a href=",quote,param2,quote,=">"]%
-%[*concat,&_imgdiv_result,="<img src=",_gifsizer,=" alt=",quote,param3,quote,=" title=",quote,param4,quote,=" />"]%
+%[*concat,&_imgdiv_result,="<img src=",_gifsizer,=" alt=",quote,param3,quote,=" title=",quote,param4,quote,=">"]%
 %[*if,ne,param2,="",*concat,&_imgdiv_result,="</a>"]%
 %[*concat,&_imgdiv_result,="<p class=\"caption\">",param6,="</p></div>\\n"]%
 %[*expandv,&_imgdiv_result,_imgdiv_result]%
@@ -652,7 +653,7 @@ ENDDOC
 %[*if,ne,param2,="",*subst,&_theight,="\".*$",=""]%
 %[*if,ne,param2,="",*set,&_imgpopdiv_ocl,=" onClick=",quote,="showLightBox('",param2,="','",_twidth,="','",_theight,="','",param3,="','','",param7,="')",quote]%
 %[** generate the img tag **]%
-%[*concat,&_imgpopdiv_result,="<img src=",_gifsizer,=" alt=",quote,param3,quote,=" title=",quote,param4,quote,_imgpopdiv_ocl,=" />"]%
+%[*concat,&_imgpopdiv_result,="<img src=",_gifsizer,=" alt=",quote,param3,quote,=" title=",quote,param4,quote,_imgpopdiv_ocl,=">"]%
 %[*concat,&_imgpopdiv_result,="<p class=\"caption\">",param6,="</p></div>\\n"]%
 %[*expandv,&_imgpopdiv_result,_imgpopdiv_result]%
 %[*expandv,&_imgpopdiv_result,_imgpopdiv_result]%
