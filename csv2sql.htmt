@@ -5,7 +5,7 @@
 %[** . output: MySQL table definition and initialization on stdout  **]%
 %[** ..  **]%
 %[** THVV 03/27/18 v1 **]%
-%[** THVV 09/15/20 v2 expandfile3 **]%
+%[** THVV 09/15/20 v2 expandfile **]%
 %[** ---------------------------------------------------------------- **]%
 %[**  Permission is hereby granted, free of charge, to any person obtaining  **]%
 %[**  a copy of this software and associated documentation files (the  **]%

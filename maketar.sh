@@ -6,12 +6,12 @@
 COPYFILE_DISABLE=1 tar cf htmxkit.tar README.txt
 COPYFILE_DISABLE=1 tar rf htmxkit.tar checknonempty
 COPYFILE_DISABLE=1 tar rf htmxkit.tar cr2nl
-COPYFILE_DISABLE=1 tar rf htmxkit.tar csv2sql3.htmt
-COPYFILE_DISABLE=1 tar rf htmxkit.tar expandfile3
+COPYFILE_DISABLE=1 tar rf htmxkit.tar csv2sql.htmt
+COPYFILE_DISABLE=1 tar rf htmxkit.tar expandfile
 COPYFILE_DISABLE=1 tar rf htmxkit.tar expandfile.man
-COPYFILE_DISABLE=1 tar rf htmxkit.tar expandfile3.pm
-COPYFILE_DISABLE=1 tar rf htmxkit.tar readbindsql3.pm
-COPYFILE_DISABLE=1 tar rf htmxkit.tar readbindxml3.pm
+COPYFILE_DISABLE=1 tar rf htmxkit.tar expandfile.pm
+COPYFILE_DISABLE=1 tar rf htmxkit.tar readbindsql.pm
+COPYFILE_DISABLE=1 tar rf htmxkit.tar readbindxml.pm
 COPYFILE_DISABLE=1 tar rf htmxkit.tar expandfile_config
 COPYFILE_DISABLE=1 tar rf htmxkit.tar filedaysold
 COPYFILE_DISABLE=1 tar rf htmxkit.tar filemodiso

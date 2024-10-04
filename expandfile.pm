@@ -80,6 +80,7 @@
 # 04/12/21 THVV 5.3 remove debugging code for old comma and vbar syntax. Expanding %[x,y,z]% will look for a var "x,y,z". Expanding %[x|<|>]% will get an error.
 # 06/22/21 THVV 5.31 Mark the place where sqlite would be inserted, but comment it out, does not work.
 # 12/09/22 THVV 5.32 use gzcat or zcat
+# 10/01/23 THVV 5.33 do not put '>' in filenames, *shell may then destroy files
 
 # Copyright (c) 2003-2022 Tom Van Vleck
  
@@ -637,7 +638,7 @@ sub getv {
 	    #warn "trace *callv,$v0,@_\n";
 	    if ($val ne "") {
 		my $prevfilename = &getter($symtbptr, '_xf_currentfilename');
-		&catter($symtbptr, '_xf_currentfilename', '>' . $v0);
+		&setter($symtbptr, '_xf_currentfilename', $v0); # greater-than was a terrible idea
 		# if a function peeks at its args, it might see leftover args from a previous callv
 		$i = 1;
 		@savedparams = ();  # save the old values of paramX
@@ -1368,7 +1369,7 @@ sub insert_and_expand_file {
     $/ = $olddelim;
     $content = &expandblocks($content, $xptr); # make *include honor *block ---- push and pop here? no.
     my $oldfilename = &getter($xptr, '_xf_currentfilename');
-    &catter($xptr, '_xf_currentfilename', '>' . $filename);
+    &setter($xptr, '_xf_currentfilename', $filename); # '>' was a terrible idea, *shell destroyed filename
     my $ans = &expandstring(&expandMulticsBody($content, $xptr), $xptr); # rescan its value to execute *set, *include, etc
     &setter($xptr, '_xf_currentfilename', $oldfilename); # pop
     return $ans;
